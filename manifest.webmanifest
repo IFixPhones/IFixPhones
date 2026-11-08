@@ -1,6 +1,6 @@
 {
   "name": "iFixPhones Tickets",
-  "short_name": "Tickets",
+  "short_name": "iFix Tickets",
   "start_url": "/tickets.html",
   "scope": "/",
   "display": "standalone",

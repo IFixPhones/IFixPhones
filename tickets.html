@@ -7,6 +7,11 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="iFix Tickets">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <script src="fb-app.js"></script>
 <script src="fb-auth.js"></script>
@@ -64,7 +69,7 @@ a{color:var(--link);text-decoration:none}
 @media (max-width:820px){.tabs{display:none}.top .tin{gap:10px}.me .nm{display:none}.me{padding:4px}.newtxt{display:none}}
 
 .wrap{max-width:1200px;margin:0 auto;padding:22px 20px 120px}
-.mtabs{display:none;margin-bottom:14px}
+.mtabs{display:none;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 @media (max-width:820px){.mtabs{display:flex}.mtabs.tabs button{flex:1;padding:6px 4px;font-size:13px}}
 
 /* stats */
@@ -192,6 +197,28 @@ button.stat:hover{box-shadow:inset 0 0 0 1px var(--line)}
 .bk .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .tagk{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.02em}
 .tagk.mob{background:#fff1e0;color:#b25000}.tagk.shop{background:#e8f1fd;color:#0058b0}.tagk.q{background:#f0eafc;color:#6a3fc1}.tagk.ok{background:#e6f4ea;color:#1a7f37}.tagk.gr{background:#f0f0f2;color:#6e6e73}
+.bkbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.wd{background:#fff;border-radius:var(--r);min-height:220px;display:flex;flex-direction:column;overflow:hidden}
+.wd.today{box-shadow:inset 0 0 0 2px var(--blue)}
+.wd.past{opacity:.6}
+.wd.closed{background:repeating-linear-gradient(-45deg,#fff,#fff 8px,#f5f5f7 8px,#f5f5f7 16px)}
+.wdh{padding:10px 10px 8px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;align-items:baseline}
+.wdh b{font-size:15px}.wdh span{font-size:12px;color:var(--graphite)}
+.wdb{padding:6px;display:flex;flex-direction:column;gap:5px;flex:1}
+.ap{border:0;text-align:left;background:var(--mist);border-radius:9px;padding:6px 8px;font-size:12.5px;line-height:1.3;border-left:3px solid #0058b0;width:100%}
+.ap.mob{border-left-color:#d06a00}.ap.new{background:#eaf2fe}.ap.done{opacity:.55}
+.ap b{display:block;font-size:12.5px}.ap span{display:block;color:var(--graphite);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wdf{padding:6px 8px 8px;display:flex;justify-content:space-between;gap:6px}
+.wdf .link{font-size:12.5px}
+.closedtag{font-size:11.5px;font-weight:700;color:var(--red)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:6px;margin-top:8px}
+.slot{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 4px;font-size:13px;text-align:center}
+.slot[aria-pressed="true"]{background:#1d1d1f;color:#fff;border-color:#1d1d1f}
+.slot:disabled{background:#eaf2fe;color:#0058b0;border-color:#cfe0fb;cursor:default}
+.remind{background:#fff8e6;border-radius:var(--r);padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
+.todayap{background:#fff;border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+@media (max-width:900px){.wk{grid-template-columns:1fr}.wd{min-height:0}.wd.past{display:none}}
 @media (max-width:620px){.bk{grid-template-columns:1fr}.bk .side{text-align:left;align-items:flex-start;flex-direction:row}}
 .panel h2{font-size:19px;letter-spacing:-.02em}
 .panel p.d{color:var(--graphite);font-size:14px;margin:4px 0 14px}
@@ -603,6 +630,9 @@ function startData(){
     if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
     render();
   }, function(){ S.reqsErr = true; render(); }));
+  unsubs.push(db.collection('avail').onSnapshot(function(snap){
+    var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.avail = o; render();
+  }, function(){}));
   unsubs.push(db.collection('tickets').orderBy('createdAt','desc').limit(2000).onSnapshot({includeMetadataChanges:true}, function(snap){
     S.tickets = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
     if (seenTickets && !snap.metadata.fromCache) {
@@ -761,7 +791,10 @@ function ticketsView(){
     rows = '<div class="lhead"><div>Ticket</div><div>Customer</div><div>Device and repair</div><div>Tech</div><div>Status</div><div class="right">Total</div><div class="right">Updated</div></div>' +
       list.map(rowHtml).join('');
   }
-  return stats + bar + '<div class="list">' + rows + '</div>';
+  var sod = new Date(); sod.setHours(0,0,0,0);
+  var tAp = (S.reqs||[]).filter(function(r){ return isBooking(r) && (r.status === 'new' || r.status === 'confirmed') && r.apptAt >= sod.getTime() && r.apptAt < sod.getTime() + 86400e3; }).sort(function(a,b){ return a.apptAt - b.apptAt; });
+  var strip = tAp.length ? '<div class="todayap"><b>Today:</b>' + tAp.map(function(r){ return '<button class="chip" data-act="rqshow" data-id="'+esc(r.id)+'">'+esc(r.time)+' · '+esc(String(r.name||fmtPhone(r.phone)).split(' ')[0])+(r.where==='mobile'?' · 🚗':'')+'</button>'; }).join('') + '</div>' : '';
+  return strip + stats + bar + '<div class="list">' + rows + '</div>';
 }
 
 function rowHtml(t){
@@ -951,48 +984,145 @@ function settingsView(){
 }
 
 /* ---------- bookings ---------- */
+var BHOURS = {0:[720,1080],1:[600,1200],2:[600,1200],3:[600,1200],4:[600,1200],5:[600,1200],6:[600,1200]};
+var SITE_REPAIRS = ['Screen','Battery','Charging port','Back glass','Camera','Water damage','Speaker or mic','Buttons','Not sure'];
+function pad2(n){ return (n<10?'0':'') + n; }
+function isoDay(d){ return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
+function parseDay(v){ var p = String(v||'').split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function fmtMin(min){ var h = Math.floor(min/60), m = min%60, ap = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + (m ? ':' + pad2(m) : '') + ' ' + ap; }
+function dayTimes(day){ var h = BHOURS[parseDay(day).getDay()], out = []; for (var m = h[0]; m <= h[1]-60; m += 30) out.push(fmtMin(m)); return out; }
+function timeToMs(day, t){ var m = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(String(t||'').trim()); if (!day || !m) return 0; var d = parseDay(day); d.setHours((+m[1]) % 12 + (/pm/i.test(m[3]) ? 12 : 0), +(m[2]||0), 0, 0); return d.getTime(); }
+function niceDay(day){ return parseDay(day).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+function whenStr(day, t){ return parseDay(day).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' at ' + t; }
+function availOf(day){ return (S.avail && S.avail[day]) || {}; }
+function slotK(where){ return where === 'mobile' ? 'mobile' : 'shop'; }
+function blockK(where){ return where === 'mobile' ? 'blockedMobile' : 'blockedShop'; }
+function slotBusy(day, where, t, exceptId){
+  var a = availOf(day);
+  if ((a[blockK(where)]||[]).indexOf(t) > -1) return 'Blocked';
+  if ((a[slotK(where)]||[]).indexOf(t) > -1) {
+    var own = (S.reqs||[]).some(function(r){ return r.id === exceptId && r.day === day && r.time === t && slotK(r.where) === slotK(where); });
+    return own ? '' : 'Booked';
+  }
+  return '';
+}
+function FV(){ return firebase.firestore.FieldValue; }
+function slotOp(batch, day, where, t, add){
+  if (!day || !t) return;
+  var o = {}; o[slotK(where)] = add ? FV().arrayUnion(t) : FV().arrayRemove(t);
+  batch.set(S.db.doc('avail/' + day), o, {merge:true});
+}
+function commitBatch(fn, okMsg){
+  var b = S.db.batch(); fn(b);
+  return retryOnce(function(){ return b.commit(); }).then(function(){ if (okMsg) toast(okMsg); }).catch(writeErr);
+}
+function isBooking(r){ return r.kind !== 'quote' && r.day && r.time; }
+function holdsSlot(r){ return isBooking(r) && r.status !== 'cancel'; }
+
 function reqBox(r){
   var isQ = r.kind === 'quote';
   var tag = isQ ? '<span class="tagk q">Quote</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
   var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
   var first = String(r.name||'').split(' ')[0];
+  var place = r.where === 'mobile' ? '' : ' at 9055 Marbach Rd, Suite 105';
   var msg = isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
-    : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + (r.where==='mobile' ? '. We’ll text you when we’re on the way.' : ' at 9055 Marbach Rd, Suite 105.') + ' Reply here if anything changes.';
+    : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + place + '.' + (r.where==='mobile' ? ' We’ll text you when we’re on the way.' : '') + ' Reply here if anything changes.';
+  var rem = 'Hi ' + (first||'there') + ', reminder from iFixPhones: your ' + (r.repair||'repair') + ' appointment is ' + (sameDay(r.apptAt, Date.now()) ? 'today' : 'tomorrow') + ' at ' + (r.time||'') + place + '. Reply here if you need to change it.';
   var when = isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
-  var late = !isQ && r.apptAt && r.apptAt < Date.now() && (r.status === 'new' || r.status === 'confirmed');
-  return '<div class="bk'+(r.status==='new'?' new':'')+'">' +
+  var open = r.status === 'new' || r.status === 'confirmed';
+  var late = !isQ && r.apptAt && r.apptAt < Date.now() - 3600e3 && open;
+  var soon = !isQ && open && r.apptAt && r.apptAt > Date.now() && r.apptAt - Date.now() < 36*3600e3;
+  return '<div class="bk'+(r.status==='new'?' new':'')+'" id="bk-'+esc(r.id)+'">' +
     '<div><div class="when">'+when+(late?' <span style="color:var(--red);font-size:13px;font-weight:600">· time passed</span>':'')+'</div>' +
       '<div class="who">'+(r.name ? '<b>'+esc(r.name)+'</b> · ' : '')+'<a href="tel:'+esc(e164(r.phone))+'">'+esc(fmtPhone(r.phone))+'</a></div>' +
-      '<div class="meta">'+esc(r.device||'')+(r.repair ? ' · '+esc(r.repair) : '')+(r.screen && !/not sure/i.test(r.screen) ? ' · '+esc(r.screen.replace(/\s*\(.*\)$/,'')) : '')+'</div>' +
+      '<div class="meta">'+esc(r.device||'')+(r.repair ? ' · '+esc(r.repair) : '')+(r.screen && !/not sure/i.test(r.screen) ? ' · '+esc(String(r.screen).replace(/\s*\(.*$/,'')) : '')+(r.source==='shop' ? ' · added by '+esc(r.createdBy||'staff') : '')+'</div>' +
       (r.address ? '<div class="meta">📍 <a href="https://maps.google.com/?q='+encodeURIComponent(r.address)+'" target="_blank" rel="noopener">'+esc(r.address)+'</a></div>' : '') +
       (r.notes ? '<div class="note">'+esc(r.notes)+'</div>' : '') +
+      (r.remindedAt ? '<div class="meta" style="margin-top:4px">Reminder sent '+esc(rel(r.remindedAt))+'</div>' : '') +
     '</div>' +
     '<div class="side">'+tag+st+'<span class="t2">'+esc(rel(r.createdAt))+'</span></div>' +
     '<div class="acts">' +
       '<a class="btn sm ghost" href="tel:'+esc(e164(r.phone))+'">Call</a>' +
-      '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(msg)+'" data-req="'+esc(r.id)+'" data-reqsms="1">'+(isQ?'Text quote':'Text to confirm')+'</a>' +
+      (open ? '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(msg)+'" data-rqconfirm="'+esc(r.id)+'">'+(isQ?'Text quote':'Text to confirm')+'</a>' : '') +
+      (soon && r.status === 'confirmed' ? '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(rem)+'" data-rqremind="'+esc(r.id)+'">Text reminder</a>' : '') +
       (r.status === 'new' && !isQ ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="confirmed">Mark confirmed</button>' : '') +
-      (r.status !== 'done' && r.status !== 'cancel' ? '<button class="btn sm" data-act="rqticket" data-id="'+esc(r.id)+'">Make ticket</button>' : '') +
-      (r.status !== 'done' && r.status !== 'cancel' ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="done">'+(isQ?'Quote sent':'Done')+'</button><button class="link red" data-act="rq" data-id="'+esc(r.id)+'" data-v="cancel">Cancel</button>' : '<button class="link" data-act="rq" data-id="'+esc(r.id)+'" data-v="new">Reopen</button><button class="link red" data-act="rqdel" data-id="'+esc(r.id)+'">Delete</button>') +
+      (open && !isQ ? '<button class="btn sm ghost" data-act="rqmove" data-id="'+esc(r.id)+'">Reschedule</button>' : '') +
+      (open ? '<button class="btn sm" data-act="rqticket" data-id="'+esc(r.id)+'">Make ticket</button>' : '') +
+      (r.ticketId ? '<button class="btn sm ghost" data-act="open" data-id="'+esc(r.ticketId)+'">Open ticket #'+esc(r.ticketNum)+'</button>' : '') +
+      (open ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="done">'+(isQ?'Quote sent':'Done')+'</button><button class="link red" data-act="rq" data-id="'+esc(r.id)+'" data-v="cancel">Cancel</button>' : '<button class="link" data-act="rq" data-id="'+esc(r.id)+'" data-v="'+(isQ?'new':'confirmed')+'">Reopen</button><button class="link red" data-act="rqdel" data-id="'+esc(r.id)+'">Delete</button>') +
     '</div></div>';
 }
+
+function weekStart(d){ var x = new Date(d); x.setHours(0,0,0,0); return x; }
 function bookingsView(){
   var all = S.reqs || [];
   if (S.reqsErr) return '<div class="panel empty"><h3>Bookings can’t load</h3><p>Update the Firebase rules (see the setup steps), then reload.</p></div>';
-  var sod = new Date(); sod.setHours(0,0,0,0);
-  var newOnes = all.filter(function(r){ return r.status === 'new'; }).sort(function(a,b){ return (a.apptAt||a.createdAt) - (b.apptAt||b.createdAt); });
-  var upcoming = all.filter(function(r){ return r.status === 'confirmed'; }).sort(function(a,b){ return (a.apptAt||0) - (b.apptAt||0); });
-  var past = all.filter(function(r){ return r.status === 'done' || r.status === 'cancel'; }).slice(0, 30);
+  S.bkMode = S.bkMode || 'list';
+  var bar = '<div class="bkbar"><div class="seg" role="group" aria-label="View"><button data-act="bkmode" data-v="list" aria-pressed="'+(S.bkMode==='list')+'">List</button><button data-act="bkmode" data-v="week" aria-pressed="'+(S.bkMode==='week')+'">Week</button></div>' +
+    '<span class="grow" style="flex:1"></span><button class="btn sm" data-act="addappt">+ Add appointment</button></div>';
+  return bar + (S.bkMode === 'week' ? weekView(all) : listView(all));
+}
+function listView(all){
+  var sod = new Date(); sod.setHours(0,0,0,0); var eod = sod.getTime() + 86400e3;
+  var byTime = function(a,b){ return (a.apptAt||a.createdAt) - (b.apptAt||b.createdAt); };
+  var newOnes = all.filter(function(r){ return r.status === 'new'; }).sort(byTime);
+  var conf = all.filter(function(r){ return r.status === 'confirmed'; }).sort(byTime);
+  var today = conf.filter(function(r){ return r.apptAt && r.apptAt < eod; });
+  var later = conf.filter(function(r){ return !r.apptAt || r.apptAt >= eod; });
+  var past = all.filter(function(r){ return r.status === 'done' || r.status === 'cancel'; }).sort(function(a,b){ return (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt); }).slice(0, 30);
+  var tmr = conf.filter(function(r){ return r.apptAt >= eod && r.apptAt < eod + 86400e3 && !r.remindedAt; });
   if (!all.length) return '<div class="panel empty"><h3>No bookings yet</h3><p>Appointments and quote requests from ifixphones.net show up here right away, with a ding.</p></div>';
-  return (newOnes.length ? '<h3 class="bkh">New · needs a reply</h3>' + newOnes.map(reqBox).join('') : '') +
-    (upcoming.length ? '<h3 class="bkh">Confirmed</h3>' + upcoming.map(reqBox).join('') : '') +
-    (!newOnes.length && !upcoming.length ? '<div class="panel empty" style="padding:30px"><h3>All caught up</h3><p>No new bookings right now.</p></div>' : '') +
+  return (tmr.length ? '<div class="remind"><span>🔔 <b>'+tmr.length+' appointment'+(tmr.length>1?'s':'')+' tomorrow</b> still need'+(tmr.length>1?'':'s')+' a reminder text.</span></div>' : '') +
+    (newOnes.length ? '<h3 class="bkh">New · needs a reply</h3>' + newOnes.map(reqBox).join('') : '') +
+    (today.length ? '<h3 class="bkh">Today</h3>' + today.map(reqBox).join('') : '') +
+    (later.length ? '<h3 class="bkh">Coming up</h3>' + later.map(reqBox).join('') : '') +
+    (!newOnes.length && !conf.length ? '<div class="panel empty" style="padding:30px"><h3>All caught up</h3><p>No open bookings right now.</p></div>' : '') +
     (past.length ? '<h3 class="bkh">Handled</h3>' + past.map(reqBox).join('') : '');
 }
+function weekView(all){
+  var ws = S.weekStart ? new Date(S.weekStart) : weekStart(new Date());
+  var todayIso = isoDay(new Date());
+  var days = []; for (var i = 0; i < 7; i++) { var d = new Date(ws); d.setDate(ws.getDate() + i); days.push(d); }
+  var label = days[0].toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' – ' + days[6].toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  var nav = '<div class="bkbar" style="margin-top:-6px"><button class="btn sm ghost" data-act="wk" data-v="-1" aria-label="Previous week">‹</button><b>'+esc(label)+'</b><button class="btn sm ghost" data-act="wk" data-v="1" aria-label="Next week">›</button><button class="link" data-act="wk" data-v="0">Today</button></div>';
+  var cols = days.map(function(d){
+    var iso = isoDay(d), a = availOf(iso);
+    var items = all.filter(function(r){ return isBooking(r) && r.day === iso && r.status !== 'cancel'; }).sort(function(x,y){ return (x.apptAt||0) - (y.apptAt||0); });
+    var nBlocked = (a.blockedMobile||[]).length + (a.blockedShop||[]).length;
+    return '<div class="wd'+(iso===todayIso?' today':'')+(iso<todayIso?' past':'')+(a.closed?' closed':'')+'">' +
+      '<div class="wdh"><b>'+esc(d.toLocaleDateString('en-US',{weekday:'short'}))+' '+d.getDate()+'</b><span>'+(a.closed ? '<span class="closedtag">Closed</span>' : items.length ? items.length+' appt'+(items.length>1?'s':'') : '')+'</span></div>' +
+      '<div class="wdb">' + (a.closed && a.note ? '<div class="t2" style="white-space:normal">'+esc(a.note)+'</div>' : '') +
+        items.map(function(r){ return '<button class="ap'+(r.where==='mobile'?' mob':'')+(r.status==='new'?' new':'')+(r.status==='done'?' done':'')+'" data-act="rqshow" data-id="'+esc(r.id)+'"><b>'+esc(r.time)+(r.where==='mobile'?' · Mobile':'')+'</b><span>'+esc(r.name||fmtPhone(r.phone))+'</span><span>'+esc((r.device||'')+(r.repair?' · '+r.repair:''))+'</span></button>'; }).join('') +
+      '</div>' +
+      (iso >= todayIso ? '<div class="wdf"><button class="link" data-act="blockday" data-v="'+iso+'">'+(a.closed ? 'Reopen…' : nBlocked ? 'Blocked '+nBlocked+' · edit' : 'Block times')+'</button><button class="link" data-act="addappt" data-v="'+iso+'">+ Add</button></div>' : '') +
+    '</div>';
+  }).join('');
+  return nav + '<div class="wk">' + cols + '</div><p class="hint" style="margin-top:10px">Blue = at the shop · Orange = mobile. Blocked times and closed days can’t be booked on the website.</p>';
+}
+
 function reqById(id){ var a = S.reqs||[]; for (var i=0;i<a.length;i++) if (a[i].id === id) return a[i]; return null; }
 function patchReq(id, fields){
   var r = reqById(id); if (r) { Object.assign(r, fields); render(); }
   return enqueue('requests/'+id, function(){ return retryOnce(function(){ return S.db.doc('requests/'+id).update(Object.assign({updatedAt:Date.now(), handledBy:who()}, fields)); }); }).catch(writeErr);
+}
+function setReqStatus(r, v){
+  var was = r.status, f = {status:v, updatedAt:Date.now(), handledBy:who()};
+  var free = isBooking(r) && v === 'cancel' && was !== 'cancel';
+  var take = isBooking(r) && was === 'cancel' && v !== 'cancel';
+  if (take && slotBusy(r.day, r.where, r.time, r.id)) { toast(r.time + ' on ' + niceDay(r.day) + ' is taken now. Use Reschedule.'); f.status = 'cancel'; v = 'cancel'; take = false; return; }
+  Object.assign(r, f); render();
+  return commitBatch(function(b){
+    b.update(S.db.doc('requests/'+r.id), f);
+    if (free) slotOp(b, r.day, r.where, r.time, false);
+    if (take) slotOp(b, r.day, r.where, r.time, true);
+  }, v === 'cancel' && isBooking(r) ? 'Cancelled. ' + r.time + ' is open again on the website.' : null);
+}
+function deleteReq(r){
+  S.reqs = (S.reqs||[]).filter(function(x){ return x.id !== r.id; }); render();
+  return commitBatch(function(b){
+    b.delete(S.db.doc('requests/'+r.id));
+    if (holdsSlot(r) && r.status !== 'done') slotOp(b, r.day, r.where, r.time, false);
+  }, 'Deleted');
 }
 var SITE_REPAIR = {'Screen':'Screen','Battery':'Battery','Charging port':'Charging port','Back glass':'Back glass','Camera':'Rear camera','Water damage':'Water damage','Speaker or mic':'Loudspeaker','Buttons':'Buttons','Not sure':'Diagnostic'};
 function reqToTicket(r){
@@ -1000,6 +1130,129 @@ function reqToTicket(r){
   ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
     items: [{repair: SITE_REPAIR[r.repair] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: part, price:'', desc: SITE_REPAIR[r.repair] ? '' : (r.notes||'').slice(0,120)}],
     reqId: r.id, notes: r.notes||''});
+}
+
+/* time picker used by Reschedule and Add appointment */
+function timeOptions(day, where, cur, exceptId){
+  if (!day) return '<option value="">Pick a day first</option>';
+  var a = availOf(day);
+  if (a.closed) return '<option value="">Closed this day</option>';
+  var now = Date.now();
+  return '<option value="">Choose a time</option>' + dayTimes(day).map(function(t){
+    var busy = slotBusy(day, where, t, exceptId), past = timeToMs(day, t) < now - 15*60e3;
+    var lab = t + (busy ? ' — ' + busy : past ? ' — past' : '');
+    return '<option value="'+esc(t)+'"'+(busy ? ' disabled' : '')+(t===cur?' selected':'')+'>'+esc(lab)+'</option>';
+  }).join('');
+}
+function modalShell(id, title, inner, foot, wide){
+  var m = document.createElement('div');
+  m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby', id+'-t');
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-mclose></div><div class="mbox'+(wide?'':' sm')+'" style="position:relative;z-index:41;margin-top:6vh'+(wide?';width:min(640px,100%)':'')+'"><div class="mhead"><h2 id="'+id+'-t">'+title+'</h2><button class="x" data-mclose aria-label="Close">✕</button></div><div class="mbody">'+inner+'</div><div class="mfoot"><span class="err" id="'+id+'-err" role="alert"></span>'+foot+'</div></div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(function(){ m.classList.add('on'); });
+  m.addEventListener('click', function(e){ if (e.target.closest('[data-mclose]')) m.remove(); });
+  var onKey = function(e){ if (e.key === 'Escape' && document.body.contains(m)) { e.stopPropagation(); m.remove(); document.removeEventListener('keydown', onKey, true); } };
+  document.addEventListener('keydown', onKey, true);
+  return m;
+}
+function moveBox(r){
+  var m = modalShell('mv', 'Reschedule · '+esc(r.name||fmtPhone(r.phone)),
+    '<p class="muted" style="margin-bottom:12px">Now: <b>'+esc(r.whenText||'')+'</b> ('+(r.where==='mobile'?'mobile':'at the shop')+')</p>' +
+    '<div class="g2"><div class="f"><label for="mv-day">Day</label><input class="in" type="date" id="mv-day" value="'+esc(r.day||'')+'" min="'+isoDay(new Date())+'"></div>' +
+    '<div class="f"><label for="mv-time">Time</label><select class="in" id="mv-time">'+timeOptions(r.day, r.where, r.time, r.id)+'</select></div></div>' +
+    '<label class="check" style="margin-top:14px"><input type="checkbox" id="mv-text" checked>Text the customer the new time</label>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="mv-save">Save new time</button>');
+  $('#mv-day', m).addEventListener('change', function(){ $('#mv-time', m).innerHTML = timeOptions(this.value, r.where, '', r.id); });
+  $('#mv-save', m).addEventListener('click', function(){
+    var day = $('#mv-day', m).value, t = $('#mv-time', m).value;
+    if (!day || !t) { $('#mv-err', m).textContent = 'Pick a day and an open time.'; return; }
+    if (slotBusy(day, r.where, t, r.id)) { $('#mv-err', m).textContent = t + ' is taken. Pick another time.'; return; }
+    if (day === r.day && t === r.time) { m.remove(); return; }
+    var f = {day:day, time:t, whenText:whenStr(day, t), apptAt:timeToMs(day, t), status: r.status === 'new' ? 'confirmed' : r.status, remindedAt:0, updatedAt:Date.now(), handledBy:who()};
+    var oldDay = r.day, oldT = r.time, txt = $('#mv-text', m).checked;
+    Object.assign(r, f); render(); m.remove();
+    commitBatch(function(b){
+      b.update(S.db.doc('requests/'+r.id), f);
+      slotOp(b, oldDay, r.where, oldT, false);
+      slotOp(b, day, r.where, t, true);
+    }, 'Moved to ' + f.whenText);
+    if (txt) { var first = String(r.name||'').split(' ')[0]; location.href = 'sms:' + e164(r.phone) + '?&body=' + encodeURIComponent('Hi ' + (first||'there') + ', this is iFixPhones. Your appointment is now ' + f.whenText + '. Reply here if that doesn’t work.'); }
+  });
+}
+function addApptBox(day){
+  var where = 'shop';
+  var m = modalShell('aa', 'Add appointment',
+    '<p class="muted" style="margin-bottom:12px">For bookings by phone or in person. It blocks the time on the website too.</p>' +
+    '<div class="seg" role="group" aria-label="Where" style="margin-bottom:12px"><button type="button" data-w="shop" aria-pressed="true">At the shop</button><button type="button" data-w="mobile" aria-pressed="false">Mobile</button></div>' +
+    '<div class="g2"><div class="f"><label for="aa-phone">Phone</label><input class="in" id="aa-phone" type="tel" inputmode="tel" placeholder="(210) 555-0123"></div><div class="f"><label for="aa-name">Name</label><input class="in" id="aa-name"></div></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="aa-dev">Device</label><input class="in" id="aa-dev" placeholder="iPhone 15 Pro"></div><div class="f"><label for="aa-rep">Repair</label><select class="in" id="aa-rep">'+SITE_REPAIRS.map(function(x){ return '<option>'+esc(x)+'</option>'; }).join('')+'</select></div></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="aa-day">Day</label><input class="in" type="date" id="aa-day" value="'+esc(day||isoDay(new Date()))+'" min="'+isoDay(new Date())+'"></div><div class="f"><label for="aa-time">Time</label><select class="in" id="aa-time"></select></div></div>' +
+    '<div class="f hidden" id="aa-addrw" style="margin-top:12px"><label for="aa-addr">Address</label><input class="in" id="aa-addr"></div>' +
+    '<div class="f" style="margin-top:12px"><label for="aa-notes">Notes (optional)</label><textarea class="in" id="aa-notes" style="min-height:60px"></textarea></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="aa-save">Add appointment</button>', true);
+  function times(){ $('#aa-time', m).innerHTML = timeOptions($('#aa-day', m).value, where, $('#aa-time', m).value); }
+  times();
+  $('#aa-day', m).addEventListener('change', times);
+  m.addEventListener('click', function(e){
+    var w = e.target.closest('[data-w]'); if (!w) return;
+    where = w.getAttribute('data-w');
+    $$('[data-w]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b === w)); });
+    $('#aa-addrw', m).classList.toggle('hidden', where !== 'mobile'); times();
+  });
+  $('#aa-phone', m).addEventListener('change', function(){
+    var d = digits(this.value); if (d.length < 10) return;
+    var hit = S.tickets.filter(function(t){ return digits(t.customer && t.customer.phone).slice(-10) === d.slice(-10); })[0];
+    if (hit && !$('#aa-name', m).value) { $('#aa-name', m).value = hit.customer.name || ''; if (!$('#aa-dev', m).value) $('#aa-dev', m).value = (hit.device && hit.device.model) || ''; }
+  });
+  requestAnimationFrame(function(){ $('#aa-phone', m).focus(); });
+  $('#aa-save', m).addEventListener('click', function(){
+    var phone = $('#aa-phone', m).value.trim(), name = $('#aa-name', m).value.trim(), dev = $('#aa-dev', m).value.trim(), d = $('#aa-day', m).value, t = $('#aa-time', m).value, addr = $('#aa-addr', m).value.trim();
+    var err = $('#aa-err', m);
+    if (digits(phone).length < 10) { err.textContent = 'Enter a 10-digit phone number.'; return; }
+    if (!dev) { err.textContent = 'Enter the device.'; return; }
+    if (!d || !t) { err.textContent = 'Pick a day and an open time.'; return; }
+    if (where === 'mobile' && !addr) { err.textContent = 'Enter the address.'; return; }
+    if (slotBusy(d, where, t)) { err.textContent = t + ' is taken. Pick another time.'; return; }
+    var now = Date.now(), ref = S.db.collection('requests').doc();
+    var body = {kind:'booking', status:'confirmed', where:where, name:name, phone:fmtPhone(phone), device:dev, repair:$('#aa-rep', m).value, screen:'', day:d, time:t, whenText:whenStr(d, t), apptAt:timeToMs(d, t), address: where === 'mobile' ? addr : '', notes:$('#aa-notes', m).value.trim(), createdAt:now, source:'shop', createdBy:who()};
+    m.remove();
+    commitBatch(function(b){ b.set(ref, body); slotOp(b, d, where, t, true); }, 'Added for ' + body.whenText);
+  });
+}
+function blockDayBox(day){
+  var a = availOf(day), sel = {mobile:(a.blockedMobile||[]).slice(), shop:(a.blockedShop||[]).slice()}, closed = !!a.closed;
+  function grid(where){
+    return dayTimes(day).map(function(t){
+      var booked = (a[slotK(where)]||[]).indexOf(t) > -1;
+      return '<button type="button" class="slot" data-bw="'+where+'" data-t="'+esc(t)+'"'+(booked?' disabled title="Booked"':'')+' aria-pressed="'+(sel[where].indexOf(t)>-1)+'">'+esc(t)+(booked?'<br><small>Booked</small>':'')+'</button>';
+    }).join('');
+  }
+  var m = modalShell('bd', 'Block times · '+esc(niceDay(day)),
+    '<label class="check"><input type="checkbox" id="bd-closed"'+(closed?' checked':'')+'><span><b>Closed all day</b> (holiday, day off). Nobody can book this day.</span></label>' +
+    '<div class="f" style="margin-top:10px"><label for="bd-note">Reason customers see (optional)</label><input class="in" id="bd-note" maxlength="40" placeholder="Thanksgiving" value="'+esc(a.note||'')+'"></div>' +
+    '<div id="bd-grids"'+(closed?' class="hidden"':'')+'><h3 style="margin-top:18px;font-size:15px">Mobile times</h3><p class="hint">Tap a time to block it. Tap again to open it.</p><div class="slots">'+grid('mobile')+'</div>' +
+    '<h3 style="margin-top:18px;font-size:15px">Shop times</h3><div class="slots">'+grid('shop')+'</div></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="bd-save">Save</button>', true);
+  $('#bd-closed', m).addEventListener('change', function(){ $('#bd-grids', m).classList.toggle('hidden', this.checked); });
+  m.addEventListener('click', function(e){
+    var b = e.target.closest('[data-bw]'); if (!b || b.disabled) return;
+    var w = b.getAttribute('data-bw'), t = b.getAttribute('data-t'), i = sel[w].indexOf(t);
+    if (i > -1) sel[w].splice(i, 1); else sel[w].push(t);
+    b.setAttribute('aria-pressed', String(i < 0));
+  });
+  $('#bd-save', m).addEventListener('click', function(){
+    var c = $('#bd-closed', m).checked;
+    var open = (S.reqs||[]).filter(function(r){ return holdsSlot(r) && r.day === day && (r.status === 'new' || r.status === 'confirmed'); });
+    if (c && open.length && !confirm(open.length + ' appointment'+(open.length>1?'s are':' is')+' already booked this day. Close the day anyway? (They stay booked. Reschedule or cancel them.)')) return;
+    var o = {closed:c, note:$('#bd-note', m).value.trim().slice(0,40), blockedMobile:sel.mobile, blockedShop:sel.shop};
+    S.avail = S.avail || {}; S.avail[day] = Object.assign({}, a, o); render(); m.remove();
+    enqueue('avail/'+day, function(){ return retryOnce(function(){ return S.db.doc('avail/'+day).set(o, {merge:true}); }); }).then(function(){ toast(c ? niceDay(day) + ' is closed for booking' : 'Saved'); }).catch(writeErr);
+  });
+}
+function showReq(r){
+  var m = modalShell('rs', esc(r.whenText||'Booking'), '<div style="margin:-6px -4px">'+reqBox(r)+'</div>', '<button class="btn ghost" data-mclose>Close</button>', true);
+  m.classList.add('passacts');
+  m.addEventListener('click', function(e){ if (e.target.closest('[data-act]')) setTimeout(function(){ m.remove(); }, 0); });
 }
 
 /* keep search focus across re-renders */
@@ -1652,7 +1905,14 @@ async function exportCsv(){
 
 /* ---------- events ---------- */
 document.addEventListener('click', async function(e){
-  if (e.target.closest('.modal')) return; // modals handle their own clicks
+  var lk = e.target.closest('[data-rqconfirm],[data-rqremind]');
+  if (lk) {
+    var lr = reqById(lk.getAttribute('data-rqconfirm') || lk.getAttribute('data-rqremind'));
+    if (lr && lk.hasAttribute('data-rqremind')) patchReq(lr.id, {remindedAt: Date.now()});
+    else if (lr && lr.status === 'new' && lr.kind !== 'quote') setTimeout(function(){ setReqStatus(lr, 'confirmed'); }, 300);
+    return;
+  }
+  if (e.target.closest('.modal') && !e.target.closest('.modal.passacts')) return; // modals handle their own clicks
   var a = e.target.closest('[data-act]'); if (!a) return;
   var act = a.getAttribute('data-act');
   var t = S.openId ? byId(S.openId) : null;
@@ -1734,8 +1994,14 @@ document.addEventListener('click', async function(e){
     case 'edit': if (t) ticketForm(t); break;
     case 'print': if (t) printTicket(t); break;
     case 'label': if (t) printLabel(t); break;
-    case 'rq': { var rid = a.getAttribute('data-id'), rv = a.getAttribute('data-v'); if (rv === 'cancel' && !confirm('Cancel this booking?')) break; patchReq(rid, {status: rv}); break; }
-    case 'rqdel': { var did = a.getAttribute('data-id'); if (!confirm('Delete this booking for good?')) break; S.reqs = (S.reqs||[]).filter(function(r){ return r.id !== did; }); render(); enqueue('requests/'+did, function(){ return retryOnce(function(){ return S.db.doc('requests/'+did).delete(); }); }).catch(writeErr); break; }
+    case 'rq': { var rq = reqById(a.getAttribute('data-id')), rv = a.getAttribute('data-v'); if (!rq) break; if (rv === 'cancel' && !confirm('Cancel this booking?' + (isBooking(rq) ? ' ' + rq.time + ' opens up again on the website.' : ''))) break; setReqStatus(rq, rv); break; }
+    case 'rqdel': { var rd = reqById(a.getAttribute('data-id')); if (!rd || !confirm('Delete this booking for good?')) break; deleteReq(rd); break; }
+    case 'rqmove': { var rm = reqById(a.getAttribute('data-id')); if (rm) moveBox(rm); break; }
+    case 'rqshow': { var rs = reqById(a.getAttribute('data-id')); if (rs) showReq(rs); break; }
+    case 'bkmode': S.bkMode = a.getAttribute('data-v'); render(); break;
+    case 'wk': { var dv = +a.getAttribute('data-v'); var base = S.weekStart ? new Date(S.weekStart) : weekStart(new Date()); if (!dv) S.weekStart = null; else { base.setDate(base.getDate() + 7*dv); S.weekStart = base.getTime(); } render(); break; }
+    case 'addappt': addApptBox(a.getAttribute('data-v') || ''); break;
+    case 'blockday': blockDayBox(a.getAttribute('data-v')); break;
     case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
     case 'testalert': alertNew('Test alert', 'This is how new bookings will look.'); pushPhone('Test alert', 'Phone alerts are working.'); break;
     case 'sign': if (t) signBox(t); break;

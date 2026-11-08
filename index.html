@@ -525,6 +525,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
           <h3>Request sent.</h3>
           <p>We'll text you at <b id="doneNum" style="color:var(--ink)"></b> to confirm.</p>
           <div class="sum" id="doneSum"></div>
+          <p style="margin-top:14px"><a href="#" id="addCal" class="hidden">Add to my calendar</a></p>
         </div>
       </div>
     </div>
@@ -680,8 +681,26 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     dateEl.max = t.getFullYear() + '-' + pad(t.getMonth()+1) + '-' + pad(t.getDate());
   })();
 
-  function fillTimes(){
-    var v = dateEl.value;
+  // ---- live availability ----
+  var FS_BASE = 'https://firestore.googleapis.com/v1/projects/ifixphones-ca10e/databases/(default)/documents';
+  var FS_KEY = 'AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI';
+  var AV = {}, avTok = 0;
+  function strList(f){ return f && f.arrayValue && f.arrayValue.values ? f.arrayValue.values.map(function(v){ return v.stringValue; }) : []; }
+  function getAvail(day, fresh){
+    if (AV[day] && !fresh) return Promise.resolve(AV[day]);
+    return fetch(FS_BASE + '/avail/' + day + '?key=' + FS_KEY, {cache:'no-store'}).then(function(r){
+      if (r.status === 404) return {fields:{}};
+      if (!r.ok) throw new Error('avail');
+      return r.json();
+    }).then(function(j){
+      var f = j.fields || {};
+      var a = {mobile:strList(f.mobile), shop:strList(f.shop), blockedMobile:strList(f.blockedMobile), blockedShop:strList(f.blockedShop), closed: !!(f.closed && f.closed.booleanValue), note: f.note && f.note.stringValue || ''};
+      AV[day] = a; return a;
+    });
+  }
+  function slotKey(){ return mode === 'mobile' ? 'mobile' : 'shop'; }
+  function fillTimes(fresh){
+    var v = dateEl.value, keep = timeEl.value;
     timeEl.innerHTML = '';
     if (!v) { timeEl.disabled = true; timeEl.innerHTML = '<option value="">Pick a day first</option>'; return; }
     var p = v.split('-'), dt = new Date(+p[0], +p[1]-1, +p[2]);
@@ -692,15 +711,29 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       var earliest = Math.ceil((now.min + 60) / 30) * 30; // at least an hour from now
       start = Math.max(start, earliest);
     }
-    var opts = ['<option value="">Choose a time</option>'];
-    for (var m = start; m <= end; m += 30) opts.push('<option>' + fmt(m) + '</option>');
-    if (opts.length === 1) {
-      timeEl.innerHTML = '<option value="">No times left today</option>';
-      timeEl.disabled = true;
-      return;
-    }
-    timeEl.innerHTML = opts.join('');
-    timeEl.disabled = false;
+    var all = [];
+    for (var m = start; m <= end; m += 30) all.push(fmt(m));
+    if (!all.length) { timeEl.innerHTML = '<option value="">No times left today</option>'; timeEl.disabled = true; return; }
+    timeEl.disabled = true; timeEl.innerHTML = '<option value="">Checking open times…</option>';
+    var tok = ++avTok;
+    getAvail(v, fresh === true).then(function(a){ return a; }, function(){ return null; }).then(function(a){
+      if (tok !== avTok) return;
+      var k = slotKey();
+      if (a && a.closed) {
+        timeEl.innerHTML = '<option value="">Closed this day' + (a.note ? ' (' + a.note.replace(/[<>&"]/g,'') + ')' : '') + '. Pick another day</option>';
+        return;
+      }
+      var taken = a ? a[k] : [], blocked = a ? a[k === 'mobile' ? 'blockedMobile' : 'blockedShop'] : [];
+      var open = 0;
+      var opts = ['<option value="">Choose a time</option>'].concat(all.map(function(t){
+        var isTaken = taken.indexOf(t) > -1, isBlocked = blocked.indexOf(t) > -1;
+        if (!isTaken && !isBlocked) { open++; return '<option' + (t === keep ? ' selected' : '') + '>' + t + '</option>'; }
+        return '<option value="" disabled>' + t + ' — ' + (isTaken ? 'Booked' : 'Unavailable') + '</option>';
+      }));
+      if (!open) { timeEl.innerHTML = '<option value="">Fully booked this day. Pick another day</option>'; return; }
+      timeEl.innerHTML = opts.join('');
+      timeEl.disabled = false;
+    });
   }
   dateEl.addEventListener('change', fillTimes);
   dateEl.addEventListener('input', fillTimes);
@@ -712,6 +745,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     $('optStore').setAttribute('aria-pressed', String(!mob));
     $('addrField').classList.toggle('hidden', !mob);
     $('address').required = mob;
+    if (dateEl.value) fillTimes();
     $('note').textContent = mob
       ? 'Trip fee quoted when we confirm. Nothing to pay now.'
       : 'Walk-ins are always welcome too. Nothing to pay now.';
@@ -777,21 +811,30 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     btn.disabled = true; btn.textContent = 'Sending…';
     $('err').classList.add('hidden');
 
-    sendRequest(req, (mode === 'mobile' ? '🚗 New MOBILE booking' : '🏪 New shop booking'),
+    bookSlot(req, (mode === 'mobile' ? '🚗 New MOBILE booking' : '🏪 New shop booking'),
       when + '\n' + req.name + ' · ' + req.device + ' · ' + req.repair + (mode === 'mobile' ? '\n' + req.address : ''))
-    .then(function(){ return {ok:true, j:{}}; })
+    .then(function(){ lastBooking = req; return {ok:true, j:{}}; })
     .then(function(res){
       if (!res.ok || String(res.j.success) === 'false') throw new Error('send');
       $('doneNum').textContent = data.Phone;
       $('doneSum').innerHTML =
         '<b>' + data.Repair + '</b> on ' + escapeHtml(data.Device) + '<br>' +
         when + '<br>' + (mode === 'mobile' ? escapeHtml(data.Address) : '9055 Marbach Rd, Suite 105');
+      var ics = icsFor(req), ac = $('addCal');
+      if (ics) { ac.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics); ac.setAttribute('download', 'iFixPhones-appointment.ics'); ac.classList.remove('hidden'); }
       $('formWrap').classList.add('hidden');
       $('done').classList.remove('hidden');
       $('done').focus();
     })
-    .catch(function(){
+    .catch(function(e){
       btn.disabled = false; btn.textContent = 'Request appointment';
+      if (e && e.message === 'taken') {
+        var t = req.time; timeEl.value = '';
+        fillTimes(true);
+        $('time').parentNode.classList.add('bad');
+        showErr('Sorry, <b>' + t + '</b> was just booked by someone else. Please pick another time.');
+        return;
+      }
       showErr('We couldn’t send that. Please call or text <a href="tel:+12107242800">(210) 724-2800</a> and we’ll book you in.');
     });
   });
@@ -816,6 +859,41 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     var m = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(String(t||'').trim()); if (!day || !m) return 0;
     var h = (+m[1]) % 12 + (/pm/i.test(m[3]) ? 12 : 0);
     var p = day.split('-'); return new Date(+p[0], +p[1]-1, +p[2], h, +(m[2]||0)).getTime();
+  }
+
+
+  function fsVal(v){ return typeof v === 'number' ? {integerValue: String(Math.round(v))} : {stringValue: String(v == null ? '' : v).slice(0, 500)}; }
+  function rid(){ var c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', o = ''; var a = new Uint32Array(20); (window.crypto||window.msCrypto).getRandomValues(a); for (var i=0;i<20;i++) o += c[a[i] % c.length]; return o; }
+  function bookSlot(o, alertTitle, alertMsg){
+    var root = 'projects/ifixphones-ca10e/databases/(default)/documents/';
+    var f = {}; Object.keys(o).forEach(function(k){ f[k] = fsVal(o[k]); });
+    var k = o.where === 'mobile' ? 'mobile' : 'shop';
+    var body = {writes: [
+      {update: {name: root + 'requests/' + rid(), fields: f}, currentDocument: {exists: false}},
+      {update: {name: root + 'avail/' + o.day, fields: {}}, updateMask: {fieldPaths: []}, updateTransforms: [{fieldPath: k, appendMissingElements: {values: [{stringValue: o.time}]}}]}
+    ]};
+    return getAvail(o.day, true).then(function(a){
+      if (a.closed || a[k].indexOf(o.time) > -1 || a[k === 'mobile' ? 'blockedMobile' : 'blockedShop'].indexOf(o.time) > -1) throw new Error('taken');
+    }, function(){}).then(function(){
+      return fetch(FS_BASE + ':commit?key=' + FS_KEY, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    }).then(function(r){
+      if (r.status === 403 || r.status === 409 || r.status === 400) throw new Error('taken');
+      if (!r.ok) throw new Error('send');
+      AV[o.day] = null;
+      try { fetch('https://api.pushover.net/1/messages.json', {method:'POST', mode:'no-cors', body: new URLSearchParams({token:PO_TOKEN, user:PO_USER, title:alertTitle, message:alertMsg, priority:'1', url:'https://ifixphones.net/tickets.html', url_title:'Open tickets'})}).catch(function(){}); } catch(e) {}
+      return true;
+    });
+  }
+  // add-to-calendar for the customer
+  var lastBooking = null;
+  function icsFor(b){
+    if (!b || !b.apptAt) return '';
+    var d = new Date(b.apptAt), e = new Date(b.apptAt + 3600e3);
+    function f(x){ return x.getFullYear() + pad(x.getMonth()+1) + pad(x.getDate()) + 'T' + pad(x.getHours()) + pad(x.getMinutes()) + '00'; }
+    var loc = b.where === 'mobile' ? b.address : 'iFixPhones, 9055 Marbach Rd Suite 105, San Antonio, TX';
+    var esc = function(t){ return String(t||'').replace(/[\\,;]/g, function(c){ return '\\' + c; }).replace(/\n/g,'\\n'); };
+    return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//iFixPhones//Booking//EN','BEGIN:VEVENT','UID:' + rid() + '@ifixphones.net','DTSTAMP:' + f(new Date()),'DTSTART:' + f(d),'DTEND:' + f(e),
+      'SUMMARY:' + esc('iFixPhones: ' + b.repair + ' (' + b.device + ')'),'LOCATION:' + esc(loc),'DESCRIPTION:' + esc('Questions? Call or text (210) 724-2800.'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
   }
 
   // ---- screen comparison ----
