@@ -414,7 +414,9 @@ function guessBrand(model){
 var PARTS = ['','Incell','OLED','Refurbished original','Genuine Apple','Aftermarket'];
 var WARR = ['None','30 days','90 days','6 months','1 year'];
 var CHECKS = [['power','Powers on'],['display','Display'],['touch','Touch'],['bio','Face ID / Touch ID'],['fcam','Front camera'],['rcam','Rear camera'],['ear','Earpiece'],['spk','Loudspeaker'],['mic','Microphone'],['charge','Charging'],['btn','Buttons'],['net','Wi-Fi / cellular']];
-var PAY = ['Cash','Card','Zelle / Cash App','Other'];
+var PAY = ['Cash','Credit card','Debit card','Apple / Google Pay','Zelle','Cash App','Venmo','Other'];
+var CARDISH = ['Credit card','Apple / Google Pay','Card'];
+function r2(n){ return Math.round((Number(n)||0) * 100) / 100; }
 var DEFAULT_TECHS = ['Mark','Ray','David'];
 var SUPPLIERS = ['MobileSentrix','Injured Gadgets','Phone LCD Parts','Wholesale Gadget Parts','Amazon','Other'];
 var PSTAT = [['needed','Needs order'],['ordered','Ordered'],['arrived','Arrived'],['used','Installed']];
@@ -457,8 +459,24 @@ function rel(t){
 }
 function sameDay(a, b){ var x = new Date(a), y = new Date(b); return x.getFullYear()===y.getFullYear() && x.getMonth()===y.getMonth() && x.getDate()===y.getDate(); }
 function pill(k){ var s = SMAP[k] || SMAP['in']; return '<span class="pill" style="color:'+s.c+';background:'+s.bg+'"><i></i>'+esc(s.label)+'</span>'; }
-function total(t){ return (t.items||[]).reduce(function(a,i){ return a + (i.apvSt === 'pending' || i.apvSt === 'declined' ? 0 : num(i.price)); }, 0); }
-function balance(t){ return Math.max(0, total(t) - num(t.deposit)); }
+function subtotal(t){ return r2((t.items||[]).reduce(function(a,i){ return a + (i.apvSt === 'pending' || i.apvSt === 'declined' ? 0 : num(i.price)); }, 0)); }
+function discountAmt(t){ return Math.min(subtotal(t), num(t.discount)); }
+function taxRateOf(t){ return t.taxExempt ? 0 : num(t.taxRate); }
+function taxAmt(t){ return r2((subtotal(t) - discountAmt(t)) * taxRateOf(t) / 100); }
+function total(t){ return r2(subtotal(t) - discountAmt(t) + taxAmt(t)); }
+function netSales(t){ return r2(subtotal(t) - discountAmt(t)); }
+function balance(t){ return Math.max(0, r2(total(t) - num(t.deposit))); }
+function collected(t){ return r2(total(t) + num(t.surcharge)); }
+function payLabel(t){ if (t.payMethod === 'Split' && t.split) return t.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + '); return t.payMethod || ''; }
+function byMethod(t){ // amounts per method for a paid ticket (deposit counted in its own method)
+  var o = {}, add = function(k, v){ k = k || 'Not recorded'; o[k] = r2((o[k]||0) + v); };
+  var dep = num(t.deposit);
+  if (dep) add(t.depMethod || t.payMethod || 'Not recorded', dep);
+  if (t.payMethod === 'Split' && t.split) t.split.forEach(function(x){ add(x.m, num(x.a)); });
+  else add(t.payMethod, r2(total(t) - dep));
+  if (num(t.surcharge)) add(t.surMethod || 'Credit card', num(t.surcharge));
+  return o;
+}
 function itemName(i){ return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv) && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
 function repairsText(t){ return (t.items||[]).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
 function who(){ return S.me || 'Staff'; }
@@ -810,7 +828,7 @@ function matches(t, q){
 
 function ticketsView(){
   var c = counts();
-  var paidToday = S.tickets.filter(function(t){ return t.paid && t.paidAt && sameDay(t.paidAt, Date.now()); }).reduce(function(a,t){ return a + total(t); }, 0);
+  var paidToday = S.tickets.filter(function(t){ return t.paid && t.paidAt && sameDay(t.paidAt, Date.now()); }).reduce(function(a,t){ return a + collected(t); }, 0);
   var stats = '<div class="stats">' +
     '<button class="stat" data-act="filter" data-v="active"><b>'+c.active+'</b><span>Open tickets</span></button>' +
     '<button class="stat" data-act="filter" data-v="ready"><b>'+c.ready+'</b><span>Ready for pickup</span></button>' +
@@ -915,7 +933,7 @@ function reportsView(){
   else { start = Date.now() - 30*86400000; }
   var inR = function(ts){ return ts && ts >= start; };
   var paid = S.tickets.filter(function(t){ return t.paid && inR(t.paidAt); });
-  var revenue = paid.reduce(function(a,t){ return a + total(t); }, 0);
+  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + taxAmt(t); }, 0), surC = paid.reduce(function(a,t){ return a + num(t.surcharge); }, 0);
   var pcost = paid.reduce(function(a,t){ return a + partsCost(t); }, 0);
   var created = S.tickets.filter(function(t){ return inR(t.createdAt); }).length;
   var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
@@ -923,16 +941,16 @@ function reportsView(){
   var turnTxt = !done.length ? '—' : turn < 3600e3 ? Math.max(1, Math.round(turn/60000)) + ' min' : turn < 86400e3 ? (Math.round(turn/360000)/10) + ' hrs' : (Math.round(turn/8640000)/10) + ' days';
   var seg = '<div class="seg" role="group" aria-label="Period" style="margin-bottom:16px">' + [['today','Today'],['week','7 days'],['month','This month'],['30','30 days']].map(function(o){ return '<button data-act="rp" data-v="'+o[0]+'" aria-pressed="'+(RP===o[0])+'">'+o[1]+'</button>'; }).join('') + '</div>';
   var tiles = '<div class="rgrid">' +
-    '<div class="stat"><b>'+money(revenue)+'</b><span>Paid</span></div>' +
+    '<div class="stat"><b>'+money(revenue)+'</b><span>Sales (before tax)</span></div>' +
     '<div class="stat"><b>'+money(revenue - pcost)+'</b><span>After part costs</span></div>' +
-    '<div class="stat"><b>'+paid.length+'</b><span>Paid tickets</span></div>' +
+    '<div class="stat"><b>'+money(taxC)+'</b><span>Sales tax collected'+(surC?' · '+money(surC)+' card surcharges':'')+'</span></div>' +
     '<div class="stat"><b>'+created+'</b><span>New tickets</span></div>' +
     '<div class="stat"><b>'+done.length+'</b><span>Picked up</span></div>' +
     '<div class="stat"><b>'+turnTxt+'</b><span>Average check-in to pickup</span></div>' +
   '</div>';
   var byTech = {};
   var tk = function(k){ return byTech[k] || (byTech[k] = {n:0, rev:0, tsum:0, tn:0, wr:0}); };
-  done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += total(t); var ra = readyAt(t); if (ra && ra > t.createdAt) { o.tsum += ra - t.createdAt; o.tn++; } });
+  done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += netSales(t); var ra = readyAt(t); if (ra && ra > t.createdAt) { o.tsum += ra - t.createdAt; o.tn++; } });
   S.tickets.filter(function(t){ return t.warrantyReturn && inR(t.createdAt); }).forEach(function(t){
     var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && digits(x.customer&&x.customer.phone) === digits(t.customer&&t.customer.phone); }).sort(function(a,b){ return b.createdAt - a.createdAt; })[0];
     tk((prev && prev.assigned) || t.assigned || 'Unassigned').wr++;
@@ -950,14 +968,14 @@ function reportsView(){
   var maxR = repRows.reduce(function(m,k){ return Math.max(m, rep[k]); }, 1);
   var repTbl = repRows.length ? '<table class="rtable"><tbody>' + repRows.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:45%"><div class="barw"><i style="width:'+Math.round(rep[k]/maxR*100)+'%"></i></div></td><td class="right" style="width:40px">'+rep[k]+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No tickets in this period.</p>';
   var pm = {};
-  paid.forEach(function(t){ var k = t.payMethod || 'Not recorded'; pm[k] = (pm[k]||0) + total(t); });
+  paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ pm[k] = r2((pm[k]||0) + o[k]); }); });
   var pmTbl = Object.keys(pm).length ? '<table class="rtable"><tbody>' + Object.keys(pm).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(pm[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No payments in this period.</p>';
   return seg + tiles +
     (RP === 'today' ? closeoutPanel() : '') +
     '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period. Warranty returns count against the tech who did the original repair.</p>'+techTbl+'</div>' +
     '<div class="g2"><div class="panel"><h2>Most common repairs</h2><p class="d">From tickets checked in this period.</p>'+repTbl+'</div>' +
     '<div class="panel"><h2>Payments</h2><p class="d">By payment method.</p>'+pmTbl+'</div></div>' +
-    '<p class="muted" style="font-size:13px">“After part costs” uses the part costs entered on tickets.</p>';
+    '<p class="muted" style="font-size:13px">“Sales” and “After part costs” don’t include sales tax (that money goes to Texas). “After part costs” uses the part costs entered on tickets.</p>';
 }
 
 function custKey(c){ c = c || {}; var d = digits(c.phone).slice(-10); return d ? d : 'n:' + String(c.name||'').trim().toLowerCase(); }
@@ -1040,6 +1058,11 @@ function settingsView(){
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushTickets"'+(S.settings.pushTickets!==false?' checked':'')+'>Also send a phone alert when a ticket is checked in</label>' +
     '<div class="match" style="margin-top:14px"><b>Phone alerts</b> go to the <b>Pushover</b> app. Install it and sign in with the shop’s Pushover account on any phone that should get alerts.</div>' +
     '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div>' +
+  '</div>' +
+  '<div class="panel"><h2>Tax and payments</h2><p class="d">New tickets add sales tax automatically. Texas taxes phone repair (parts and labor). San Antonio’s rate is 8.25%.</p>' +
+    '<div class="g2" style="max-width:520px"><div class="f"><label for="set-tax">Sales tax %</label><input class="in" id="set-tax" inputmode="decimal" data-setting="taxRate" value="'+esc(S.settings.taxRate == null ? 8.25 : S.settings.taxRate)+'"></div>' +
+    '<div class="f"><label for="set-sur">Credit card surcharge %</label><input class="in" id="set-sur" inputmode="decimal" data-setting="surchargeRate" value="'+esc(S.settings.surchargeRate || 0)+'"></div></div>' +
+    '<div class="match" style="margin-top:12px"><b>Card surcharge:</b> turn it on in <b>Square</b> (Dashboard → Settings → Payments → Credit card surcharges) and use the same % here. Square only charges it on credit cards, never debit, and prints it on the receipt. Keep it at or under what Square charges you (about 2.6% + 15¢ in person). Square gives you a sign to post at the counter. Leave it at 0 if you don’t surcharge.</div>' +
   '</div>' +
   '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
     '<div class="f" style="max-width:360px"><label for="lblsize">Label size</label><select class="in" id="lblsize" data-setting="labelSize">' + Object.keys(LABELS).map(function(k){ return '<option value="'+k+'"'+((S.settings.labelSize||'brother62')===k?' selected':'')+'>'+esc(LABELS[k].name)+'</option>'; }).join('') + '</select></div>' +
@@ -1192,8 +1215,9 @@ var STOCK_CATS = ['Screen','Battery','Charging port','Back glass','Camera','Spea
 function partTypes(brand, model){
   var m = String(model||'');
   if (brand === 'Apple iPhone') {
-    var oled = /(1[3-9]|2\d) Pro/.test(m);
-    return ['Screen · Incell'].concat(oled ? ['Screen · OLED'] : []).concat(['Screen · Original','Battery','Charging port']).concat(/iPhone [78]\b|iPhone 7 Plus/.test(m) ? [] : ['Back glass']).concat(['Rear camera']);
+    var oledOnly = /iPhone (1[7-9]|2\d)|iPhone Air|iPhone Duo/.test(m) && !/\d+e\b/.test(m);
+    var oled = oledOnly || /(1[3-9]|2\d) Pro/.test(m);
+    return (oledOnly ? [] : ['Screen · Incell']).concat(oled ? ['Screen · OLED'] : []).concat(['Screen · Original','Battery','Charging port']).concat(/iPhone [78]\b|iPhone 7 Plus/.test(m) ? [] : ['Back glass']).concat(['Rear camera']);
   }
   if (brand === 'Apple iPad' || /Tab/.test(m)) return ['Screen / digitizer','LCD','Battery','Charging port'];
   if (/Fold/.test(m)) return ['Inner screen','Outer screen','Battery','Charging port','Back glass'];
@@ -1512,12 +1536,13 @@ function closeoutData(){
   var sod = new Date(); sod.setHours(0,0,0,0); var a = sod.getTime(), b = a + 86400e3;
   var inD = function(ts){ return ts >= a && ts < b; };
   var paid = S.tickets.filter(function(t){ return t.paid && inD(t.paidAt); });
-  var by = {}; paid.forEach(function(t){ var k = t.payMethod || 'Not recorded'; by[k] = (by[k]||0) + total(t); });
+  var by = {}; paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ by[k] = r2((by[k]||0) + o[k]); }); });
+  var taxC = paid.reduce(function(s2,t){ return s2 + taxAmt(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + num(t.surcharge); }, 0);
   var deps = S.tickets.filter(function(t){ return inD(t.createdAt) && num(t.deposit); });
   var bbOut = (S.bb||[]).filter(function(x){ return inD(x.createdAt) && num(x.paid); });
   var bbIn = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inD(x.soldAt); });
   var cashBuy = bbOut.filter(function(x){ return x.payMethod === 'Cash'; }).reduce(function(s2,x){ return s2 + num(x.paid); }, 0);
-  return {day:sod, paid:paid, by:by, total:paid.reduce(function(s2,t){ return s2 + total(t); }, 0), deps:deps, depTotal:deps.reduce(function(s2,t){ return s2 + num(t.deposit); }, 0),
+  return {day:sod, paid:paid, by:by, taxC:r2(taxC), surC:r2(surC), total:r2(paid.reduce(function(s2,t){ return s2 + collected(t); }, 0)), deps:deps, depTotal:deps.reduce(function(s2,t){ return s2 + num(t.deposit); }, 0),
     checkedIn:S.tickets.filter(function(t){ return inD(t.createdAt); }).length, pickedUp:S.tickets.filter(function(t){ return t.status === 'done' && inD(t.pickedUpAt); }).length,
     bbOut:bbOut, bbOutTotal:bbOut.reduce(function(s2,x){ return s2 + num(x.paid); }, 0), bbIn:bbIn, bbInTotal:bbIn.reduce(function(s2,x){ return s2 + num(x.soldPrice); }, 0), cashBuy:cashBuy,
     ready:S.tickets.filter(function(t){ return t.status === 'ready'; }).length, open:S.tickets.filter(function(t){ return ['in','part','repair'].indexOf(t.status) > -1; }).length};
@@ -1526,7 +1551,7 @@ function closeoutPanel(){
   var d = closeoutData();
   var rows = Object.keys(d.by).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(d.by[k])+'</td></tr>'; }).join('');
   return '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Close out today</h2><button class="btn sm ghost" data-act="closeout">Print close-out</button></div>' +
-    '<div class="g2" style="margin-top:12px"><div><table class="rtable"><tbody>' + (rows || '<tr><td class="muted">No repair payments yet today</td><td></td></tr>') + '<tr><td><b>Repairs total</b></td><td class="right amt"><b>'+money(d.total)+'</b></td></tr></tbody></table></div>' +
+    '<div class="g2" style="margin-top:12px"><div><table class="rtable"><tbody>' + (rows || '<tr><td class="muted">No repair payments yet today</td><td></td></tr>') + '<tr><td><b>Collected</b></td><td class="right amt"><b>'+money(d.total)+'</b></td></tr><tr><td class="t2">Includes sales tax</td><td class="right t2">'+money(d.taxC)+'</td></tr>'+(d.surC?'<tr><td class="t2">Includes card surcharges</td><td class="right t2">'+money(d.surC)+'</td></tr>':'')+'</tbody></table></div>' +
     '<div><table class="rtable"><tbody><tr><td>Checked in</td><td class="right">'+d.checkedIn+'</td></tr><tr><td>Picked up</td><td class="right">'+d.pickedUp+'</td></tr><tr><td>Deposits taken</td><td class="right amt">'+money(d.depTotal)+'</td></tr>' +
     (d.bbOut.length || d.bbIn.length ? '<tr><td>Phones bought</td><td class="right amt">−'+money(d.bbOutTotal)+'</td></tr><tr><td>Phones sold</td><td class="right amt">'+money(d.bbInTotal)+'</td></tr>' : '') +
     '<tr><td>Still open / ready</td><td class="right">'+d.open+' / '+d.ready+'</td></tr></tbody></table></div></div>' +
@@ -1537,11 +1562,80 @@ function closeoutDoc(){
   var tr = function(a, b){ return '<tr><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Close-out '+esc(dateOnly(d.day))+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:640px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:20px;margin:0}h2{font-size:14px;margin:18px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid #eee}.sig{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:24px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}</style></head><body>' +
     '<h1>iFixPhones · Close-out</h1><div>'+esc(d.day.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}))+' · printed by '+esc(who())+'</div>' +
-    '<h2>Repair payments</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total</b>', '<b>'+money(d.total)+'</b>') + '</table>' +
-    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(total(t))+' '+esc(t.payMethod||'')); }).join('') || tr('None','')) + '</table>' +
+    '<h2>Repair payments</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total collected</b>', '<b>'+money(d.total)+'</b>') + tr('Sales tax collected (owed to Texas)', money(d.taxC)) + tr('Card surcharges', money(d.surC)) + '</table>' +
+    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(collected(t))+' '+esc(payLabel(t))); }).join('') || tr('None','')) + '</table>' +
     '<h2>Other</h2><table>' + tr('Deposits taken', money(d.depTotal)) + tr('Checked in', d.checkedIn) + tr('Picked up', d.pickedUp) + tr('Phones bought (paid out)', money(d.bbOutTotal)) + tr('Phones sold', money(d.bbInTotal)) + tr('Still open / ready for pickup', d.open + ' / ' + d.ready) + '</table>' +
     '<h2>Drawer count</h2><table>' + tr('Cash counted', '$__________') + tr('Card total in Square', '$__________') + tr('Difference', '$__________') + '</table>' +
     '<div class="sig"><div>Counted by</div><div>Checked by</div></div></body></html>';
+}
+
+/* ---------- payments ---------- */
+function payBox(t){
+  var bal = balance(t), sr = num(S.settings.surchargeRate);
+  var m = modalShell('py', 'Take payment · #' + esc(t.num),
+    '<div class="tot b" style="font-size:20px;margin-bottom:12px"><span>Amount due</span><span>'+money(bal)+'</span></div>' +
+    '<div class="f"><label for="py-m">Paid by</label><select class="in" id="py-m">'+PAY.concat(['Split payment']).map(function(p){ return '<option'+(p===(S.lastPay||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div>' +
+    '<div id="py-cash" class="f" style="margin-top:12px"><label for="py-in">Cash received (optional)</label><input class="in" id="py-in" inputmode="decimal" placeholder="$"><p class="hint" id="py-chg"></p></div>' +
+    '<div id="py-sur" class="f" style="margin-top:12px"><label for="py-s">Card surcharge (from the Square receipt)</label><input class="in" id="py-s" inputmode="decimal" value="'+(sr ? r2(bal * sr / 100) : '')+'" placeholder="$0"><p class="hint">'+(sr ? 'Square adds '+sr+'% to credit cards only. If the customer’s card was debit, Square won’t add it, so set this to 0.' : 'Turn on a surcharge in Settings → Tax and payments if you add one in Square.')+'</p></div>' +
+    '<div id="py-split" style="margin-top:12px"><div class="g2"><div class="f"><label for="py-m1">First payment</label><select class="in" id="py-m1">'+PAY.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a1">Amount</label><input class="in" id="py-a1" inputmode="decimal"></div></div>' +
+      '<div class="g2" style="margin-top:10px"><div class="f"><label for="py-m2">Second payment</label><select class="in" id="py-m2">'+PAY.map(function(p, i){ return '<option'+(i===1?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a2">Amount</label><input class="in" id="py-a2" inputmode="decimal" readonly></div></div></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="py-ok">Mark paid</button>', true);
+  function upd(){
+    var meth = $('#py-m', m).value;
+    $('#py-cash', m).style.display = meth === 'Cash' ? '' : 'none';
+    $('#py-sur', m).style.display = CARDISH.indexOf(meth) > -1 ? '' : 'none';
+    $('#py-split', m).style.display = meth === 'Split payment' ? '' : 'none';
+    var cin = num($('#py-in', m).value);
+    $('#py-chg', m).textContent = cin ? (cin >= bal ? 'Change: ' + money(r2(cin - bal)) : 'That’s ' + money(r2(bal - cin)) + ' short') : '';
+    var a1 = num($('#py-a1', m).value); $('#py-a2', m).value = a1 ? r2(Math.max(0, bal - a1)) : '';
+  }
+  upd(); m.addEventListener('input', upd); m.addEventListener('change', upd);
+  $('#py-ok', m).addEventListener('click', function(){
+    var meth = $('#py-m', m).value, err = $('#py-err', m);
+    var f = {paid:true, paidAt:Date.now(), surcharge:0, split:[], cashIn:0, payMethod:meth};
+    var log = 'took payment of ' + money(bal);
+    if (meth === 'Split payment') {
+      var a1 = num($('#py-a1', m).value), a2 = r2(bal - a1);
+      if (!a1 || a1 >= bal) { err.textContent = 'Enter the first amount (less than ' + money(bal) + ').'; return; }
+      f.payMethod = 'Split'; f.split = [{m:$('#py-m1', m).value, a:a1}, {m:$('#py-m2', m).value, a:a2}];
+      log += ' (' + f.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + ') + ')';
+    } else {
+      log += ' by ' + meth;
+      if (meth === 'Cash' && num($('#py-in', m).value)) { f.cashIn = num($('#py-in', m).value); if (f.cashIn < bal) { err.textContent = 'Cash received is less than the amount due.'; return; } }
+      if (CARDISH.indexOf(meth) > -1 && num($('#py-s', m).value)) { f.surcharge = r2(num($('#py-s', m).value)); f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' card surcharge'; if (f.surcharge > r2(bal * 0.03) + 0.01) { err.textContent = 'Card surcharges can’t be more than 3%.'; return; } }
+    }
+    S.lastPay = meth === 'Split payment' ? S.lastPay : meth;
+    m.remove();
+    var live = byId(t.id); if (live) patchTicket(live, f, [logEntry(log)]);
+    toast('Paid' + (f.cashIn ? ' · change ' + money(r2(f.cashIn - bal)) : ''));
+  });
+}
+function receiptText(t){
+  var c = t.customer || {}, lines = ['iFixPhones receipt · Ticket #' + t.num, ((t.device||{}).model||'') + ': ' + repairsText(t)];
+  if (discountAmt(t)) lines.push('Discount: -' + money(discountAmt(t)));
+  if (taxAmt(t)) lines.push('Sales tax: ' + money(taxAmt(t)));
+  if (num(t.surcharge)) lines.push('Card surcharge: ' + money(t.surcharge));
+  lines.push('Total paid: ' + money(collected(t)) + (payLabel(t) ? ' (' + payLabel(t) + ')' : ''));
+  lines.push('Warranty: ' + (t.warranty || 'None') + '. Policy: ifixphones.net/policy.html');
+  lines.push('Thank you, ' + (String(c.name||'').split(' ')[0] || 'friend') + '!');
+  return lines.join('\n');
+}
+function receiptDoc(t){
+  var c = t.customer||{}, d = t.device||{};
+  var tr = function(a, b, bold){ return '<tr'+(bold?' style="font-weight:700"':'')+'><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
+  var rows = (t.items||[]).filter(function(i){ return i.apvSt !== 'declined' && i.apvSt !== 'pending'; }).map(function(i){ return tr(esc(itemName(i)) + (i.part ? '<br><small>'+esc(i.part)+'</small>' : ''), num(i.price) ? money(i.price) : ''); }).join('');
+  var we = warrantyEnd(t);
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt #'+esc(t.num)+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;max-width:420px;margin:20px auto;padding:0 16px;font-size:13px;line-height:1.45}h1{font-size:20px;margin:0}table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:5px 0;border-bottom:1px solid #eee;vertical-align:top}small{color:#666}.c{text-align:center}.m{color:#555}</style></head><body>' +
+    '<div class="c"><h1>iFixPhones</h1><div class="m">'+esc(SHOP.addr)+'<br>'+esc(SHOP.shop)+' · '+esc(SHOP.web)+'</div></div>' +
+    '<p style="margin-top:14px"><b>Receipt · Ticket #'+esc(t.num)+'</b><br>'+esc(dt(t.paidAt||Date.now()))+'<br>'+esc(c.name||'')+' · '+esc(d.model||'')+'</p>' +
+    '<table>' + rows + tr('Subtotal', money(subtotal(t))) + (discountAmt(t) ? tr('Discount' + (t.discountNote ? ' (' + esc(t.discountNote) + ')' : ''), '−' + money(discountAmt(t))) : '') +
+      tr('Sales tax' + (taxRateOf(t) ? ' (' + taxRateOf(t) + '%)' : t.taxExempt ? ' (exempt)' : ''), money(taxAmt(t))) + tr('Total', money(total(t)), 1) +
+      (num(t.surcharge) ? tr('Credit card surcharge', money(t.surcharge)) : '') +
+      (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') +
+      tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(collected(t) - num(t.deposit))), 1) +
+      (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
+    '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (/incell/i.test(repairsText(t)) ? '. Incell parts have no warranty.' : '') + '<br>Warranty covers the part only when our supplier does; cracks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' +
+    '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
 }
 
 /* ---------- bookings ---------- */
@@ -1870,8 +1964,11 @@ function renderSheet(){
   }).join('');
   var tot = total(t), dep = num(t.deposit), bal = balance(t);
   var payBlock = t.paid
-    ? '<div class="tot" style="color:var(--green);font-weight:600"><span>Paid'+(t.payMethod?' by '+esc(t.payMethod):'')+'</span><span>'+esc(dt(t.paidAt))+'</span></div>' + (ro?'':'<div class="acts"><button class="link" data-act="unpay">Undo payment</button></div>')
-    : (ro ? '' : '<div class="acts" style="align-items:center"><label class="sr" for="paym">Payment method</label><select class="in" id="paym" style="width:auto;min-height:36px;padding:6px 32px 6px 10px">'+PAY.map(function(p){return '<option>'+p+'</option>';}).join('')+'</select><button class="btn sm" data-act="pay">Mark '+money(bal)+' paid</button></div>');
+    ? (num(t.surcharge) ? '<div class="tot"><span>Card surcharge</span><span>'+money(t.surcharge)+'</span></div>' : '') +
+      '<div class="tot" style="color:var(--green);font-weight:600"><span>Paid'+(payLabel(t)?' · '+esc(payLabel(t)):'')+'</span><span>'+esc(dt(t.paidAt))+'</span></div>' +
+      (t.cashIn ? '<div class="tot t2"><span>Cash received / change</span><span>'+money(t.cashIn)+' / '+money(r2(t.cashIn - (t.payMethod==='Cash' ? bal : 0)))+'</span></div>' : '') +
+      '<div class="acts"><button class="btn sm ghost" data-act="receipt">Print receipt</button><a class="btn sm ghost" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(receiptText(t))+'">Text receipt</a>' + (ro?'':'<button class="link" data-act="unpay">Undo payment</button>') + '</div>'
+    : (ro ? '' : '<div class="acts"><button class="btn sm" data-act="pay">Take payment · '+money(bal)+'</button></div>');
 
   var checklist = function(which){
     var m = t[which] || {};
@@ -1920,8 +2017,11 @@ function renderSheet(){
       '</dl></div>' +
 
       '<div class="card"><h3>Repairs and payment</h3><table class="items">'+(items||'<tr><td class="muted">No repairs listed</td></tr>')+'</table>' +
+        (discountAmt(t) || taxAmt(t) ? '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(t))+'</span></div>' : '') +
+        (discountAmt(t) ? '<div class="tot"><span>Discount'+(t.discountNote?' · '+esc(t.discountNote):'')+'</span><span>−'+money(discountAmt(t))+'</span></div>' : '') +
+        (taxAmt(t) ? '<div class="tot"><span>Sales tax ('+taxRateOf(t)+'%)</span><span>'+money(taxAmt(t))+'</span></div>' : (t.taxExempt ? '<div class="tot"><span>Sales tax</span><span class="t2">Exempt</span></div>' : '')) +
         '<div class="tot b"><span>Total</span><span>'+money(tot)+'</span></div>' +
-        (dep ? '<div class="tot"><span>Deposit</span><span>−'+money(dep)+'</span></div><div class="tot"><span>Balance</span><span>'+money(bal)+'</span></div>' : '') +
+        (dep ? '<div class="tot"><span>Deposit'+(t.depMethod?' ('+esc(t.depMethod)+')':'')+'</span><span>−'+money(dep)+'</span></div><div class="tot"><span>Balance</span><span>'+money(bal)+'</span></div>' : '') +
         payBlock +
         '<div class="g2" style="margin-top:14px"><div class="f"><label for="asg">Technician</label><select class="in" id="asg" data-act="assign" '+(ro?'disabled':'')+'>'+techOpts+'</select></div>' +
         '<div class="f"><label for="war">Warranty</label><select class="in" id="war" data-act="warranty" '+(ro?'disabled':'')+'>'+warrOpts+'</select></div></div>' +
@@ -2111,7 +2211,8 @@ function ticketForm(existing, prefill){
     editId: t ? t.id : null,
     type: t ? (t.type||'shop') : (prefill && prefill.type) || 'shop',
     items: t && t.items && t.items.length ? clone(t.items) : (prefill && prefill.items ? clone(prefill.items) : [{repair:'Screen', part:'', price:''}]),
-    reqId: prefill && prefill.reqId || null
+    reqId: prefill && prefill.reqId || null,
+    taxRate: t ? num(t.taxRate) : (S.settings.taxRate == null ? 8.25 : num(S.settings.taxRate))
   };
   var c = t && t.customer || (prefill ? clone(prefill) : {}), d = t && t.device || (prefill && prefill.model ? {model:prefill.model, brand:guessBrand(prefill.model)} : {});
   var pre = t && t.pre || {};
@@ -2141,13 +2242,18 @@ function ticketForm(existing, prefill){
       '</div>' +
       '<div class="msec"><h3><span class="n">3</span>Repairs</h3><div id="tf-items"></div>' +
         '<button type="button" class="link" data-additem>+ Add another repair</button>' +
-        '<div class="g3" style="margin-top:14px"><div class="f"><label for="tf-dep">Deposit</label><input class="in" id="tf-dep" inputmode="decimal" value="'+esc(t && num(t.deposit) ? t.deposit : '')+'" placeholder="$0"></div>' +
+        '<div class="g3" style="margin-top:14px"><div class="f"><label for="tf-disc">Discount ($)</label><input class="in" id="tf-disc" inputmode="decimal" value="'+esc(t && num(t.discount) ? t.discount : '')+'" placeholder="$0"></div>' +
+        '<div class="f"><label for="tf-discn">Discount reason</label><input class="in" id="tf-discn" maxlength="40" value="'+esc(t && t.discountNote || '')+'" placeholder="Returning customer"></div>' +
+        '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-tex" '+(t&&t.taxExempt?'checked':'')+'>Tax exempt</label></div></div>' +
+        '<div class="g3" style="margin-top:12px"><div class="f"><label for="tf-dep">Deposit</label><input class="in" id="tf-dep" inputmode="decimal" value="'+esc(t && num(t.deposit) ? t.deposit : '')+'" placeholder="$0"></div>' +
+        '<div class="f"><label for="tf-depm">Deposit paid by</label><select class="in" id="tf-depm">'+PAY.map(function(p){ return '<option'+(p===((t&&t.depMethod)||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div></div>' +
+        '<div class="g3" style="margin-top:12px">' +
         '<div class="f"><label for="tf-tech">Technician</label><select class="in" id="tf-tech">'+techOpts+'</select></div>' +
         '<div class="f"><label for="tf-war">Warranty</label><select class="in" id="tf-war">'+warrOpts+'</select></div></div>' +
         '<div class="g2" style="margin-top:12px"><div class="f"><label for="tf-due">Promised by (optional)</label><input class="in" id="tf-due" type="datetime-local" value="'+esc(toLocalInput(t && t.dueAt))+'"></div>' +
         '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-wret" '+(t&&t.warrantyReturn?'checked':'')+'>Warranty return</label></div></div>' +
         '<div class="acts" style="margin-top:8px"><button type="button" class="chip" data-due="1">In 1 hour</button><button type="button" class="chip" data-due="eod">Today by close</button><button type="button" class="chip" data-due="tmr">Tomorrow 2 PM</button></div>' +
-        '<div class="tot b" style="margin-top:14px"><span>Total</span><span id="tf-total">$0</span></div>' +
+        '<div id="tf-sums" style="margin-top:14px"></div><div class="tot b"><span>Total</span><span id="tf-total">$0</span></div>' +
       '</div>' +
       '<div class="msec"><h3><span class="n">4</span>Condition at check-in</h3>' +
         '<div class="cl">' + CHECKS.map(function(ch){
@@ -2200,7 +2306,7 @@ function ticketForm(existing, prefill){
   });
   m.addEventListener('input', function(e){
     if (e.target.id === 'tf-phone') lookupCustomer();
-    if (e.target.closest('.irow') || e.target.id === 'tf-dep') { syncItems(); updateTotal(); }
+    if (e.target.closest('.irow') || ['tf-dep','tf-disc','tf-tex'].indexOf(e.target.id) > -1) { syncItems(); updateTotal(); }
     if (e.target.classList.contains('bad')) e.target.classList.remove('bad');
   });
   m.addEventListener('change', function(e){
@@ -2265,8 +2371,11 @@ function syncItems(){
   });
 }
 function updateTotal(){
-  var tot = NT.items.reduce(function(a,i){ return a + num(i.price); }, 0);
-  var el = $('#tf-total'); if (el) el.textContent = money(tot);
+  var tmp = {items: NT.items, discount: num(($('#tf-disc')||{}).value), taxExempt: !!(($('#tf-tex')||{}).checked), taxRate: NT.taxRate};
+  var el = $('#tf-total'); if (el) el.textContent = money(total(tmp));
+  var sm = $('#tf-sums');
+  if (sm) sm.innerHTML = '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
+    '<div class="tot"><span>Sales tax'+(tmp.taxExempt ? ' (exempt)' : ' ('+num(NT.taxRate)+'%)')+'</span><span>'+money(taxAmt(tmp))+'</span></div>' + (num(($('#tf-dep')||{}).value) ? '<div class="tot"><span>Deposit</span><span>−'+money(num($('#tf-dep').value))+'</span></div>' : '');
 }
 
 function submitForm(t, m, closeForm){
@@ -2292,6 +2401,11 @@ function submitForm(t, m, closeForm){
     device: {brand:$('#tf-brand').value || guessBrand(model), model:model, color:$('#tf-color').value.trim(), imei:$('#tf-imei').value.trim(), passcode:$('#tf-pc').value.trim()},
     items: items,
     deposit: num($('#tf-dep').value),
+    depMethod: num($('#tf-dep').value) ? $('#tf-depm').value : '',
+    discount: num($('#tf-disc').value),
+    discountNote: $('#tf-discn').value.trim().slice(0,40),
+    taxExempt: $('#tf-tex').checked,
+    taxRate: NT.taxRate,
     assigned: $('#tf-tech').value,
     warranty: $('#tf-war').value,
     pre: m._pre,
@@ -2323,7 +2437,7 @@ function submitForm(t, m, closeForm){
     var sb = clone(body); sb.id = ref.id; syncStatus(sb);
     if (!byId(ref.id)) { var loc = clone(body); loc.id = ref.id; S.tickets.unshift(loc); }
     closeForm(); toast('Ticket #' + body.num + ' created');
-    S.filter = 'active'; S.q = ''; render();
+    S.filter = 'active'; S.q = ''; S.view = 'tickets'; render();
     openTicket(ref.id);
     if (reqId) patchReq(reqId, {status:'done', ticketId: ref.id, ticketNum: body.num});
     if (S.settings.pushTickets !== false) pushPhone('New ticket #' + body.num, (body.customer.name||'') + ' · ' + (body.device.model||'') + ' · ' + repairsText(body) + ' · by ' + who());
@@ -2356,9 +2470,10 @@ function ticketDoc(t){
     '<div style="text-align:right"><div style="font-size:20px;font-weight:700">Ticket #'+esc(t.num)+'</div><div>'+esc(dt(t.createdAt))+'</div><div>'+esc(t.type==='mobile'?'Mobile repair':'In-store repair')+'</div></div></div>' +
     '<h2>Customer and device</h2><div class="g"><div><b>'+esc(c.name)+'</b><br>'+esc(fmtPhone(c.phone))+(t.address?'<br>'+esc(t.address):'')+'</div>' +
     '<div><b>'+esc(d.model)+'</b>'+(d.color?'<br>'+esc(d.color):'')+(d.imei?'<br>IMEI/serial: '+esc(d.imei):'')+'</div></div>' +
-    '<h2>Repairs</h2><table>'+rows+'<tr><td><b>Total</b></td><td style="text-align:right"><b>'+money(tot)+'</b></td></tr>' +
+    '<h2>Repairs</h2><table>'+rows+(discountAmt(t)?'<tr><td>Discount</td><td style="text-align:right">−'+money(discountAmt(t))+'</td></tr>':'')+'<tr><td>Sales tax'+(taxRateOf(t)?' ('+taxRateOf(t)+'%)':t.taxExempt?' (exempt)':'')+'</td><td style="text-align:right">'+money(taxAmt(t))+'</td></tr><tr><td><b>Total</b></td><td style="text-align:right"><b>'+money(tot)+'</b></td></tr>' +
     (dep?'<tr><td>Deposit</td><td style="text-align:right">−'+money(dep)+'</td></tr><tr><td>Balance</td><td style="text-align:right">'+money(Math.max(0,tot-dep))+'</td></tr>':'') +
-    (t.paid?'<tr><td>Paid'+(t.payMethod?' ('+esc(t.payMethod)+')':'')+'</td><td style="text-align:right">'+esc(dt(t.paidAt))+'</td></tr>':'') + '</table>' +
+    (t.paid?(num(t.surcharge)?'<tr><td>Credit card surcharge</td><td style="text-align:right">'+money(t.surcharge)+'</td></tr>':'')+'<tr><td>Paid'+(payLabel(t)?' ('+esc(payLabel(t))+')':'')+'</td><td style="text-align:right">'+esc(dt(t.paidAt))+'</td></tr>':'') + '</table>' +
+    (S.settings.surchargeRate ? '<p style="font-size:11px;color:#555">Credit card payments include a '+num(S.settings.surchargeRate)+'% surcharge. No surcharge on debit cards or cash.</p>' : '') +
     (t.dueAt?'<p><b>Promised by:</b> '+esc(dt(t.dueAt))+'</p>':'')+'<p><b>Warranty:</b> '+esc(t.warranty||'None')+(/incell/i.test(repairsText(t))?' (Incell parts have no warranty)':'')+' · <b>Technician:</b> '+esc(t.assigned||'—')+'</p>' +
     '<h2>Condition at check-in</h2><div class="cl">'+pre+'</div>' +
     '<p><b>Existing damage:</b> '+esc(t.damage||'None noted')+(t.liquid?' · <b>Signs of liquid damage</b>':'')+'</p>' +
@@ -2460,12 +2575,12 @@ function signBox(t){
 function csvCell(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }
 async function exportCsv(){
   if (!S.dl) return;
-  var head = ['Ticket','Status','Checked in','Checked in by','Type','Customer','Phone','Address','Device','Color','IMEI/serial','Repairs','Total','Deposit','Paid','Payment method','Paid at','Technician','Warranty','Existing damage','Liquid','Picked up','Promised by','Parts','Part costs','Warranty return'];
+  var head = ['Ticket','Status','Checked in','Checked in by','Type','Customer','Phone','Address','Device','Color','IMEI/serial','Repairs','Subtotal','Discount','Sales tax','Total','Card surcharge','Deposit','Paid','Payment method','Paid at','Technician','Warranty','Existing damage','Liquid','Picked up','Promised by','Parts','Part costs','Warranty return'];
   var lines = [head.join(',')].concat(S.tickets.map(function(t){
     var c = t.customer||{}, d = t.device||{};
     return [t.num, (SMAP[t.status]||{}).label, dt(t.createdAt), t.createdBy, t.type, c.name, fmtPhone(c.phone), t.address, d.model, d.color, d.imei,
       (t.items||[]).map(function(i){ return itemName(i) + (i.part?' ('+i.part+')':'') + (num(i.price)?' '+money(i.price):''); }).join('; '),
-      total(t), num(t.deposit), t.paid?'Yes':'No', t.payMethod, t.paidAt?dt(t.paidAt):'', t.assigned, t.warranty, t.damage, t.liquid?'Yes':'No', t.pickedUpAt?dt(t.pickedUpAt):'', t.dueAt?dt(t.dueAt):'',
+      subtotal(t), discountAmt(t), taxAmt(t), total(t), num(t.surcharge), num(t.deposit), t.paid?'Yes':'No', payLabel(t), t.paidAt?dt(t.paidAt):'', t.assigned, t.warranty, t.damage, t.liquid?'Yes':'No', t.pickedUpAt?dt(t.pickedUpAt):'', t.dueAt?dt(t.dueAt):'',
       (t.parts||[]).map(function(p){ return p.name + ' (' + (p.supplier||'') + ', ' + PSMAP[p.status] + (p.orderNo?', order '+p.orderNo:'') + ')'; }).join('; '), partsCost(t), t.warrantyReturn?'Yes':'No'].map(csvCell).join(',');
   }));
   try { await S.dl.save({filename:'iFixPhones-tickets-'+new Date().toISOString().slice(0,10)+'.csv', data:lines.join('\n')}); toast('Backup saved'); }
@@ -2538,14 +2653,9 @@ document.addEventListener('click', async function(e){
       patchTicket(t, o, [logEntry((w==='pre'?'before repair':'after repair') + ': ' + label + ' ' + vtxt)]);
       break;
     }
-    case 'pay': {
-      if (!t) break;
-      var meth = $('#paym') ? $('#paym').value : '';
-      patchTicket(t, {paid:true, payMethod:meth, paidAt:Date.now()}, [logEntry('marked ' + money(balance(t)) + ' paid' + (meth ? ' by ' + meth : ''))]);
-      toast('Marked paid');
-      break;
-    }
-    case 'unpay': if (t) patchTicket(t, {paid:false, payMethod:'', paidAt:0}, [logEntry('undid the payment')]); break;
+    case 'pay': if (t) payBox(t); break;
+    case 'receipt': if (t) printHtml(receiptDoc(t)); break;
+    case 'unpay': if (t) patchTicket(t, {paid:false, payMethod:'', paidAt:0, surcharge:0, split:[], cashIn:0}, [logEntry('undid the payment')]); break;
     case 'note': {
       if (!t) break;
       var ta = $('#note'); var txt = ta ? ta.value.trim() : '';

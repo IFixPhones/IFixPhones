@@ -431,7 +431,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
               <li><span>Warranty</span><span class="val" id="cWarr">When supplier-covered</span></li>
               <li><span>Price</span><span class="val" id="cPrice">$$</span></li>
             </ul>
-            <div class="fits" id="cFits">iPhone 13 Pro and Pro Max and newer Pro models</div>
+            <div class="fits" id="cFits">iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air</div>
           </div>
         </div>
       </div>
@@ -524,7 +524,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
                 <select id="quality" name="Screen">
                   <option>Not sure, help me choose</option>
                   <option>Incell (best price)</option>
-                  <option>OLED (iPhone 13 Pro and newer Pro models)</option>
+                  <option>OLED (13 Pro and newer Pro, iPhone 17, Air)</option>
                   <option>Original (refurbished or genuine Apple)</option>
                 </select>
               </div>
@@ -678,7 +678,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         </details>
         <details>
           <summary>Which screen should I pick?</summary>
-          <p>Incell is the best price. OLED is our best aftermarket screen, for iPhone 13 Pro and newer Pro models. Original is a refurbished original or a genuine Apple part, closest to factory. Tap through the comparison above to see the difference. Not sure? Pick "help me choose" and we'll recommend one for your phone.</p>
+          <p>Incell is the best price. OLED is our best aftermarket screen, for iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air (iPhone 17, 17 Pro, 17 Pro Max and Air get OLED only, no Incell). Original is a refurbished original or a genuine Apple part, closest to factory. Tap through the comparison above to see the difference. Not sure? Pick "help me choose" and we'll recommend one for your phone.</p>
         </details>
         <details>
           <summary>How much is the mobile trip fee?</summary>
@@ -987,8 +987,8 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
   // ---- screen comparison ----
   var TIERS = {
-    incell:{tag:'Best price', name:'Incell', desc:'An LCD-style replacement at the lowest price. Blacks look a little gray and colors are softer, and it can use a bit more battery.', r:{black:2,color:3,bright:3,touch:3}, price:'$', warr:'None', fits:'Most iPhone models'},
-    oled:{tag:'Our best aftermarket screen', name:'OLED', desc:'True deep blacks and bright, sharp color like the original, for a lot less.', r:{black:5,color:4,bright:4,touch:4}, price:'$$', warr:'When supplier-covered', fits:'iPhone 13 Pro and Pro Max and newer Pro models'},
+    incell:{tag:'Best price', name:'Incell', desc:'An LCD-style replacement at the lowest price. Blacks look a little gray and colors are softer, and it can use a bit more battery.', r:{black:2,color:3,bright:3,touch:3}, price:'$', warr:'None', fits:'Most iPhone models, including 17e (not iPhone 17, 17 Pro or Air)'},
+    oled:{tag:'Our best aftermarket screen', name:'OLED', desc:'True deep blacks and bright, sharp color like the original, for a lot less.', r:{black:5,color:4,bright:4,touch:4}, price:'$$', warr:'When supplier-covered', fits:'iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air'},
     original:{tag:'Closest to factory', name:'Original', desc:'A refurbished original screen, or a brand-new genuine Apple part for a higher price. Factory color, brightness and touch.', r:{black:5,color:5,bright:5,touch:5}, price:'$$$', warr:'Select phones', fits:'Ask us for your model'}
   };
   function pickTier(t){
