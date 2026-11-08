@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /tickets.html
+Disallow: /approve.html
+Allow: /
+
+Sitemap: https://ifixphones.net/sitemap.xml
