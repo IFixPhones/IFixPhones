@@ -3,426 +3,511 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IFixPhones | Phone & iPad Repair | In-Store & Mobile</title>
-<meta name="description" content="IFixPhones: phone and iPad repair for all models, in-store at 9055 Marbach Rd Suite 105 or mobile service that comes to you.">
+<title>IFixPhones | Phone and iPad Repair in San Antonio</title>
+<meta name="description" content="Phone and iPad repair for every model. Walk in at 9055 Marbach Rd, Suite 105, or book mobile repair and we come to you.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#0b1220; --ink2:#131c2e; --line:#24304a;
-    --text:#e8edf6; --muted:#9aa7bd;
-    --accent:#2ee6a6; --accent2:#3aa0ff; --warn:#ffb547;
-    --radius:16px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:Inter,system-ui,sans-serif;background:var(--ink);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
-  h1,h2,h3{font-family:Archivo,Inter,sans-serif;line-height:1.1;letter-spacing:-.01em}
+:root{
+  --white:#ffffff;
+  --mist:#f5f5f7;
+  --ink:#1d1d1f;
+  --graphite:#6e6e73;
+  --line:#d2d2d7;
+  --blue:#0071e3;
+  --link:#0066cc;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased;line-height:1.47;font-size:17px;letter-spacing:-.022em}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:3px solid rgba(0,113,227,.55);outline-offset:3px;border-radius:6px}
+img,svg{display:block}
 
-  /* top bar */
-  .top{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
-  .logo{font-family:Archivo;font-weight:900;font-size:22px;text-decoration:none;letter-spacing:-.02em}
-  .logo span{color:var(--accent)}
-  .nav{display:flex;gap:22px;font-size:15px;color:var(--muted)}
-  .nav a{text-decoration:none}
-  .nav a:hover{color:var(--text)}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:600 15px Inter,sans-serif;text-decoration:none;padding:12px 20px;border-radius:999px;transition:transform .15s, background .15s}
-  .btn:active{transform:scale(.97)}
-  .btn-primary{background:var(--accent);color:#04241a}
-  .btn-primary:hover{background:#5df0bb}
-  .btn-ghost{background:transparent;color:var(--text);border:1.5px solid var(--line)}
-  .btn-ghost:hover{border-color:var(--muted)}
-  .btn-sm{padding:9px 16px;font-size:14px}
-  @media (max-width:760px){.nav{display:none}}
+.w{max-width:1000px;margin:0 auto;padding:0 22px}
+h1,h2,h3{font-weight:600;letter-spacing:-.03em;line-height:1.05}
+h2{font-size:clamp(36px,6vw,56px);text-wrap:balance}
+.lede{font-size:clamp(19px,2.4vw,24px);line-height:1.3;color:var(--graphite);margin-top:10px;letter-spacing:-.015em}
+.center{text-align:center}
+.center .lede{margin-left:auto;margin-right:auto;max-width:36ch;text-wrap:balance}
 
-  /* hero */
-  .hero{padding:72px 0 56px;position:relative;overflow:hidden}
-  .hero::before{content:"";position:absolute;inset:-200px -100px auto auto;width:560px;height:560px;background:radial-gradient(circle,rgba(46,230,166,.18),transparent 65%);pointer-events:none}
-  .hero::after{content:"";position:absolute;left:-180px;bottom:-260px;width:520px;height:520px;background:radial-gradient(circle,rgba(58,160,255,.14),transparent 65%);pointer-events:none}
-  .pill{display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;color:var(--accent);background:rgba(46,230,166,.1);border:1px solid rgba(46,230,166,.3);padding:6px 12px;border-radius:999px;margin-bottom:20px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(46,230,166,.2)}
-  .hero h1{font-size:clamp(38px,7vw,68px);font-weight:900;max-width:820px}
-  .hero h1 em{font-style:normal;color:var(--accent)}
-  .hero p.lead{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:620px;margin:18px 0 28px}
-  .cta-row{display:flex;flex-wrap:wrap;gap:12px}
-  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:40px;max-width:720px}
-  .phonecard{background:var(--ink2);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;text-decoration:none;display:block}
-  .phonecard small{display:block;color:var(--muted);font-size:13px;margin-bottom:2px}
-  .phonecard strong{font-family:Archivo;font-size:22px;letter-spacing:.01em}
-  .phonecard:hover{border-color:var(--accent)}
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
+.nav .w{display:flex;align-items:center;justify-content:space-between;height:48px}
+.brand{font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.02em}
+.brand:hover{text-decoration:none}
+.nav ul{display:flex;gap:28px;list-style:none;font-size:13px}
+.nav ul a{color:var(--ink);opacity:.8}
+.nav ul a:hover{opacity:1;text-decoration:none}
+@media (max-width:600px){.nav ul li.hide-s{display:none}.nav ul{gap:18px}}
 
-  section{padding:64px 0;border-top:1px solid var(--line)}
-  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:10px}
-  h2{font-size:clamp(28px,4.5vw,42px);font-weight:800;margin-bottom:12px}
-  .sub{color:var(--muted);max-width:640px;margin-bottom:32px}
+/* buttons */
+.btn{display:inline-block;background:var(--blue);color:#fff;font-size:17px;font-weight:400;padding:11px 22px;border-radius:980px;border:0;cursor:pointer;font-family:inherit;letter-spacing:-.01em}
+.btn:hover{background:#0077ed;text-decoration:none}
+.btn.light{background:#fff;color:var(--ink)}
+.btn.light:hover{background:#ececf0}
+.more{font-size:17px}
+.more::after{content:" ›";}
+.actions{display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:24px}
 
-  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-  .card{background:var(--ink2);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-  .card h3{font-size:18px;margin:12px 0 6px}
-  .card p{color:var(--muted);font-size:15px}
-  .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(46,230,166,.1);color:var(--accent)}
-  .ico svg{width:22px;height:22px}
+/* hero */
+.hero{padding:clamp(56px,9vw,96px) 0 0;overflow:hidden}
+.hero h1{font-size:clamp(56px,11vw,112px);letter-spacing:-.045em}
+.lineup{display:flex;justify-content:center;align-items:flex-end;gap:clamp(12px,2.6vw,32px);margin:clamp(48px,7vw,72px) auto 0;padding:0 12px 40px;max-width:1100px;
+  --pw:clamp(78px,13vw,150px);--tw:clamp(150px,27vw,310px)}
+.lineup .s{--pw:clamp(68px,11vw,130px)}
+/* device = metal frame, black bezel, glass screen */
+.dev{flex:none;position:relative;background:var(--frame);
+  box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 -1px 0 rgba(0,0,0,.25) inset,0 40px 50px -28px rgba(0,0,0,.5),0 70px 80px -60px rgba(0,0,0,.35)}
+.dev::before{content:"";position:absolute;background:#050505;z-index:0}
+.dev .scr{position:absolute;overflow:hidden;z-index:1}
+.dev .scr::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:linear-gradient(118deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 28%,rgba(255,255,255,0) 42%)}
+.phone{width:var(--pw);aspect-ratio:9/19.4;border-radius:calc(var(--pw)*.175)}
+.phone::before{inset:calc(var(--pw)*.018);border-radius:calc(var(--pw)*.16)}
+.phone .scr{inset:calc(var(--pw)*.045);border-radius:calc(var(--pw)*.135)}
+/* pill cutout vs hole-punch */
+.pill .scr::before{content:"";position:absolute;top:calc(var(--pw)*.045);left:50%;transform:translateX(-50%);width:32%;height:calc(var(--pw)*.09);background:#000;border-radius:99px;z-index:5}
+.punch .scr::before{content:"";position:absolute;top:calc(var(--pw)*.05);left:50%;transform:translateX(-50%);width:calc(var(--pw)*.07);height:calc(var(--pw)*.07);background:#000;border-radius:50%;z-index:5;box-shadow:0 0 0 1px rgba(255,255,255,.06)}
+.square{border-radius:calc(var(--pw)*.07)}
+.square::before{border-radius:calc(var(--pw)*.06)}
+.square .scr{border-radius:calc(var(--pw)*.035)}
+/* side buttons */
+.k{position:absolute;width:3px;background:var(--btn,#8e8e93);border-radius:2px;z-index:-1}
+.k.l{left:-2px}.k.r{right:-2px}
+.tab{width:var(--tw);aspect-ratio:3/4.15;border-radius:calc(var(--tw)*.065)}
+.tab::before{inset:calc(var(--tw)*.008);border-radius:calc(var(--tw)*.058)}
+.tab .scr{inset:calc(var(--tw)*.045);border-radius:calc(var(--tw)*.025)}
+.pad-cam{position:absolute;top:calc(var(--tw)*.02);left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#1c1c24;box-shadow:inset 0 0 0 1.5px #2a2a35;z-index:2}
+/* finishes */
+.ti-natural{--frame:linear-gradient(90deg,#8d877e,#d9d4cb 8%,#b4ada3 20%,#c9c3ba 50%,#b4ada3 80%,#d9d4cb 92%,#8d877e);--btn:#a29b91}
+.ti-black{--frame:linear-gradient(90deg,#1b1b1d,#5a5a5e 8%,#2e2e31 22%,#3a3a3d 50%,#2e2e31 78%,#5a5a5e 92%,#1b1b1d);--btn:#2e2e31}
+.alu-silver{--frame:linear-gradient(90deg,#9c9ca1,#f2f2f5 8%,#c8c8cd 22%,#dcdce0 50%,#c8c8cd 78%,#f2f2f5 92%,#9c9ca1);--btn:#b9b9be}
+.alu-blue{--frame:linear-gradient(90deg,#3b4a66,#9fb0cf 8%,#5d6e8f 22%,#7183a6 50%,#5d6e8f 78%,#9fb0cf 92%,#3b4a66);--btn:#5d6e8f}
+.alu-violet{--frame:linear-gradient(90deg,#4f4664,#c4b9dc 8%,#7a6e95 22%,#9184ad 50%,#7a6e95 78%,#c4b9dc 92%,#4f4664);--btn:#7a6e95}
+/* wallpapers */
+.g1{background:radial-gradient(60% 40% at 30% 30%,#7fa6ff 0%,transparent 70%),radial-gradient(70% 50% at 80% 80%,#2a1a8f 0%,transparent 70%),linear-gradient(170deg,#3550d6,#0d1450)}
+.g2{background:radial-gradient(70% 45% at 70% 25%,#ffd7a1 0%,transparent 70%),radial-gradient(80% 50% at 20% 85%,#b8124f 0%,transparent 70%),linear-gradient(175deg,#ff9a5a,#d7305e)}
+.g3{background:radial-gradient(70% 40% at 30% 20%,#d9ffe9 0%,transparent 70%),radial-gradient(80% 50% at 80% 90%,#063d33 0%,transparent 70%),linear-gradient(170deg,#4cc28f,#0f5a49)}
+.g4{background:radial-gradient(60% 40% at 70% 25%,#f3e6ff 0%,transparent 70%),radial-gradient(80% 55% at 25% 85%,#2c1260 0%,transparent 70%),linear-gradient(170deg,#a689f3,#4b2b91)}
+.g5{background:radial-gradient(55% 35% at 25% 25%,#ffffff 0%,transparent 70%),radial-gradient(70% 45% at 80% 75%,#5c6b85 0%,transparent 70%),radial-gradient(50% 30% at 70% 30%,#f6c9a8 0%,transparent 70%),linear-gradient(165deg,#e8eaee,#8e98aa)}
+@media (max-width:640px){.lineup .x{display:none}.lineup{--pw:clamp(86px,22vw,140px);--tw:clamp(150px,42vw,260px)}}
+/* the one moment: a cracked screen that mends */
+.crack{position:absolute;inset:0;z-index:2;pointer-events:none}
+.crack path{fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.9;stroke-dasharray:400;stroke-dashoffset:0}
+.shatter{position:absolute;inset:0;z-index:1;background:rgba(20,20,24,.38);transition:opacity .9s ease}
+.mend .crack path{animation:mend 1.1s cubic-bezier(.6,0,.2,1) forwards}
+.mend .crack path:nth-child(2){animation-delay:.08s}
+.mend .crack path:nth-child(3){animation-delay:.16s}
+.mend .crack path:nth-child(4){animation-delay:.22s}
+.mend .crack path:nth-child(5){animation-delay:.3s}
+.mend .shatter{opacity:0;transition-delay:.5s}
+.mend .glint{animation:glint 1.2s ease .9s forwards}
+.glint{position:absolute;inset:-20% -60%;z-index:2;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(-80%);opacity:0}
+@keyframes mend{to{stroke-dashoffset:400;opacity:0}}
+@keyframes glint{0%{opacity:1;transform:translateX(-80%)}100%{opacity:0;transform:translateX(80%)}}
+@media (prefers-reduced-motion:reduce){.crack,.shatter,.glint{display:none}}
 
-  /* tiers */
-  .tiers{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-  .tier{border-radius:var(--radius);padding:22px;border:1px solid var(--line);background:var(--ink2);position:relative}
-  .tier .tag{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .tier h3{font-size:22px;margin:6px 0 8px}
-  .tier p{color:var(--muted);font-size:15px}
-  .tier.best{border-color:var(--accent);background:linear-gradient(180deg,rgba(46,230,166,.08),var(--ink2) 60%)}
-  .tier.best .tag{color:var(--accent)}
+/* sections */
+section{padding:clamp(72px,10vw,120px) 0}
+.mist{background:var(--mist)}
+.dark{background:#000;color:#f5f5f7}
+.dark .lede{color:#a1a1a6}
+.dark a{color:#2997ff}
+.dark a.btn{color:#fff}
 
-  /* mobile */
-  .mobile{display:grid;gap:28px;grid-template-columns:1.1fr .9fr;align-items:start}
-  @media (max-width:860px){.mobile{grid-template-columns:1fr}}
-  .fees{display:grid;gap:10px}
-  .fee{display:flex;justify-content:space-between;align-items:center;background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-  .fee b{font-family:Archivo;font-size:24px;color:var(--accent)}
-  .fee span{color:var(--muted);font-size:15px}
-  .fee strong{display:block;color:var(--text);font-size:16px}
-  ul.checks{list-style:none;display:grid;gap:10px;margin-top:6px}
-  ul.checks li{padding-left:28px;position:relative;color:var(--muted)}
-  ul.checks li::before{content:"";position:absolute;left:0;top:5px;width:16px;height:16px;border-radius:50%;background:var(--accent);
-    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='8'/%3E%3C/svg%3E");}
-  ul.checks li::after{content:"";position:absolute;left:5px;top:8px;width:6px;height:3px;border-left:2px solid #04241a;border-bottom:2px solid #04241a;transform:rotate(-45deg)}
-  ul.checks li b{color:var(--text);font-weight:600}
+/* repairs */
+.repairs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.tile{text-align:left;background:#fff;border-radius:22px;padding:32px 26px 30px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between}
+.tile h3{font-size:24px;letter-spacing:-.025em}
+.tile p{color:var(--graphite);font-size:15px;margin-top:4px}
+.tile svg{width:56px;height:56px;margin-bottom:28px}
+@media (max-width:820px){.repairs{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.repairs{grid-template-columns:1fr 1fr;gap:10px}.tile{padding:22px 18px;min-height:170px;border-radius:18px}.tile h3{font-size:19px}.tile svg{width:42px;height:42px;margin-bottom:18px}}
+.also{color:var(--graphite);margin-top:28px;font-size:15px}
 
-  /* booking */
-  .book{background:var(--ink2);border:1px solid var(--line);border-radius:22px;padding:28px}
-  @media (max-width:560px){.book{padding:20px}}
-  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:22px}
-  .seg button{border:0;background:transparent;color:var(--muted);font:600 15px Inter;padding:12px;border-radius:10px;cursor:pointer}
-  .seg button.on{background:var(--accent);color:#04241a}
-  .form{display:grid;gap:14px;grid-template-columns:1fr 1fr}
-  .form .full{grid-column:1/-1}
-  @media (max-width:560px){.form{grid-template-columns:1fr}}
-  label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
-  input,select,textarea{width:100%;background:var(--ink);border:1.5px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font:16px Inter,sans-serif;outline:none}
-  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-  textarea{min-height:90px;resize:vertical}
-  .hint{font-size:13px;color:var(--muted);margin-top:6px}
-  .err{color:#ff7b7b;font-size:14px;margin-top:4px;display:none}
-  .hidden{display:none !important}
-  .result{margin-top:22px;border:1px dashed var(--accent);border-radius:16px;padding:20px;background:rgba(46,230,166,.05)}
-  .result h3{font-size:20px;margin-bottom:6px}
-  .result pre{white-space:pre-wrap;font:14px/1.5 Inter,sans-serif;background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;color:var(--text)}
-  .result .cta-row{margin-top:4px}
+/* models */
+.models{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 22px;margin-top:36px;font-size:clamp(26px,4.6vw,44px);font-weight:600;letter-spacing:-.035em;line-height:1.2}
+.models span{color:#c7c7cc}
+.models span:nth-child(odd){color:var(--ink)}
 
-  /* location */
-  .loc{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-  .loc .card strong{display:block;font-size:18px;margin-top:4px}
-  footer{border-top:1px solid var(--line);padding:30px 0 90px;color:var(--muted);font-size:14px}
-  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+/* quality */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px;border-top:1px solid var(--line)}
+.tier{padding:30px 22px 0;text-align:center}
+.tier+.tier{border-left:1px solid var(--line)}
+.meter{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.meter i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.meter i.on{background:var(--ink)}
+.tier h3{font-size:24px}
+.tier p{color:var(--graphite);margin-top:4px;font-size:16px}
+@media (max-width:600px){.tiers{grid-template-columns:1fr;border-top:0}.tier{padding:24px 0;border-top:1px solid var(--line)}.tier+.tier{border-left:0}}
 
-  /* sticky mobile call bar */
-  .callbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(11,18,32,.95);border-top:1px solid var(--line);backdrop-filter:blur(10px)}
-  .callbar .btn{flex:1;padding:12px 8px;font-size:14px}
-  @media (max-width:760px){.callbar{display:flex}}
+/* mobile */
+.route{width:100%;max-width:640px;margin:48px auto 0;height:auto}
+.route .path{stroke-dasharray:6 8}
+.fee{color:#86868b;font-size:14px;margin-top:20px}
+
+/* booking */
+.book{max-width:640px;margin:48px auto 0}
+.seg{display:flex;background:var(--mist);border-radius:12px;padding:3px;margin-bottom:22px}
+.seg button{flex:1;border:0;background:transparent;font:inherit;font-size:15px;padding:9px;border-radius:9px;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:500}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields .full{grid-column:1/-1}
+@media (max-width:540px){.fields{grid-template-columns:1fr}}
+.field{position:relative}
+.field input,.field select,.field textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:#fff;border:1px solid #86868b;border-radius:12px;padding:24px 14px 8px;outline:none;-webkit-appearance:none;appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+.field textarea{min-height:96px;resize:vertical}
+.field label{position:absolute;left:15px;top:8px;font-size:12px;color:var(--graphite);pointer-events:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.2)}
+.field.bad input,.field.bad select{border-color:#e30000;background:#fff2f4}
+.note{font-size:13px;color:var(--graphite);text-align:center;margin-top:14px}
+.submit{width:100%;margin-top:18px;padding:15px;font-size:17px;border-radius:12px}
+.hidden{display:none !important}
+.sent{margin-top:24px;background:var(--mist);border-radius:18px;padding:24px;text-align:center}
+.sent h3{font-size:24px}
+.sent p{color:var(--graphite);margin-top:6px;font-size:15px}
+.sent pre{text-align:left;white-space:pre-wrap;font:15px/1.5 var(--font);background:#fff;border-radius:12px;padding:16px;margin:16px 0;color:var(--ink)}
+.sent .actions{margin-top:8px;gap:18px}
+.linkbtn{background:none;border:0;font:inherit;color:var(--link);cursor:pointer;font-size:17px}
+
+/* visit */
+.visit{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:48px}
+.card{background:#fff;border-radius:22px;padding:34px 30px}
+.card .big{font-size:clamp(24px,3.4vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.15}
+.card .small{color:var(--graphite);font-size:15px;margin-bottom:8px}
+.card .more{display:inline-block;margin-top:18px}
+.card + .card .row + .row{margin-top:22px}
+@media (max-width:720px){.visit{grid-template-columns:1fr}}
+
+footer{background:var(--mist);border-top:1px solid var(--line);padding:22px 0 100px;font-size:12px;color:var(--graphite)}
+footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* thumb bar on phones */
+.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;display:none;gap:8px;padding:6px;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.14)}
+.bar a{flex:1;text-align:center;padding:11px 6px;border-radius:999px;font-size:15px;color:var(--ink)}
+.bar a.pri{background:var(--blue);color:#fff}
+.bar a:hover{text-decoration:none}
+@media (max-width:640px){.bar{display:flex}}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="wrap">
-    <a href="#top" class="logo">IFix<span>Phones</span></a>
-    <nav class="nav">
-      <a href="#services">Services</a>
-      <a href="#quality">Parts &amp; Pricing</a>
-      <a href="#mobile">Mobile Repair</a>
-      <a href="#location">Visit</a>
-    </nav>
-    <a href="tel:+12107733548" class="btn btn-primary btn-sm">📞 Call Us</a>
+<nav class="nav" aria-label="Main">
+  <div class="w">
+    <a href="#top" class="brand">IFixPhones</a>
+    <ul>
+      <li class="hide-s"><a href="#repairs">Repairs</a></li>
+      <li><a href="#mobile">Mobile</a></li>
+      <li><a href="#visit">Visit</a></li>
+      <li><a href="tel:+12107733548">Call</a></li>
+    </ul>
   </div>
-</header>
+</nav>
 
 <main id="top">
-  <div class="hero">
-    <div class="wrap">
-      <div class="pill"><span class="dot"></span> Walk-ins welcome · No appointment needed</div>
-      <h1>Phone &amp; iPad repair <em>done right</em>, at our shop or your door.</h1>
-      <p class="lead">Every repair on every model, from cracked screens to dead batteries and charging ports. You pick the part quality that fits your budget.</p>
-      <div class="cta-row">
-        <a href="#location" class="btn btn-primary">Walk In Today</a>
-        <a href="#book" class="btn btn-ghost">🚗 Book Mobile Repair</a>
-      </div>
-      <div class="phones">
-        <a class="phonecard" href="tel:+12107733548"><small>In-store / Shop line</small><strong>(210) 773-3548</strong></a>
-        <a class="phonecard" href="tel:+12107242800"><small>Mobile repair line</small><strong>(210) 724-2800</strong></a>
+
+  <header class="hero center">
+    <div class="w">
+      <h1>Fixed. Fast.</h1>
+      <p class="lede">Phone and iPad repair. In store or at your door.</p>
+      <div class="actions">
+        <a class="btn" href="#visit">Walk in</a>
+        <a class="more" href="#book">Book mobile repair</a>
       </div>
     </div>
-  </div>
 
-  <section id="services">
-    <div class="wrap">
-      <div class="eyebrow">What we fix</div>
-      <h2>All repairs. All models.</h2>
-      <p class="sub">iPhone, Samsung, Google Pixel, Motorola, LG, iPad, Android tablets and more. If it's broken, bring it in or we'll come to you.</p>
-      <div class="grid">
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9 7l3 4-2 3 4 3"/></svg></div><h3>Screen Replacement</h3><p>Cracked glass, black screen, lines, or touch not responding.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2M6 10v4M10 10v4"/></svg></div><h3>Battery Replacement</h3><p>Fast drain, random shutdowns, swollen battery, low battery health.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Charging Port</h3><p>Won't charge, loose cable, or only charges at an angle.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><circle cx="12" cy="7" r="2"/></svg></div><h3>Back Glass &amp; Camera</h3><p>Shattered back glass, cracked camera lens, blurry photos.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s6 7 6 12a6 6 0 01-12 0c0-5 6-12 6-12z"/></svg></div><h3>Water Damage</h3><p>Dropped in water? Power it off and get it to us fast.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg></div><h3>Speakers, Mics &amp; Buttons</h3><p>No sound, muffled calls, stuck or broken buttons.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M8 18h8"/></svg></div><h3>iPad &amp; Tablets</h3><p>Glass, LCD, batteries and charging ports on all iPad models.</p></div>
-        <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></div><h3>Diagnostics &amp; More</h3><p>Not sure what's wrong? We'll find it and give you options.</p></div>
+    <div class="lineup" aria-hidden="true">
+      <div class="dev phone punch s x alu-violet"><i class="k r" style="top:22%;height:14%"></i><i class="k r" style="top:40%;height:7%"></i><div class="scr g4"></div></div>
+      <div class="dev phone pill ti-natural"><i class="k l" style="top:17%;height:5%"></i><i class="k l" style="top:25%;height:9%"></i><i class="k l" style="top:36%;height:9%"></i><i class="k r" style="top:27%;height:14%"></i><div class="scr g2"></div></div>
+      <div class="dev tab alu-silver"><i class="k r" style="top:6%;height:6%"></i><i class="k r" style="top:13%;height:6%"></i><span class="pad-cam"></span><div class="scr g5"></div></div>
+      <div class="dev phone punch square ti-black" id="hurt"><i class="k r" style="top:22%;height:14%"></i><i class="k r" style="top:40%;height:7%"></i>
+        <div class="scr g1">
+          <div class="shatter"></div>
+          <svg class="crack" viewBox="0 0 100 210" preserveAspectRatio="none">
+            <path d="M62 78 L48 60 L52 41 L40 22 L44 4"/>
+            <path d="M62 78 L80 66 L97 70"/>
+            <path d="M62 78 L70 101 L58 126 L66 152 L55 184 L60 206"/>
+            <path d="M62 78 L36 90 L22 84 L3 98"/>
+            <path d="M58 126 L36 132 L18 150 L4 148"/>
+          </svg>
+          <div class="glint"></div>
+        </div>
+      </div>
+      <div class="dev phone pill s x alu-blue"><i class="k l" style="top:18%;height:5%"></i><i class="k l" style="top:26%;height:9%"></i><i class="k l" style="top:37%;height:9%"></i><i class="k r" style="top:28%;height:14%"></i><div class="scr g3"></div></div>
+    </div>
+  </header>
+
+  <section id="repairs" class="mist center">
+    <div class="w">
+      <h2>Whatever broke.</h2>
+      <p class="lede">Every repair. Every model.</p>
+
+      <div class="repairs">
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="6"/><path d="M31 18l-5 7 6 4-4 8"/></svg>
+          <div><h3>Screen</h3><p>Cracked, black, or not responding.</p></div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="17" width="40" height="22" rx="5"/><path d="M50 24v8"/><rect x="11" y="22" width="12" height="12" rx="2" fill="#1d1d1f" stroke="none"/></svg>
+          <div><h3>Battery</h3><p>Dies fast or shuts off.</p></div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="20" width="32" height="16" rx="8"/><rect x="20" y="25" width="16" height="6" rx="3"/></svg>
+          <div><h3>Charging port</h3><p>Won't charge or feels loose.</p></div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="6"/><rect x="19" y="8" width="11" height="11" rx="3"/><path d="M36 30l-6 6 4 4-3 7"/></svg>
+          <div><h3>Back glass</h3><p>Shattered back panel.</p></div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="28" cy="28" r="18"/><circle cx="28" cy="28" r="8"/><circle cx="33" cy="22" r="1.6" fill="#1d1d1f"/></svg>
+          <div><h3>Camera</h3><p>Blurry, cracked lens, or black.</p></div>
+        </div>
+        <div class="tile">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 6s14 16 14 27a14 14 0 01-28 0C14 22 28 6 28 6z"/></svg>
+          <div><h3>Water damage</h3><p>Turn it off. Bring it in.</p></div>
+        </div>
+      </div>
+      <p class="also">Plus speakers, mics, buttons, and diagnostics.</p>
+    </div>
+  </section>
+
+  <section class="center">
+    <div class="w">
+      <h2>Every model.</h2>
+      <div class="models">
+        <span>iPhone</span><span>Galaxy</span><span>Pixel</span><span>Motorola</span><span>iPad</span><span>Galaxy Tab</span><span>OnePlus</span><span>and more</span>
       </div>
     </div>
   </section>
 
-  <section id="quality">
-    <div class="wrap">
-      <div class="eyebrow">Parts &amp; pricing</div>
-      <h2>Your budget, your choice.</h2>
-      <p class="sub">We offer different part qualities on most repairs, so you're never stuck with one price. Ask for a quote on your exact model.</p>
+  <section class="mist center">
+    <div class="w">
+      <h2>Your budget. Your call.</h2>
+      <p class="lede">Pick the part quality that fits.</p>
       <div class="tiers">
-        <div class="tier"><div class="tag">Budget</div><h3>Economy</h3><p>The most affordable way to get your phone working again. Great for older phones or a quick fix.</p></div>
-        <div class="tier best"><div class="tag">Most popular</div><h3>Standard</h3><p>High-quality parts with great display and battery performance at a fair price.</p></div>
-        <div class="tier"><div class="tag">Best</div><h3>Premium / OEM-grade</h3><p>Top-tier parts closest to factory quality: brightest screens, best touch and longest life.</p></div>
+        <div class="tier">
+          <div class="meter" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+          <h3>Economy</h3><p>Lowest price.</p>
+        </div>
+        <div class="tier">
+          <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></div>
+          <h3>Standard</h3><p>Best value.</p>
+        </div>
+        <div class="tier">
+          <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <h3>Premium</h3><p>Closest to factory.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="mobile">
-    <div class="wrap mobile">
-      <div>
-        <div class="eyebrow">Mobile repair</div>
-        <h2>We come to you.</h2>
-        <p class="sub">Home, work, school or a parking lot. <a href="#book"><b>Book your time below</b></a>, or if you need it done right now, call <a href="tel:+12107242800"><b>(210) 724-2800</b></a> to see if we're free. Most screens, batteries and charging ports are fixed on the spot, usually in under an hour.</p>
-        <ul class="checks">
-          <li><b>Same quality parts</b> as our shop, with the same warranty</li>
-          <li><b>Repaired in front of you</b>, so your phone never leaves your sight</li>
-          <li><b>Bigger jobs?</b> We'll pick it up, fix it at the shop and bring it back</li>
-          <li><b>Businesses &amp; schools:</b> ask about multi-device visits</li>
-        </ul>
+  <section id="mobile" class="dark center">
+    <div class="w">
+      <h2>We come to you.</h2>
+      <p class="lede">Home, work, wherever. Fixed on the spot.</p>
+      <div class="actions">
+        <a class="btn" href="#book">Book a time</a>
+        <a class="more" href="tel:+12107242800">Call (210) 724-2800</a>
       </div>
-      <div class="fees">
-        <div class="fee"><div><strong>Within 10 miles</strong><span>of our Marbach Rd shop</span></div><b>$20</b></div>
-        <div class="fee"><div><strong>10–20 miles</strong><span>extended service area</span></div><b>$30</b></div>
-        <div class="fee"><div><strong>20+ miles</strong><span>call or text for a quote</span></div><b>Call</b></div>
-        <div class="fee"><div><strong>Need it ASAP?</strong><span>Same-day when available · rush fee may apply</span></div><b><a href="tel:+12107242800" style="text-decoration:none">Call</a></b></div>
-        <p class="hint">Trip fee is added to the cost of the repair. Mobile line: <a href="tel:+12107242800">(210) 724-2800</a></p>
-      </div>
+      <svg class="route" viewBox="0 0 640 120" aria-hidden="true">
+        <path class="path" d="M40 90 C 180 90, 200 30, 320 30 S 470 90, 600 50" fill="none" stroke="#424245" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="40" cy="90" r="7" fill="#f5f5f7"/>
+        <circle cx="600" cy="50" r="10" fill="#0071e3"/>
+        <circle cx="600" cy="50" r="18" fill="none" stroke="#0071e3" stroke-opacity=".35" stroke-width="2"/>
+        <text x="40" y="116" fill="#86868b" font-size="13" text-anchor="middle" font-family="-apple-system,Inter,sans-serif">Shop</text>
+        <text x="600" y="88" fill="#86868b" font-size="13" text-anchor="middle" font-family="-apple-system,Inter,sans-serif">You</text>
+      </svg>
+      <p class="fee">Trip fee depends on distance. Call and we'll quote it.</p>
     </div>
   </section>
 
-  <section id="book">
-    <div class="wrap">
-      <div class="eyebrow">Book an appointment</div>
-      <h2>Book your repair</h2>
-      <p class="sub"><b style="color:var(--text)">Mobile repair:</b> book your time here. Need it right now? Call <a href="tel:+12107242800">(210) 724-2800</a> to see if we're free. <b style="color:var(--text)">In-store:</b> no appointment needed, just walk in. You can still book ahead if you want a set time. Tap Send and your request comes straight to us as a text, then we'll confirm.</p>
+  <section id="book" class="center">
+    <div class="w">
+      <h2>Book a repair.</h2>
+      <p class="lede">We'll text you to confirm.</p>
 
       <div class="book">
-        <div class="seg" role="tablist">
-          <button type="button" id="optMobile" aria-pressed="false">🚗 Mobile (We Come to You)</button>
-          <button type="button" id="optStore" aria-pressed="false">🏪 In-Store</button>
+        <div class="seg" role="group" aria-label="Where">
+          <button type="button" id="optMobile" aria-pressed="true">Mobile</button>
+          <button type="button" id="optStore" aria-pressed="false">In store</button>
         </div>
 
-        <form id="bookForm" class="form" novalidate>
-          <div>
-            <label for="name">Your name</label>
-            <input id="name" autocomplete="name" placeholder="First & last name" required>
+        <form id="form" novalidate>
+          <div class="fields">
+            <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" required></div>
+            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" required></div>
+            <div class="field"><label for="device">Device</label><input id="device" placeholder="iPhone 14, Galaxy S23…" required></div>
+            <div class="field"><label for="repair">Repair</label>
+              <select id="repair" required>
+                <option value="">Choose</option>
+                <option>Screen</option><option>Battery</option><option>Charging port</option>
+                <option>Back glass</option><option>Camera</option><option>Water damage</option>
+                <option>Speaker or mic</option><option>Buttons</option><option>Not sure</option>
+              </select>
+            </div>
+            <div class="field"><label for="quality">Part quality</label>
+              <select id="quality">
+                <option>Not sure yet</option><option>Economy</option><option>Standard</option><option>Premium</option>
+              </select>
+            </div>
+            <div class="field"><label for="date">Day</label><input id="date" type="date" required></div>
+            <div class="field"><label for="time">Time</label>
+              <select id="time" required>
+                <option value="">Choose</option>
+                <option>Morning</option><option>Midday</option><option>Afternoon</option><option>Evening</option><option>Anytime</option>
+              </select>
+            </div>
+            <div class="field" id="addrField"><label for="address">Address</label><input id="address" autocomplete="street-address" required></div>
+            <div class="field full"><label for="notes">Notes (optional)</label><textarea id="notes"></textarea></div>
           </div>
-          <div>
-            <label for="phone">Your phone number</label>
-            <input id="phone" type="tel" autocomplete="tel" placeholder="(210) 555-0123" required>
-          </div>
-          <div>
-            <label for="device">Device &amp; model</label>
-            <input id="device" placeholder="e.g. iPhone 14 Pro, Galaxy S23, iPad 9th gen" required>
-          </div>
-          <div>
-            <label for="repair">What needs fixing?</label>
-            <select id="repair" required>
-              <option value="">Choose a repair…</option>
-              <option>Screen replacement</option>
-              <option>Battery replacement</option>
-              <option>Charging port</option>
-              <option>Back glass</option>
-              <option>Camera / camera lens</option>
-              <option>Water damage</option>
-              <option>Speaker / microphone</option>
-              <option>Buttons</option>
-              <option>Not sure / diagnostic</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div>
-            <label for="quality">Part quality</label>
-            <select id="quality">
-              <option>Not sure, give me options</option>
-              <option>Economy (lowest price)</option>
-              <option>Standard</option>
-              <option>Premium / OEM-grade</option>
-            </select>
-          </div>
-          <div>
-            <label for="date">Preferred day</label>
-            <input id="date" type="date" required>
-          </div>
-          <div>
-            <label for="time">Preferred time</label>
-            <select id="time" required>
-              <option value="">Choose a time…</option>
-              <option>Morning (9am–12pm)</option>
-              <option>Midday (12pm–3pm)</option>
-              <option>Afternoon (3pm–6pm)</option>
-              <option>Evening (after 6pm)</option>
-              <option>Anytime / ASAP</option>
-            </select>
-          </div>
-          <div id="addrWrap" class="hidden">
-            <label for="address">Address for mobile service</label>
-            <input id="address" autocomplete="street-address" placeholder="Street, city, ZIP">
-          </div>
-          <div class="full">
-            <label for="notes">Anything else? <span style="font-weight:400">(optional)</span></label>
-            <textarea id="notes" placeholder="Describe the problem, gate code, best place to meet, etc."></textarea>
-          </div>
-          <div class="full">
-            <p class="err" id="err">Please fill in the highlighted fields.</p>
-            <button type="submit" class="btn btn-primary" style="width:100%;padding:16px;font-size:16px">Send My Appointment Request</button>
-            <p class="hint" style="text-align:center">Tapping Send opens a pre-written text to <b id="destLabel">our shop line (210) 773-3548</b>. Just hit send in your messages app.</p>
-          </div>
+          <button class="btn submit" type="submit">Send request</button>
+          <p class="note" id="note">Opens a text to (210) 724-2800. Trip fee quoted when we confirm.</p>
         </form>
 
-        <div id="result" class="result hidden" aria-live="polite">
-          <h3>Almost done: send the text 👇</h3>
-          <p style="color:var(--muted)">Your messages app should open with this request filled in. If it didn't, tap "Text Us" or copy the message and text it to <b id="resNum"></b>.</p>
+        <div class="sent hidden" id="sent" aria-live="polite">
+          <h3>One more tap.</h3>
+          <p>Hit send in your messages app. If it didn't open, text this to <span id="sentNum"></span>.</p>
           <pre id="msg"></pre>
-          <div class="cta-row">
-            <a id="smsBtn" class="btn btn-primary" href="#">💬 Text Us</a>
-            <button id="copyBtn" type="button" class="btn btn-ghost">Copy Message</button>
-            <a id="callBtn" class="btn btn-ghost" href="#">📞 Call Instead</a>
+          <div class="actions">
+            <a class="btn" id="smsBtn" href="#">Open messages</a>
+            <button class="linkbtn" id="copyBtn" type="button">Copy text</button>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="location">
-    <div class="wrap">
-      <div class="eyebrow">Visit us</div>
-      <h2>Stop by the shop</h2>
-      <p class="sub">Walk-ins always welcome, no appointment needed. For less common models, call ahead to make sure we have your part in stock.</p>
-      <div class="loc">
+  <section id="visit" class="mist center">
+    <div class="w">
+      <h2>Walk-ins welcome.</h2>
+      <p class="lede">No appointment needed.</p>
+      <div class="visit" style="text-align:left">
         <div class="card">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-          <p style="margin-top:12px">Address</p>
-          <strong>9055 Marbach Rd, Suite 105<br>San Antonio, TX</strong>
-          <a class="btn btn-ghost btn-sm" style="margin-top:14px" href="https://www.google.com/maps/search/?api=1&query=9055+Marbach+Rd+Suite+105+San+Antonio+TX">Get Directions</a>
+          <p class="small">The shop</p>
+          <p class="big">9055 Marbach Rd<br>Suite 105<br>San Antonio, TX</p>
+          <a class="more" href="https://www.google.com/maps/search/?api=1&query=9055+Marbach+Rd+Suite+105+San+Antonio+TX">Directions</a>
         </div>
         <div class="card">
-          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.4c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg></div>
-          <p style="margin-top:12px">In-store / shop</p>
-          <strong><a href="tel:+12107733548">(210) 773-3548</a></strong>
-          <p style="margin-top:14px">Mobile repair</p>
-          <strong><a href="tel:+12107242800">(210) 724-2800</a></strong>
+          <div class="row">
+            <p class="small">Shop</p>
+            <a class="big" href="tel:+12107733548" style="color:var(--ink)">(210) 773-3548</a>
+          </div>
+          <div class="row">
+            <p class="small">Mobile repair</p>
+            <a class="big" href="tel:+12107242800" style="color:var(--ink)">(210) 724-2800</a>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
 </main>
 
 <footer>
-  <div class="wrap">
-    <div>© <span id="yr"></span> IFixPhones · 9055 Marbach Rd, Suite 105, San Antonio, TX</div>
-    <div>Phone · iPad · Tablet Repair · In-Store &amp; Mobile</div>
+  <div class="w">
+    <span>Copyright <span id="yr"></span> IFixPhones. San Antonio, TX.</span>
+    <span>ifixphones.net</span>
   </div>
 </footer>
 
-<div class="callbar">
-  <a class="btn btn-ghost" href="tel:+12107733548">📞 Shop</a>
-  <a class="btn btn-ghost" href="tel:+12107242800">🚗 Mobile</a>
-  <a class="btn btn-primary" href="#book">Book Mobile</a>
+<div class="bar">
+  <a href="tel:+12107733548">Call shop</a>
+  <a class="pri" href="#book">Book mobile</a>
 </div>
 
 <script>
 (function(){
-  var SHOP = {num:'+12107733548', label:'(210) 773-3548'};
-  var MOBILE = {num:'+12107242800', label:'(210) 724-2800'};
-  var mode = 'mobile';
-
   var $ = function(id){return document.getElementById(id)};
   $('yr').textContent = new Date().getFullYear();
 
-  // default date = today, no past dates
+  // the crack mends shortly after load
+  var hurt = $('hurt');
+  setTimeout(function(){ hurt.classList.add('mend'); }, 700);
+
   try{
-    var d = new Date(); var iso = new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
-    $('date').min = iso;
+    var d = new Date();
+    $('date').min = new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
   }catch(e){}
+
+  var LINES = {
+    mobile:{num:'+12107242800', label:'(210) 724-2800'},
+    store:{num:'+12107733548', label:'(210) 773-3548'}
+  };
+  var mode = 'mobile';
 
   function setMode(m){
     mode = m;
     var mob = m === 'mobile';
-    $('optStore').classList.toggle('on', !mob);
-    $('optMobile').classList.toggle('on', mob);
-    $('optStore').setAttribute('aria-pressed', String(!mob));
     $('optMobile').setAttribute('aria-pressed', String(mob));
-    $('addrWrap').classList.toggle('hidden', !mob);
+    $('optStore').setAttribute('aria-pressed', String(!mob));
+    $('addrField').classList.toggle('hidden', !mob);
     $('address').required = mob;
-    $('destLabel').textContent = mob ? 'our mobile line ' + MOBILE.label : 'our shop line ' + SHOP.label;
+    $('note').textContent = mob
+      ? 'Opens a text to (210) 724-2800. Trip fee quoted when we confirm.'
+      : 'Opens a text to (210) 773-3548. Walk-ins are always welcome too.';
   }
-  setMode('mobile');
-  $('optStore').addEventListener('click', function(){setMode('store')});
   $('optMobile').addEventListener('click', function(){setMode('mobile')});
+  $('optStore').addEventListener('click', function(){setMode('store')});
 
-  function prettyDate(v){
+  function nice(v){
     if(!v) return '';
-    var p = v.split('-'); var dt = new Date(+p[0], +p[1]-1, +p[2]);
-    return dt.toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric'});
+    var p = v.split('-');
+    return new Date(+p[0], +p[1]-1, +p[2]).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
   }
 
-  $('bookForm').addEventListener('submit', function(e){
+  $('form').addEventListener('submit', function(e){
     e.preventDefault();
-    var fields = ['name','phone','device','repair','date','time'];
-    if(mode === 'mobile') fields.push('address');
-    var ok = true;
-    fields.forEach(function(id){
-      var el = $(id); var bad = !el.value.trim();
-      el.style.borderColor = bad ? '#ff7b7b' : '';
-      if(bad) ok = false;
+    var need = ['name','phone','device','repair','date','time'];
+    if(mode === 'mobile') need.push('address');
+    var first = null;
+    need.forEach(function(id){
+      var el = $(id), bad = !el.value.trim();
+      el.parentNode.classList.toggle('bad', bad);
+      if(bad && !first) first = el;
     });
-    $('err').style.display = ok ? 'none' : 'block';
-    if(!ok) return;
+    if(first){ first.focus(); return; }
 
-    var dest = mode === 'mobile' ? MOBILE : SHOP;
-    var lines = [
-      'NEW APPOINTMENT REQUEST (' + (mode === 'mobile' ? 'MOBILE' : 'IN-STORE') + ')',
+    var line = LINES[mode];
+    var body = [
+      (mode === 'mobile' ? 'Mobile repair request' : 'In-store appointment request'),
       'Name: ' + $('name').value.trim(),
       'Phone: ' + $('phone').value.trim(),
       'Device: ' + $('device').value.trim(),
       'Repair: ' + $('repair').value,
-      'Part quality: ' + $('quality').value,
-      'When: ' + prettyDate($('date').value) + ', ' + $('time').value
+      'Parts: ' + $('quality').value,
+      'When: ' + nice($('date').value) + ', ' + $('time').value
     ];
-    if(mode === 'mobile') lines.push('Address: ' + $('address').value.trim());
-    var notes = $('notes').value.trim();
-    if(notes) lines.push('Notes: ' + notes);
-    var body = lines.join('\n');
+    if(mode === 'mobile') body.push('Address: ' + $('address').value.trim());
+    if($('notes').value.trim()) body.push('Notes: ' + $('notes').value.trim());
+    var text = body.join('\n');
 
-    var href = 'sms:' + dest.num + '?&body=' + encodeURIComponent(body);
-    $('msg').textContent = body;
-    $('resNum').textContent = dest.label;
+    var href = 'sms:' + line.num + '?&body=' + encodeURIComponent(text);
+    $('msg').textContent = text;
+    $('sentNum').textContent = line.label;
     $('smsBtn').href = href;
-    $('callBtn').href = 'tel:' + dest.num;
-    $('result').classList.remove('hidden');
-    $('result').scrollIntoView({behavior:'smooth', block:'center'});
+    $('sent').classList.remove('hidden');
+    $('sent').scrollIntoView({behavior:'smooth', block:'center'});
     try{ window.location.href = href; }catch(err){}
   });
 
+  ['name','phone','device','repair','date','time','address'].forEach(function(id){
+    $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); });
+  });
+
   $('copyBtn').addEventListener('click', function(){
-    var btn = this;
+    var b = this;
     try{
       navigator.clipboard.writeText($('msg').textContent).then(function(){
-        btn.textContent = 'Copied ✓';
-        setTimeout(function(){btn.textContent='Copy Message'},2000);
-      }).catch(function(){ btn.textContent = 'Select & copy above'; });
-    }catch(e){ btn.textContent = 'Select & copy above'; }
+        b.textContent = 'Copied';
+        setTimeout(function(){ b.textContent = 'Copy text'; }, 1800);
+      }, function(){ b.textContent = 'Select the text above to copy'; });
+    }catch(e){ b.textContent = 'Select the text above to copy'; }
   });
 })();
 </script>
