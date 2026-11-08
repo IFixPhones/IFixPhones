@@ -479,12 +479,13 @@ function taxAmt(t){ return r2((subtotal(t) - discountAmt(t)) * taxRateOf(t) / 10
 function total(t){ return r2(subtotal(t) - discountAmt(t) + taxAmt(t)); }
 function netSales(t){ return r2(subtotal(t) - discountAmt(t)); }
 function balance(t){ return Math.max(0, r2(total(t) - num(t.deposit))); }
-function collected(t){ return r2(total(t) + num(t.surcharge)); }
+function collected(t){ return r2(total(t) + num(t.surcharge) + num(t.depSurcharge)); }
+function cardFees(t){ return r2(num(t.surcharge) + num(t.depSurcharge)); }
 function payLabel(t){ if (t.payMethod === 'Split' && t.split) return t.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + '); return t.payMethod || ''; }
 function byMethod(t){ // amounts per method for a paid ticket (deposit counted in its own method)
   var o = {}, add = function(k, v){ k = k || 'Not recorded'; o[k] = r2((o[k]||0) + v); };
   var dep = num(t.deposit);
-  if (dep) add(t.depMethod || t.payMethod || 'Not recorded', dep);
+  if (dep) add(t.depMethod || t.payMethod || 'Not recorded', r2(dep + num(t.depSurcharge)));
   if (t.payMethod === 'Split' && t.split) t.split.forEach(function(x){ add(x.m, num(x.a)); });
   else add(t.payMethod, r2(total(t) - dep));
   if (num(t.surcharge)) add(t.surMethod || 'Credit card', num(t.surcharge));
@@ -954,7 +955,7 @@ function reportsView(){
   else { start = Date.now() - 30*86400000; }
   var inR = function(ts){ return ts && ts >= start; };
   var paid = S.tickets.filter(function(t){ return t.paid && inR(t.paidAt); });
-  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + taxAmt(t); }, 0), surC = paid.reduce(function(a,t){ return a + num(t.surcharge); }, 0);
+  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + taxAmt(t); }, 0), surC = paid.reduce(function(a,t){ return a + cardFees(t); }, 0);
   var pcost = paid.reduce(function(a,t){ return a + partsCost(t); }, 0);
   var created = S.tickets.filter(function(t){ return inR(t.createdAt); }).length;
   var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
@@ -1569,7 +1570,7 @@ function closeoutData(){
   var inD = function(ts){ return ts >= a && ts < b; };
   var paid = S.tickets.filter(function(t){ return t.paid && inD(t.paidAt); });
   var by = {}; paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ by[k] = r2((by[k]||0) + o[k]); }); });
-  var taxC = paid.reduce(function(s2,t){ return s2 + taxAmt(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + num(t.surcharge); }, 0);
+  var taxC = paid.reduce(function(s2,t){ return s2 + taxAmt(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + cardFees(t); }, 0);
   var deps = S.tickets.filter(function(t){ return inD(t.createdAt) && num(t.deposit); });
   var bbOut = (S.bb||[]).filter(function(x){ return inD(x.createdAt) && num(x.paid); });
   var bbIn = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inD(x.soldAt); });
@@ -1668,7 +1669,7 @@ function receiptText(t){
   var c = t.customer || {}, lines = ['iFixPhones receipt · Ticket #' + t.num, ((t.device||{}).model||'') + ': ' + repairsText(t)];
   if (discountAmt(t)) lines.push('Discount: -' + money(discountAmt(t)));
   if (taxAmt(t)) lines.push('Sales tax: ' + money(taxAmt(t)));
-  if (num(t.surcharge)) lines.push('Card surcharge: ' + money(t.surcharge));
+  if (cardFees(t)) lines.push('Credit card fee: ' + money(cardFees(t)));
   lines.push('Total paid: ' + money(collected(t)) + (payLabel(t) ? ' (' + payLabel(t) + ')' : ''));
   lines.push('Warranty: ' + (t.warranty || 'None') + '. Policy: ifixphones.net/policy.html');
   lines.push('Thank you, ' + (String(c.name||'').split(' ')[0] || 'friend') + '!');
@@ -1685,8 +1686,8 @@ function receiptDoc(t){
     '<table>' + rows + tr('Subtotal', money(subtotal(t))) + (discountAmt(t) ? tr('Discount' + (t.discountNote ? ' (' + esc(t.discountNote) + ')' : ''), '−' + money(discountAmt(t))) : '') +
       tr('Sales tax' + (taxRateOf(t) ? ' (' + taxRateOf(t) + '%)' : t.taxExempt ? ' (exempt)' : ''), money(taxAmt(t))) + tr('Total', money(total(t)), 1) +
       (num(t.surcharge) ? tr('Credit card surcharge', money(t.surcharge)) : '') +
-      (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') +
-      tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(collected(t) - num(t.deposit))), 1) +
+      (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') + (num(t.depSurcharge) ? tr('Credit card fee on deposit', money(t.depSurcharge)) : '') +
+      tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(total(t) - num(t.deposit) + num(t.surcharge))), 1) +
       (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
     '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (/incell/i.test(repairsText(t)) ? '. Incell parts have no warranty.' : '') + '<br>Warranty covers the part only when our supplier does; cracks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' +
     '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
@@ -2229,7 +2230,7 @@ function renderSheet(){
         (discountAmt(t) ? '<div class="tot"><span>Discount'+(t.discountNote?' · '+esc(t.discountNote):'')+'</span><span>−'+money(discountAmt(t))+'</span></div>' : '') +
         (taxAmt(t) ? '<div class="tot"><span>Sales tax ('+taxRateOf(t)+'%)</span><span>'+money(taxAmt(t))+'</span></div>' : (t.taxExempt ? '<div class="tot"><span>Sales tax</span><span class="t2">Exempt</span></div>' : '')) +
         '<div class="tot b"><span>Total</span><span>'+money(tot)+'</span></div>' +
-        (dep ? '<div class="tot"><span>Deposit'+(t.depMethod?' ('+esc(t.depMethod)+')':'')+'</span><span>−'+money(dep)+'</span></div><div class="tot"><span>Balance</span><span>'+money(bal)+'</span></div>' : '') +
+        (dep ? '<div class="tot"><span>Deposit'+(t.depMethod?' ('+esc(t.depMethod)+')':'')+(num(t.depSurcharge)?' <span class="t2">+ '+money(t.depSurcharge)+' card fee</span>':'')+'</span><span>−'+money(dep)+'</span></div><div class="tot"><span>Balance</span><span>'+money(bal)+'</span></div>' : '') +
         payBlock +
         '<div class="g2" style="margin-top:14px"><div class="f"><label for="asg">Technician</label><select class="in" id="asg" data-act="assign" '+(ro?'disabled':'')+'>'+techOpts+'</select></div>' +
         '<div class="f"><label for="war">Warranty</label><select class="in" id="war" data-act="warranty" '+(ro?'disabled':'')+'>'+warrOpts+'</select></div></div>' +
@@ -2456,14 +2457,14 @@ function ticketForm(existing, prefill){
         '<div class="f"><label for="tf-discn">Discount reason</label><input class="in" id="tf-discn" maxlength="40" value="'+esc(t && t.discountNote || '')+'" placeholder="Returning customer"></div>' +
         '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-tex" '+(t&&t.taxExempt?'checked':'')+'>Tax exempt</label></div></div>' +
         '<div class="g3" style="margin-top:12px"><div class="f"><label for="tf-dep">Deposit</label><input class="in" id="tf-dep" inputmode="decimal" value="'+esc(t && num(t.deposit) ? t.deposit : '')+'" placeholder="$0"></div>' +
-        '<div class="f"><label for="tf-depm">Deposit paid by</label><select class="in" id="tf-depm">'+PAY.map(function(p){ return '<option'+(p===((t&&t.depMethod)||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div></div>' +
+        '<div class="f"><label for="tf-depm">Deposit paid by</label><select class="in" id="tf-depm">'+PAY.map(function(p){ return '<option'+(p===((t&&t.depMethod)||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f" style="justify-content:flex-end"><p class="hint" id="tf-dephint" style="margin:0 0 10px"></p></div></div>' +
         '<div class="g3" style="margin-top:12px">' +
         '<div class="f"><label for="tf-tech">Technician</label><select class="in" id="tf-tech">'+techOpts+'</select></div>' +
         '<div class="f"><label for="tf-war">Warranty</label><select class="in" id="tf-war">'+warrOpts+'</select></div></div>' +
         '<div class="g2" style="margin-top:12px"><div class="f"><label for="tf-due">Promised by (optional)</label><input class="in" id="tf-due" type="datetime-local" value="'+esc(toLocalInput(t && t.dueAt))+'"></div>' +
         '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-wret" '+(t&&t.warrantyReturn?'checked':'')+'>Warranty return</label></div></div>' +
         '<div class="acts" style="margin-top:8px"><button type="button" class="chip" data-due="1">In 1 hour</button><button type="button" class="chip" data-due="eod">Today by close</button><button type="button" class="chip" data-due="tmr">Tomorrow 2 PM</button></div>' +
-        '<div id="tf-sums" style="margin-top:14px"></div><div class="tot b"><span>Total</span><span id="tf-total">$0</span></div>' +
+        '<div id="tf-sums" style="margin-top:14px"></div><div class="tot b"><span>Total</span><span id="tf-total">$0</span></div><div id="tf-card"></div>' +
       '</div>' +
       '<div class="msec"><h3><span class="n">4</span>Condition at check-in</h3>' +
         '<div class="cl">' + CHECKS.map(function(ch){
@@ -2516,7 +2517,7 @@ function ticketForm(existing, prefill){
   });
   m.addEventListener('input', function(e){
     if (e.target.id === 'tf-phone') lookupCustomer();
-    if (e.target.closest('.irow') || ['tf-dep','tf-disc','tf-tex'].indexOf(e.target.id) > -1) { syncItems(); updateTotal(); }
+    if (e.target.closest('.irow') || ['tf-dep','tf-disc','tf-tex','tf-depm'].indexOf(e.target.id) > -1) { syncItems(); updateTotal(); }
     if (e.target.classList.contains('bad')) e.target.classList.remove('bad');
   });
   m.addEventListener('change', function(e){
@@ -2586,6 +2587,10 @@ function updateTotal(){
   var sm = $('#tf-sums');
   if (sm) sm.innerHTML = '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
     '<div class="tot"><span>Sales tax'+(tmp.taxExempt ? ' (exempt)' : ' ('+num(NT.taxRate)+'%)')+'</span><span>'+money(taxAmt(tmp))+'</span></div>' + (num(($('#tf-dep')||{}).value) ? '<div class="tot"><span>Deposit</span><span>−'+money(num($('#tf-dep').value))+'</span></div>' : '');
+  var sr = surRate(), tc = $('#tf-card');
+  if (tc) tc.innerHTML = sr && total(tmp) ? '<div class="tot" style="color:var(--blue)"><span>If paid by credit card (+'+sr+'%)</span><span>'+money(r2(total(tmp) * (1 + sr/100)))+'</span></div>' : '';
+  var dh = $('#tf-dephint'), dv = num(($('#tf-dep')||{}).value), dm = ($('#tf-depm')||{}).value;
+  if (dh) dh.innerHTML = sr && dv && CARDISH.indexOf(dm) > -1 ? 'Charge <b>'+money(r2(dv * (1 + sr/100)))+'</b> on Square (deposit + '+sr+'% card fee)' : '';
 }
 
 function submitForm(t, m, closeForm){
@@ -2612,6 +2617,7 @@ function submitForm(t, m, closeForm){
     items: items,
     deposit: num($('#tf-dep').value),
     depMethod: num($('#tf-dep').value) ? $('#tf-depm').value : '',
+    depSurcharge: num($('#tf-dep').value) && CARDISH.indexOf($('#tf-depm').value) > -1 ? r2(num($('#tf-dep').value) * surRate() / 100) : 0,
     discount: num($('#tf-disc').value),
     discountNote: $('#tf-discn').value.trim().slice(0,40),
     taxExempt: $('#tf-tex').checked,
