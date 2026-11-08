@@ -94,6 +94,18 @@ a{color:var(--link);text-decoration:none}
 .apv{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line2);font-size:14px;flex-wrap:wrap}
 .apv:last-child{border-bottom:0}
 .stockpick{display:flex;gap:8px;margin-top:8px}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.mblock{background:#fff;border-radius:var(--r);overflow:hidden}
+.mhead2{width:100%;border:0;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;text-align:left;font-size:15px}
+.msum{display:flex;gap:6px;align-items:center}
+.chev{color:var(--graphite);font-size:20px;line-height:1;transition:transform .15s;display:inline-block}
+.mblock.open .chev{transform:rotate(90deg)}
+.mparts{padding:0 18px 8px;border-top:1px solid var(--line2)}
+.prow2{display:grid;grid-template-columns:minmax(0,1fr) 46px auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line2)}
+.prow2:last-child{border-bottom:0}
+.pname{border:0;background:none;text-align:left;padding:4px 0;display:flex;flex-direction:column;font-size:15px}
+.pstat{font-size:12.5px;text-align:right}
+.qty button:disabled{opacity:.35}
 
 button.stat:hover{box-shadow:inset 0 0 0 1px var(--line)}
 .stat b{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
@@ -1176,25 +1188,100 @@ function qrSvg(text, px){
 
 /* ---------- inventory ---------- */
 var STOCK_CATS = ['Screen','Battery','Charging port','Back glass','Camera','Speaker','Other'];
-function stockLow(i){ return num(i.qty) <= num(i.min || 0); }
-function lowCount(){ return (S.inv||[]).filter(function(i){ return num(i.min) > 0 && stockLow(i); }).length; }
+/* stock organized by brand > model > part */
+function partTypes(brand, model){
+  var m = String(model||'');
+  if (brand === 'Apple iPhone') {
+    var oled = /(1[3-9]|2\d) Pro/.test(m);
+    return ['Screen · Incell'].concat(oled ? ['Screen · OLED'] : []).concat(['Screen · Original','Battery','Charging port']).concat(/iPhone [78]\b|iPhone 7 Plus/.test(m) ? [] : ['Back glass']).concat(['Rear camera']);
+  }
+  if (brand === 'Apple iPad' || /Tab/.test(m)) return ['Screen / digitizer','LCD','Battery','Charging port'];
+  if (/Fold/.test(m)) return ['Inner screen','Outer screen','Battery','Charging port','Back glass'];
+  return ['Screen','Battery','Charging port','Back glass','Rear camera'];
+}
+function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 140); }
+function invById(id){ return (S.inv||[]).filter(function(x){ return x.id === id; })[0]; }
+function stockLow(i){ return num(i.qty) <= num(i.min == null ? 1 : i.min); }
+function isTracked(i){ return num(i.min == null ? 1 : i.min) > 0; }
+function lowCount(){ return (S.inv||[]).filter(function(i){ return isTracked(i) && stockLow(i); }).length; }
 function stockView(){
-  var q = (S.q||'').toLowerCase();
-  var list = (S.inv||[]).filter(function(i){ return !q || (i.name + ' ' + i.cat + ' ' + (i.supplier||'')).toLowerCase().indexOf(q) > -1; })
-    .sort(function(a,b){ var la = stockLow(a) && num(a.min) > 0, lb = stockLow(b) && num(b.min) > 0; return (lb - la) || String(a.name).localeCompare(b.name); });
-  var worth = (S.inv||[]).reduce(function(a,i){ return a + num(i.qty) * num(i.cost); }, 0);
-  var low = lowCount();
-  var head = '<div class="rgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><b>'+(S.inv||[]).length+'</b><span>Parts tracked</span></div><div class="stat"><b'+(low?' class="low"':'')+'>'+low+'</b><span>Running low</span></div><div class="stat"><b>'+money(worth)+'</b><span>Stock value (at cost)</span></div></div>';
-  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search stock</label><input id="q" type="search" placeholder="Search stock" value="'+esc(S.q)+'" autocomplete="off"></div><button class="btn" data-act="stockadd">+ Add part</button></div>';
-  var rows = list.map(function(i){
-    var n = num(i.qty), lw = num(i.min) > 0 && stockLow(i);
-    return '<div class="stk"><div><div class="t1">'+esc(i.name)+'</div><div class="t2">'+esc(i.cat||'')+(i.supplier?' · '+esc(i.supplier):'')+(num(i.min)?' · low at '+num(i.min):'')+'</div></div>' +
-      '<div class="qty"><button data-act="stockqty" data-id="'+esc(i.id)+'" data-v="-1" aria-label="One less">−</button><b class="'+(n<=0?'out':lw?'low':'')+'">'+n+'</b><button data-act="stockqty" data-id="'+esc(i.id)+'" data-v="1" aria-label="One more">+</button></div>' +
-      '<div class="hide-s amt">'+(num(i.cost)?money(i.cost):'')+'</div>' +
-      '<div class="hide-s">'+(n<=0?'<span class="out">Out</span>':lw?'<span class="low">Low</span>':'<span class="t2">OK</span>')+'</div>' +
-      '<button class="link" data-act="stockedit" data-id="'+esc(i.id)+'">Edit</button></div>';
-  }).join('');
-  return head + bar + (rows ? '<div>'+rows+'</div>' : '<div class="panel empty"><h3>'+(q?'No parts match':'No stock yet')+'</h3><p>Add the screens, batteries and other parts you keep on hand. When a tech uses one on a ticket, the count goes down automatically.</p></div>');
+  var inv = S.inv || [], q = (S.q||'').toLowerCase().trim();
+  var worth = inv.reduce(function(a,i){ return a + num(i.qty) * num(i.cost); }, 0);
+  var inStock = inv.reduce(function(a,i){ return a + Math.max(0, num(i.qty)); }, 0), low = lowCount();
+  var head = '<div class="rgrid"><div class="stat"><b>'+inStock+'</b><span>Parts on the shelf</span></div><button class="stat" data-act="reorder"><b'+(low?' class="low"':'')+'>'+low+'</b><span>Low or out · tap for order list</span></button><div class="stat"><b>'+money(worth)+'</b><span>Stock value (at cost)</span></div></div>';
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search models</label><input id="q" type="search" placeholder="Search a model, e.g. 14 Pro" value="'+esc(S.q)+'" autocomplete="off"></div>' +
+    '<button class="btn sm ghost" data-act="stockonly" aria-pressed="'+!!S.stockOnly+'">'+(S.stockOnly?'Showing: in stock':'Showing: all models')+'</button></div>';
+  var brands = BRANDS.filter(function(b){ return b !== 'Other'; });
+  S.sBrand = S.sBrand || brands[0];
+  var count = function(b){ return inv.filter(function(i){ return i.brand === b; }).reduce(function(a,i){ return a + Math.max(0, num(i.qty)); }, 0); };
+  var chips = '<div class="chips" style="margin-bottom:14px">' + brands.concat(['Other parts']).map(function(b){
+    var n = b === 'Other parts' ? inv.filter(function(i){ return !i.brand || i.brand === 'Other'; }).length : count(b);
+    return '<button class="chip" data-act="sbrand" data-v="'+esc(b)+'" aria-pressed="'+(!q && S.sBrand===b)+'">'+esc(b.replace('Apple ',''))+(n?' <i>'+n+'</i>':'')+'</button>';
+  }).join('') + '</div>';
+  var body;
+  if (!q && S.sBrand === 'Other parts') {
+    var other = inv.filter(function(i){ return !i.brand || i.brand === 'Other'; }).sort(function(a,b){ return String(a.name).localeCompare(b.name); });
+    body = '<div class="panel" style="padding:8px 18px">' + (other.length ? other.map(function(i){ return partRow({id:i.id, name:i.name, item:i}); }).join('') : '<p class="muted" style="padding:12px 0">Tools, adhesive, screen protectors, cases, anything else you keep on hand.</p>') +
+      '<div class="acts" style="margin:10px 0"><button class="btn sm" data-act="stockadd">+ Add other part</button></div></div>';
+  } else {
+    var list = [];
+    (q ? brands : [S.sBrand]).forEach(function(b){ (CATALOG[b]||[]).forEach(function(m){ if (!q || m.toLowerCase().indexOf(q) > -1 || q.split(/\s+/).every(function(w){ return m.toLowerCase().indexOf(w) > -1; })) list.push({b:b, m:m}); }); });
+    if (S.stockOnly) list = list.filter(function(x){ return inv.some(function(i){ return i.brand === x.b && i.model === x.m && num(i.qty) > 0; }); });
+    S.openModels = S.openModels || {};
+    body = list.length ? '<div class="mlist">' + list.map(function(x){
+      var key = x.b + '|' + x.m, items = inv.filter(function(i){ return i.brand === x.b && i.model === x.m; });
+      var have = items.reduce(function(a,i){ return a + Math.max(0, num(i.qty)); }, 0), lowN = items.filter(function(i){ return isTracked(i) && stockLow(i); }).length;
+      var open = !!S.openModels[key] || (q && list.length <= 3);
+      return '<div class="mblock'+(open?' open':'')+'"><button class="mhead2" data-act="smodel" data-v="'+esc(key)+'" aria-expanded="'+open+'"><span><b>'+esc(x.m)+'</b>'+(q?'<span class="t2"> · '+esc(x.b.replace('Apple ',''))+'</span>':'')+'</span><span class="msum">'+(have?'<span class="tagk ok">'+have+' in stock</span>':'')+(lowN?'<span class="tagk" style="background:#fff1e0;color:#a04a00">'+lowN+' low</span>':'')+'<span class="chev">›</span></span></button>' +
+        (open ? '<div class="mparts">' + partTypes(x.b, x.m).map(function(pt){ var id = stockId(x.b, x.m, pt); return partRow({id:id, name:pt, item:invById(id), brand:x.b, model:x.m, part:pt}); }).join('') + '</div>' : '') + '</div>';
+    }).join('') + '</div>' : '<div class="panel empty"><h3>'+(S.stockOnly?'Nothing in stock here':'No models match')+'</h3><p>'+(S.stockOnly?'Tap “Showing: in stock” to see all models.':'Try a shorter search, like “14 Pro” or “S23”.')+'</p></div>';
+  }
+  return head + bar + chips + body;
+}
+function partRow(o){
+  var i = o.item, n = i ? num(i.qty) : 0, tracked = i && isTracked(i), lw = tracked && stockLow(i);
+  var spec = esc(JSON.stringify({id:o.id, brand:o.brand||'', model:o.model||'', part:o.part||''}));
+  return '<div class="prow2"><button class="pname" data-act="partedit" data-spec="'+spec+'"><span>'+esc(o.name)+'</span>'+(i && num(i.cost)?'<span class="t2">'+money(i.cost)+' each</span>':'')+'</button>' +
+    '<span class="pstat">'+(!i ? '' : n <= 0 && tracked ? '<span class="out">Out</span>' : lw ? '<span class="low">Low</span>' : '')+'</span>' +
+    '<span class="qty"><button data-act="pbump" data-spec="'+spec+'" data-v="-1" aria-label="One less '+esc(o.name)+'"'+(n<=0?' disabled':'')+'>−</button><b class="'+(i && n<=0 && tracked?'out':lw?'low':'')+'">'+n+'</b><button data-act="pbump" data-spec="'+spec+'" data-v="1" aria-label="One more '+esc(o.name)+'">+</button></span></div>';
+}
+function bumpPart(spec, delta){
+  var i = invById(spec.id);
+  var cur = i ? num(i.qty) : 0;
+  if (cur + delta < 0) return;
+  if (i) { i.qty = cur + delta; }
+  else { i = {id:spec.id, brand:spec.brand, model:spec.model, part:spec.part, name:spec.model + ' · ' + spec.part, cat:String(spec.part).split(' ')[0], qty:delta, min:1, cost:0}; S.inv = (S.inv||[]).concat([i]); }
+  render();
+  var body = {qty: FV().increment(delta), updatedAt: Date.now()};
+  if (spec.brand) { body.brand = spec.brand; body.model = spec.model; body.part = spec.part; body.name = spec.model + ' · ' + spec.part; body.cat = String(spec.part).split(' ')[0]; }
+  S.db.doc('inventory/' + spec.id).set(body, {merge:true}).then(function(){
+    if (delta < 0 && isTracked(i) && i.qty <= num(i.min == null ? 1 : i.min)) toast((i.qty <= 0 ? 'Out of ' : 'Running low: ') + i.name);
+  }).catch(writeErr);
+}
+function partEditBox(spec){
+  var i = invById(spec.id) || {qty:0, min:1, cost:'', supplier:''};
+  var name = i.name || (spec.model + ' · ' + spec.part);
+  var m = modalShell('pe', esc(name),
+    '<div class="g2"><div class="f"><label for="pe-qty">In stock</label><input class="in" id="pe-qty" inputmode="numeric" value="'+esc(num(i.qty))+'"></div><div class="f"><label for="pe-min">Warn me at</label><input class="in" id="pe-min" inputmode="numeric" value="'+esc(i.min == null ? 1 : i.min)+'"></div></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="pe-cost">Cost each</label><input class="in" id="pe-cost" inputmode="decimal" value="'+esc(i.cost||'')+'" placeholder="$"></div><div class="f"><label for="pe-sup">Supplier</label><select class="in" id="pe-sup">'+['' ].concat(SUPPLIERS).map(function(x){ return '<option'+(x===(i.supplier||'')?' selected':'')+' value="'+esc(x)+'">'+esc(x||'—')+'</option>'; }).join('')+'</select></div></div>' +
+    '<p class="hint" style="margin-top:10px">Set “Warn me at” to 0 if you don’t want low-stock warnings for this part.</p>',
+    (i.id ? '<button class="link red" id="pe-del" style="margin-right:auto">Stop tracking</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="pe-save">Save</button>');
+  $('#pe-save', m).addEventListener('click', function(){
+    var o = {qty:Math.max(0, Math.round(num($('#pe-qty', m).value))), min:Math.max(0, Math.round(num($('#pe-min', m).value))), cost:num($('#pe-cost', m).value), supplier:$('#pe-sup', m).value, updatedAt:Date.now()};
+    if (spec.brand) { o.brand = spec.brand; o.model = spec.model; o.part = spec.part; o.name = name; o.cat = String(spec.part).split(' ')[0]; }
+    m.remove();
+    S.db.doc('inventory/' + spec.id).set(o, {merge:true}).then(function(){ toast('Saved'); }).catch(writeErr);
+  });
+  var del = $('#pe-del', m);
+  if (del) del.addEventListener('click', function(){ if (!confirm('Stop tracking ' + name + '?')) return; m.remove(); S.db.doc('inventory/' + spec.id).delete().then(function(){ toast('Removed'); }).catch(writeErr); });
+}
+function reorderBox(){
+  var list = (S.inv||[]).filter(function(i){ return isTracked(i) && stockLow(i); }).sort(function(a,b){ return String(a.supplier||'').localeCompare(b.supplier||'') || String(a.name).localeCompare(b.name); });
+  var text = list.map(function(i){ return '- ' + i.name + ' (have ' + num(i.qty) + ')' + (i.supplier ? ' · ' + i.supplier : ''); }).join('\n');
+  var m = modalShell('ro', 'Order list', list.length ? '<p class="muted" style="margin-bottom:10px">Parts that are low or out. Copy this into your supplier order.</p><pre style="white-space:pre-wrap;background:var(--mist);border-radius:12px;padding:12px 14px;font:inherit;font-size:14px">'+esc(text)+'</pre>' : '<div class="empty" style="padding:24px"><h3>Nothing to order</h3><p>Everything you track is stocked.</p></div>',
+    '<button class="btn ghost" data-mclose>Close</button>' + (list.length ? '<button class="btn" id="ro-copy">Copy list</button>' : ''), true);
+  var cp = $('#ro-copy', m);
+  if (cp) cp.addEventListener('click', function(){ navigator.clipboard.writeText('iFixPhones parts order\n' + text).then(function(){ toast('Copied'); }, function(){ toast('Select the text and copy it'); }); });
 }
 function stockBox(item){
   var i = item || {cat:'Screen', qty:1, min:1};
@@ -1207,7 +1294,7 @@ function stockBox(item){
   requestAnimationFrame(function(){ $('#sk-name', m).focus(); });
   $('#sk-save', m).addEventListener('click', function(){
     var name = $('#sk-name', m).value.trim(); if (!name) { $('#sk-err', m).textContent = 'Enter the part name.'; return; }
-    var o = {name:name.slice(0,80), cat:$('#sk-cat', m).value, supplier:$('#sk-sup', m).value, qty:Math.round(num($('#sk-qty', m).value)), min:Math.round(num($('#sk-min', m).value)), cost:num($('#sk-cost', m).value), updatedAt:Date.now()};
+    var o = {brand:'Other', name:name.slice(0,80), cat:$('#sk-cat', m).value, supplier:$('#sk-sup', m).value, qty:Math.round(num($('#sk-qty', m).value)), min:Math.round(num($('#sk-min', m).value)), cost:num($('#sk-cost', m).value), updatedAt:Date.now()};
     var ref = item ? S.db.doc('inventory/'+item.id) : S.db.collection('inventory').doc();
     m.remove();
     retryOnce(function(){ return item ? ref.update(o) : ref.set(Object.assign({createdAt:Date.now()}, o)); }).then(function(){ toast(item ? 'Saved' : 'Added to stock'); }).catch(writeErr);
@@ -1220,12 +1307,12 @@ function stockQty(id, delta){
   if (num(i.qty) + delta < 0) { toast(i.name + ' is already at 0'); return; }
   i.qty = num(i.qty) + delta; render();
   S.db.doc('inventory/'+id).update({qty: FV().increment(delta), updatedAt: Date.now()}).then(function(){
-    if (delta < 0 && num(i.min) > 0 && i.qty <= num(i.min)) toast('Running low: ' + i.name + ' (' + i.qty + ' left)');
+    if (delta < 0 && isTracked(i) && stockLow(i)) toast((i.qty <= 0 ? 'Out of ' : 'Running low: ') + i.name + ' (' + i.qty + ' left)');
   }).catch(writeErr);
 }
 function stockOptions(t){
   var model = String((t.device||{}).model||'').toLowerCase(), words = model.split(/\s+/).filter(function(w){ return w.length > 1; });
-  var score = function(i){ var n = String(i.name).toLowerCase(); return words.filter(function(w){ return n.indexOf(w) > -1; }).length; };
+  var score = function(i){ if (i.model && String(i.model).toLowerCase() === model) return 100; var n = String(i.name).toLowerCase(); return words.filter(function(w){ return n.indexOf(w) > -1; }).length; };
   return (S.inv||[]).filter(function(i){ return num(i.qty) > 0; }).sort(function(a,b){ return score(b) - score(a) || String(a.name).localeCompare(b.name); })
     .map(function(i){ return '<option value="'+esc(i.id)+'">'+esc(i.name)+' ('+num(i.qty)+' left)</option>'; }).join('');
 }
@@ -2480,6 +2567,12 @@ document.addEventListener('click', async function(e){
     case 'closeout': printHtml(closeoutDoc()); break;
     case 'pmode': S.pMode = a.getAttribute('data-v'); S.q = ''; render(); break;
     case 'stockadd': stockBox(null); break;
+    case 'sbrand': S.sBrand = a.getAttribute('data-v'); S.q = ''; render(); break;
+    case 'smodel': { S.openModels = S.openModels || {}; var mk = a.getAttribute('data-v'); S.openModels[mk] = !S.openModels[mk]; render(); break; }
+    case 'stockonly': S.stockOnly = !S.stockOnly; render(); break;
+    case 'pbump': bumpPart(JSON.parse(a.getAttribute('data-spec')), +a.getAttribute('data-v')); break;
+    case 'partedit': partEditBox(JSON.parse(a.getAttribute('data-spec'))); break;
+    case 'reorder': reorderBox(); break;
     case 'stockedit': { var si = (S.inv||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (si) stockBox(si); break; }
     case 'stockqty': stockQty(a.getAttribute('data-id'), +a.getAttribute('data-v')); break;
     case 'usestock': { var sp = $('#stk-pick'); if (t && sp && sp.value) useStock(t, sp.value); break; }
