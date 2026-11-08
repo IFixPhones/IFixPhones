@@ -3,11 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IFixPhones | Phone and iPad Repair in San Antonio</title>
-<meta name="description" content="Phone and iPad repair for every model. Walk in at 9055 Marbach Rd, Suite 105, or book mobile repair and we come to you.">
+<title>iFixPhones | Phone, iPad and Mobile Repair in San Antonio</title>
+<meta name="description" content="Phone and iPad repair for every model in San Antonio. Walk in at 9055 Marbach Rd, Suite 105, or book mobile repair and we come to you. Open 7 days.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d1d1f'/%3E%3Crect x='21' y='12' width='22' height='40' rx='5' fill='none' stroke='%23fff' stroke-width='3.5'/%3E%3Cpath d='M28 17h8' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta property="og:title" content="iFixPhones | Phone and iPad Repair">
+<meta property="og:description" content="Every repair. In store or at your door. San Antonio, TX.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"MobilePhoneStore",
+  "name":"iFixPhones",
+  "url":"https://ifixphones.net",
+  "telephone":"+1-210-773-3548",
+  "email":"ifixphones9055@gmail.com",
+  "address":{"@type":"PostalAddress","streetAddress":"9055 Marbach Rd, Suite 105","addressLocality":"San Antonio","addressRegion":"TX","addressCountry":"US"},
+  "openingHoursSpecification":[
+    {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"10:00","closes":"20:00"},
+    {"@type":"OpeningHoursSpecification","dayOfWeek":"Sunday","opens":"12:00","closes":"18:00"}
+  ]
+}
+</script>
 <style>
 :root{
   --white:#ffffff;
@@ -17,6 +36,7 @@
   --line:#d2d2d7;
   --blue:#0071e3;
   --link:#0066cc;
+  --green:#1a7f37;
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -26,36 +46,42 @@ a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:3px solid rgba(0,113,227,.55);outline-offset:3px;border-radius:6px}
 img,svg{display:block}
-
 .w{max-width:1000px;margin:0 auto;padding:0 22px}
 h1,h2,h3{font-weight:600;letter-spacing:-.03em;line-height:1.05}
-h2{font-size:clamp(36px,6vw,56px);text-wrap:balance}
-.lede{font-size:clamp(19px,2.4vw,24px);line-height:1.3;color:var(--graphite);margin-top:10px;letter-spacing:-.015em}
+h2{font-size:clamp(34px,6vw,56px);text-wrap:balance}
+.lede{font-size:clamp(18px,2.4vw,24px);line-height:1.3;color:var(--graphite);margin-top:10px;letter-spacing:-.015em}
 .center{text-align:center}
-.center .lede{margin-left:auto;margin-right:auto;max-width:36ch;text-wrap:balance}
+.center .lede{margin-left:auto;margin-right:auto;max-width:38ch;text-wrap:balance}
 
 /* nav */
-.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
-.nav .w{display:flex;align-items:center;justify-content:space-between;height:48px}
-.brand{font-weight:600;font-size:19px;color:var(--ink);letter-spacing:-.02em}
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
+.nav .w{display:flex;align-items:center;justify-content:space-between;height:52px;gap:16px}
+.brand{font-weight:700;font-size:20px;color:var(--ink);letter-spacing:-.035em}
 .brand:hover{text-decoration:none}
-.nav ul{display:flex;gap:28px;list-style:none;font-size:13px}
+.nav ul{display:flex;gap:26px;list-style:none;font-size:13px;align-items:center}
 .nav ul a{color:var(--ink);opacity:.8}
 .nav ul a:hover{opacity:1;text-decoration:none}
-@media (max-width:600px){.nav ul li.hide-s{display:none}.nav ul{gap:18px}}
+.nav .call{background:var(--ink);color:#fff;opacity:1;padding:7px 14px;border-radius:999px;font-weight:500}
+.nav .call:hover{background:#000}
+@media (max-width:700px){.nav ul li.hide-s{display:none}.nav ul{gap:14px}}
+
+.status{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--graphite);background:var(--mist);padding:6px 12px 6px 10px;border-radius:999px;margin-bottom:22px}
+.status i{width:8px;height:8px;border-radius:50%;background:#aeaeb2}
+.status.open i{background:#30d158;box-shadow:0 0 0 3px rgba(48,209,88,.2)}
+.status b{color:var(--ink);font-weight:600}
 
 /* buttons */
-.btn{display:inline-block;background:var(--blue);color:#fff;font-size:17px;font-weight:400;padding:11px 22px;border-radius:980px;border:0;cursor:pointer;font-family:inherit;letter-spacing:-.01em}
+.btn{display:inline-block;background:var(--blue);color:#fff;font-size:17px;font-weight:400;padding:12px 24px;border-radius:980px;border:0;cursor:pointer;font-family:inherit;letter-spacing:-.01em}
 .btn:hover{background:#0077ed;text-decoration:none}
-.btn.light{background:#fff;color:var(--ink)}
-.btn.light:hover{background:#ececf0}
+.btn[disabled]{opacity:.6;cursor:default}
 .more{font-size:17px}
-.more::after{content:" ›";}
+.more::after{content:" ›"}
 .actions{display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:24px}
 
 /* hero */
-.hero{padding:clamp(56px,9vw,96px) 0 0;overflow:hidden}
+.hero{padding:clamp(40px,7vw,80px) 0 0;overflow:hidden}
 .hero h1{font-size:clamp(56px,11vw,112px);letter-spacing:-.045em}
+
 .lineup{display:flex;justify-content:center;align-items:flex-end;gap:clamp(12px,2.6vw,32px);margin:clamp(48px,7vw,72px) auto 0;padding:0 12px 40px;max-width:1100px;
   --pw:clamp(78px,13vw,150px);--tw:clamp(150px,27vw,310px)}
 .lineup .s{--pw:clamp(68px,11vw,130px)}
@@ -111,7 +137,17 @@ h2{font-size:clamp(36px,6vw,56px);text-wrap:balance}
 @keyframes glint{0%{opacity:1;transform:translateX(-80%)}100%{opacity:0;transform:translateX(80%)}}
 @media (prefers-reduced-motion:reduce){.crack,.shatter,.glint{display:none}}
 
-/* sections */
+
+
+
+/* proof strip */
+.proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.proof div{padding:22px 16px;text-align:center}
+.proof div+div{border-left:1px solid var(--line)}
+.proof b{display:block;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.proof span{display:block;font-size:13px;color:var(--graphite);margin-top:2px}
+@media (max-width:720px){.proof{grid-template-columns:repeat(2,minmax(0,1fr))}.proof div:nth-child(3){border-left:0}.proof div:nth-child(n+3){border-top:1px solid var(--line)}}
+
 section{padding:clamp(72px,10vw,120px) 0}
 .mist{background:var(--mist)}
 .dark{background:#000;color:#f5f5f7}
@@ -120,13 +156,13 @@ section{padding:clamp(72px,10vw,120px) 0}
 .dark a.btn{color:#fff}
 
 /* repairs */
-.repairs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
-.tile{text-align:left;background:#fff;border-radius:22px;padding:32px 26px 30px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between}
-.tile h3{font-size:24px;letter-spacing:-.025em}
+.repairs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:56px}
+.tile{text-align:left;background:#fff;border-radius:22px;padding:30px 26px 28px;min-height:210px;display:flex;flex-direction:column;justify-content:space-between}
+.tile h3{font-size:23px;letter-spacing:-.025em}
 .tile p{color:var(--graphite);font-size:15px;margin-top:4px}
-.tile svg{width:56px;height:56px;margin-bottom:28px}
-@media (max-width:820px){.repairs{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:480px){.repairs{grid-template-columns:1fr 1fr;gap:10px}.tile{padding:22px 18px;min-height:170px;border-radius:18px}.tile h3{font-size:19px}.tile svg{width:42px;height:42px;margin-bottom:18px}}
+.tile svg{width:52px;height:52px;margin-bottom:26px}
+@media (max-width:820px){.repairs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.repairs{gap:10px}.tile{padding:20px 16px;min-height:168px;border-radius:18px}.tile h3{font-size:18px}.tile p{font-size:14px}.tile svg{width:40px;height:40px;margin-bottom:16px}}
 .also{color:var(--graphite);margin-top:28px;font-size:15px}
 
 /* models */
@@ -134,62 +170,83 @@ section{padding:clamp(72px,10vw,120px) 0}
 .models span{color:#c7c7cc}
 .models span:nth-child(odd){color:var(--ink)}
 
-/* quality */
-.tiers{display:grid;grid-template-columns:repeat(3,1fr);margin-top:56px;border-top:1px solid var(--line)}
-.tier{padding:30px 22px 0;text-align:center}
-.tier+.tier{border-left:1px solid var(--line)}
-.meter{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
-.meter i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+/* screen options */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:56px;text-align:left}
+.tier{background:#fff;border-radius:22px;padding:30px 26px;display:flex;flex-direction:column}
+.tier.pick{box-shadow:inset 0 0 0 2px var(--ink)}
+.tier .tag{font-size:13px;font-weight:600;color:var(--graphite);min-height:18px}
+.tier.pick .tag{color:var(--ink)}
+.meter{display:flex;gap:6px;margin:14px 0 18px}
+.meter i{width:28px;height:6px;border-radius:3px;background:var(--line)}
 .meter i.on{background:var(--ink)}
-.tier h3{font-size:24px}
-.tier p{color:var(--graphite);margin-top:4px;font-size:16px}
-@media (max-width:600px){.tiers{grid-template-columns:1fr;border-top:0}.tier{padding:24px 0;border-top:1px solid var(--line)}.tier+.tier{border-left:0}}
+.tier h3{font-size:26px}
+.tier p{color:var(--graphite);margin-top:8px;font-size:16px;line-height:1.45}
+.tier .fits{margin-top:auto;padding-top:20px;font-size:14px;color:var(--ink);font-weight:500}
+.fine{max-width:640px;margin:28px auto 0;font-size:14px;color:var(--graphite);line-height:1.5}
+@media (max-width:820px){.tiers{grid-template-columns:1fr}.tier .fits{padding-top:14px}}
 
 /* mobile */
 .route{width:100%;max-width:640px;margin:48px auto 0;height:auto}
 .route .path{stroke-dasharray:6 8}
-.fee{color:#86868b;font-size:14px;margin-top:20px}
+.fee{color:#a1a1a6;font-size:15px;margin-top:20px}
 
 /* booking */
-.book{max-width:640px;margin:48px auto 0}
+.book{max-width:660px;margin:48px auto 0;text-align:left}
 .seg{display:flex;background:var(--mist);border-radius:12px;padding:3px;margin-bottom:22px}
-.seg button{flex:1;border:0;background:transparent;font:inherit;font-size:15px;padding:9px;border-radius:9px;color:var(--ink);cursor:pointer}
-.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:500}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg button{flex:1;border:0;background:transparent;font:inherit;font-size:15px;padding:10px;border-radius:9px;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:600}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .fields .full{grid-column:1/-1}
 @media (max-width:540px){.fields{grid-template-columns:1fr}}
 .field{position:relative}
-.field input,.field select,.field textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:#fff;border:1px solid #86868b;border-radius:12px;padding:24px 14px 8px;outline:none;-webkit-appearance:none;appearance:none}
+.field input,.field select,.field textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:#fff;border:1px solid #86868b;border-radius:12px;padding:25px 14px 8px;outline:none;-webkit-appearance:none;appearance:none;min-height:58px}
 .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+.field select:disabled{background-color:var(--mist);color:var(--graphite)}
 .field textarea{min-height:96px;resize:vertical}
 .field label{position:absolute;left:15px;top:8px;font-size:12px;color:var(--graphite);pointer-events:none}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.2)}
-.field.bad input,.field.bad select{border-color:#e30000;background:#fff2f4}
+.field.bad input,.field.bad select{border-color:#d70015;background-color:#fff5f6}
+.err{color:#d70015;font-size:14px;margin-top:12px;text-align:center}
 .note{font-size:13px;color:var(--graphite);text-align:center;margin-top:14px}
-.submit{width:100%;margin-top:18px;padding:15px;font-size:17px;border-radius:12px}
+.submit{width:100%;margin-top:18px;padding:16px;font-size:17px;border-radius:12px}
 .hidden{display:none !important}
-.sent{margin-top:24px;background:var(--mist);border-radius:18px;padding:24px;text-align:center}
-.sent h3{font-size:24px}
-.sent p{color:var(--graphite);margin-top:6px;font-size:15px}
-.sent pre{text-align:left;white-space:pre-wrap;font:15px/1.5 var(--font);background:#fff;border-radius:12px;padding:16px;margin:16px 0;color:var(--ink)}
-.sent .actions{margin-top:8px;gap:18px}
-.linkbtn{background:none;border:0;font:inherit;color:var(--link);cursor:pointer;font-size:17px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.done{text-align:center;background:var(--mist);border-radius:22px;padding:44px 26px}
+.done .check{width:56px;height:56px;border-radius:50%;background:var(--green);margin:0 auto 18px;display:grid;place-items:center}
+.done h3{font-size:28px}
+.done p{color:var(--graphite);margin-top:8px}
+.done .sum{display:inline-block;text-align:left;margin-top:20px;font-size:15px;color:var(--ink);background:#fff;border-radius:14px;padding:16px 20px;line-height:1.6}
 
 /* visit */
-.visit{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:48px}
-.card{background:#fff;border-radius:22px;padding:34px 30px}
-.card .big{font-size:clamp(24px,3.4vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.15}
-.card .small{color:var(--graphite);font-size:15px;margin-bottom:8px}
-.card .more{display:inline-block;margin-top:18px}
-.card + .card .row + .row{margin-top:22px}
+.visit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:48px;text-align:left}
+.card{background:#fff;border-radius:22px;padding:32px 30px}
+.card .big{font-size:clamp(22px,3.2vw,30px);font-weight:600;letter-spacing:-.03em;line-height:1.15;color:var(--ink)}
+.card .small{color:var(--graphite);font-size:14px;margin-bottom:6px}
+.card .more{display:inline-block;margin-top:16px}
+.row + .row{margin-top:22px}
+.hours{list-style:none;margin-top:4px}
+.hours li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #ececf0;font-size:16px}
+.hours li:last-child{border-bottom:0}
+.hours li.today{font-weight:600}
+.hours li span:last-child{color:var(--graphite)}
+.hours li.today span:last-child{color:var(--ink)}
 @media (max-width:720px){.visit{grid-template-columns:1fr}}
 
-footer{background:var(--mist);border-top:1px solid var(--line);padding:22px 0 100px;font-size:12px;color:var(--graphite)}
-footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+/* faq */
+.faq{max-width:720px;margin:40px auto 0;text-align:left}
+.faq details{border-bottom:1px solid var(--line);padding:20px 0}
+.faq summary{cursor:pointer;font-size:19px;font-weight:600;letter-spacing:-.02em;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-weight:400;color:var(--graphite);font-size:24px;line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq p{color:var(--graphite);margin-top:10px;line-height:1.55}
 
-/* thumb bar on phones */
-.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;display:none;gap:8px;padding:6px;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.14)}
-.bar a{flex:1;text-align:center;padding:11px 6px;border-radius:999px;font-size:15px;color:var(--ink)}
+footer{background:var(--mist);border-top:1px solid var(--line);padding:26px 0 110px;font-size:12px;color:var(--graphite)}
+footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (min-width:641px){footer{padding-bottom:26px}}
+
+.bar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;display:none;gap:8px;padding:6px;background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-radius:999px;box-shadow:0 8px 30px rgba(0,0,0,.14)}
+.bar a{flex:1;text-align:center;padding:12px 6px;border-radius:999px;font-size:15px;color:var(--ink)}
 .bar a.pri{background:var(--blue);color:#fff}
 .bar a:hover{text-decoration:none}
 @media (max-width:640px){.bar{display:flex}}
@@ -199,12 +256,13 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
 <nav class="nav" aria-label="Main">
   <div class="w">
-    <a href="#top" class="brand">IFixPhones</a>
+    <a href="#top" class="brand">iFixPhones</a>
     <ul>
       <li class="hide-s"><a href="#repairs">Repairs</a></li>
-      <li><a href="#mobile">Mobile</a></li>
-      <li><a href="#visit">Visit</a></li>
-      <li><a href="tel:+12107733548">Call</a></li>
+      <li class="hide-s"><a href="#screens">Screens</a></li>
+      <li class="hide-s"><a href="#mobile">Mobile</a></li>
+      <li><a href="#visit">Hours</a></li>
+      <li><a class="call" href="tel:+12107733548">Call</a></li>
     </ul>
   </div>
 </nav>
@@ -213,14 +271,14 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
   <header class="hero center">
     <div class="w">
+      <div class="status" id="status"><i></i><span>Open 7 days</span></div>
       <h1>Fixed. Fast.</h1>
-      <p class="lede">Phone and iPad repair. In store or at your door.</p>
+      <p class="lede">Phone and iPad repair in San Antonio. In store or at your door.</p>
       <div class="actions">
-        <a class="btn" href="#visit">Walk in</a>
-        <a class="more" href="#book">Book mobile repair</a>
+        <a class="btn" href="#book">Book a repair</a>
+        <a class="more" href="tel:+12107733548">Call (210) 773-3548</a>
       </div>
     </div>
-
     <div class="lineup" aria-hidden="true">
       <div class="dev phone punch s x alu-violet"><i class="k r" style="top:22%;height:14%"></i><i class="k r" style="top:40%;height:7%"></i><div class="scr g4"></div></div>
       <div class="dev phone pill ti-natural"><i class="k l" style="top:17%;height:5%"></i><i class="k l" style="top:25%;height:9%"></i><i class="k l" style="top:36%;height:9%"></i><i class="k r" style="top:27%;height:14%"></i><div class="scr g2"></div></div>
@@ -242,42 +300,50 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     </div>
   </header>
 
-  <section id="repairs" class="mist center">
+  <div class="w">
+    <div class="proof">
+      <div><b>20 years</b><span>of repair experience</span></div>
+      <div><b>Every model</b><span>iPhone, Samsung, iPad and more</span></div>
+      <div><b>Walk-ins</b><span>No appointment needed</span></div>
+      <div><b>Mobile</b><span>We come to you</span></div>
+    </div>
+  </div>
+
+  <section id="repairs" class="center">
     <div class="w">
       <h2>Whatever broke.</h2>
-      <p class="lede">Every repair. Every model.</p>
-
+      <p class="lede">We fix it. Every repair, every model.</p>
       <div class="repairs">
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="6"/><path d="M31 18l-5 7 6 4-4 8"/></svg>
-          <div><h3>Screen</h3><p>Cracked, black, or not responding.</p></div>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="15" y="4" width="26" height="48" rx="6"/><path d="M31 18l-5 7 6 4-4 8"/></svg>
+          <div><h3>Screen</h3><p>Cracked, black or not responding.</p></div>
         </div>
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="17" width="40" height="22" rx="5"/><path d="M50 24v8"/><rect x="11" y="22" width="12" height="12" rx="2" fill="#1d1d1f" stroke="none"/></svg>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="17" width="40" height="22" rx="5"/><path d="M50 24v8"/><rect x="11" y="22" width="12" height="12" rx="2" fill="#1d1d1f" stroke="none"/></svg>
           <div><h3>Battery</h3><p>Dies fast or shuts off.</p></div>
         </div>
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="20" width="32" height="16" rx="8"/><rect x="20" y="25" width="16" height="6" rx="3"/></svg>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="20" width="32" height="16" rx="8"/><rect x="20" y="25" width="16" height="6" rx="3"/></svg>
           <div><h3>Charging port</h3><p>Won't charge or feels loose.</p></div>
         </div>
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="6"/><rect x="19" y="8" width="11" height="11" rx="3"/><path d="M36 30l-6 6 4 4-3 7"/></svg>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="15" y="4" width="26" height="48" rx="6"/><rect x="19" y="8" width="11" height="11" rx="3"/><path d="M36 30l-6 6 4 4-3 7"/></svg>
           <div><h3>Back glass</h3><p>Shattered back panel.</p></div>
         </div>
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="28" cy="28" r="18"/><circle cx="28" cy="28" r="8"/><circle cx="33" cy="22" r="1.6" fill="#1d1d1f"/></svg>
-          <div><h3>Camera</h3><p>Blurry, cracked lens, or black.</p></div>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="28" cy="28" r="18"/><circle cx="28" cy="28" r="8"/><circle cx="33" cy="22" r="1.6" fill="#1d1d1f"/></svg>
+          <div><h3>Camera</h3><p>Blurry, cracked lens or black.</p></div>
         </div>
-        <div class="tile">
-          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 6s14 16 14 27a14 14 0 01-28 0C14 22 28 6 28 6z"/></svg>
+        <div class="tile" style="background:var(--mist)">
+          <svg viewBox="0 0 56 56" fill="none" stroke="#1d1d1f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M28 6s14 16 14 27a14 14 0 01-28 0C14 22 28 6 28 6z"/></svg>
           <div><h3>Water damage</h3><p>Turn it off. Bring it in.</p></div>
         </div>
       </div>
-      <p class="also">Plus speakers, mics, buttons, and diagnostics.</p>
+      <p class="also">Plus speakers, mics, buttons, soldering, unlocking and data recovery.</p>
     </div>
   </section>
 
-  <section class="center">
+  <section class="mist center">
     <div class="w">
       <h2>Every model.</h2>
       <div class="models">
@@ -286,24 +352,34 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     </div>
   </section>
 
-  <section class="mist center">
+  <section id="screens" class="center">
     <div class="w">
-      <h2>Your budget. Your call.</h2>
-      <p class="lede">Pick the part quality that fits.</p>
-      <div class="tiers">
-        <div class="tier">
+      <h2>Pick your screen.</h2>
+      <p class="lede">Three options. We'll tell you exactly which part goes in your phone.</p>
+      <div class="tiers" style="--card:var(--mist)">
+        <div class="tier" style="background:var(--mist)">
+          <div class="tag">Best price</div>
           <div class="meter" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-          <h3>Economy</h3><p>Lowest price.</p>
+          <h3>Aftermarket</h3>
+          <p>A quality replacement screen at the lowest price.</p>
+          <div class="fits">Most iPhone models</div>
         </div>
-        <div class="tier">
+        <div class="tier pick" style="background:var(--mist)">
+          <div class="tag">Most popular on Pro models</div>
           <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></div>
-          <h3>Standard</h3><p>Best value.</p>
+          <h3>Premium OLED</h3>
+          <p>Our best aftermarket screen. Deep blacks and sharp, bright color.</p>
+          <div class="fits">iPhone 13 Pro and Pro Max and newer Pro models</div>
         </div>
-        <div class="tier">
+        <div class="tier" style="background:var(--mist)">
+          <div class="tag">Closest to factory</div>
           <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></div>
-          <h3>Premium</h3><p>Closest to factory.</p>
+          <h3>Original</h3>
+          <p>A refurbished original screen, or a brand-new genuine Apple part for a higher price.</p>
+          <div class="fits">Ask us for your model</div>
         </div>
       </div>
+      <p class="fine">Newer iPhones may show a parts notice in Settings after a screen replacement. Your phone works the same, and we'll walk you through it before we start.</p>
     </div>
   </section>
 
@@ -312,7 +388,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       <h2>We come to you.</h2>
       <p class="lede">Home, work, wherever. Fixed on the spot.</p>
       <div class="actions">
-        <a class="btn" href="#book">Book a time</a>
+        <a class="btn" href="#book" data-mode="mobile">Book mobile repair</a>
         <a class="more" href="tel:+12107242800">Call (210) 724-2800</a>
       </div>
       <svg class="route" viewBox="0 0 640 120" aria-hidden="true">
@@ -323,61 +399,64 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         <text x="40" y="116" fill="#86868b" font-size="13" text-anchor="middle" font-family="-apple-system,Inter,sans-serif">Shop</text>
         <text x="600" y="88" fill="#86868b" font-size="13" text-anchor="middle" font-family="-apple-system,Inter,sans-serif">You</text>
       </svg>
-      <p class="fee">Trip fee depends on distance. Call and we'll quote it.</p>
+      <p class="fee">Trip fee depends on distance. We'll quote it when we confirm your time.</p>
     </div>
   </section>
 
   <section id="book" class="center">
     <div class="w">
       <h2>Book a repair.</h2>
-      <p class="lede">We'll text you to confirm.</p>
+      <p class="lede">Pick a time. We'll text you to confirm.</p>
 
       <div class="book">
-        <div class="seg" role="group" aria-label="Where">
-          <button type="button" id="optMobile" aria-pressed="true">Mobile</button>
-          <button type="button" id="optStore" aria-pressed="false">In store</button>
+        <div id="formWrap">
+          <div class="seg" role="group" aria-label="Where should we fix it?">
+            <button type="button" id="optMobile" aria-pressed="true">We come to you</button>
+            <button type="button" id="optStore" aria-pressed="false">At the shop</button>
+          </div>
+
+          <form id="form" novalidate>
+            <div class="fields">
+              <div class="field"><label for="name">Name</label><input id="name" name="Name" autocomplete="name" required></div>
+              <div class="field"><label for="phone">Phone</label><input id="phone" name="Phone" type="tel" autocomplete="tel" inputmode="tel" required></div>
+              <div class="field"><label for="device">Device</label><input id="device" name="Device" placeholder="iPhone 14 Pro, Galaxy S23…" required></div>
+              <div class="field"><label for="repair">Repair</label>
+                <select id="repair" name="Repair" required>
+                  <option value="">Choose</option>
+                  <option>Screen</option><option>Battery</option><option>Charging port</option>
+                  <option>Back glass</option><option>Camera</option><option>Water damage</option>
+                  <option>Speaker or mic</option><option>Buttons</option><option>Not sure</option>
+                </select>
+              </div>
+              <div class="field full hidden" id="qualityField"><label for="quality">Screen</label>
+                <select id="quality" name="Screen">
+                  <option>Not sure, help me choose</option>
+                  <option>Aftermarket</option>
+                  <option>Premium OLED (iPhone 13 Pro and newer Pro models)</option>
+                  <option>Original (refurbished or genuine Apple)</option>
+                </select>
+              </div>
+              <div class="field"><label for="date">Day</label><input id="date" name="Day" type="date" required></div>
+              <div class="field"><label for="time">Time</label>
+                <select id="time" name="Time" required disabled>
+                  <option value="">Pick a day first</option>
+                </select>
+              </div>
+              <div class="field full" id="addrField"><label for="address">Address</label><input id="address" name="Address" autocomplete="street-address" required></div>
+              <div class="field full"><label for="notes">Anything else? (optional)</label><textarea id="notes" name="Notes"></textarea></div>
+            </div>
+            <div class="hp" aria-hidden="true"><label for="hp">Leave empty</label><input id="hp" name="_honey" tabindex="-1" autocomplete="off"></div>
+            <p class="err hidden" id="err" role="alert"></p>
+            <button class="btn submit" type="submit" id="submit">Request appointment</button>
+            <p class="note" id="note">Trip fee quoted when we confirm. Nothing to pay now.</p>
+          </form>
         </div>
 
-        <form id="form" novalidate>
-          <div class="fields">
-            <div class="field"><label for="name">Name</label><input id="name" autocomplete="name" required></div>
-            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" required></div>
-            <div class="field"><label for="device">Device</label><input id="device" placeholder="iPhone 14, Galaxy S23…" required></div>
-            <div class="field"><label for="repair">Repair</label>
-              <select id="repair" required>
-                <option value="">Choose</option>
-                <option>Screen</option><option>Battery</option><option>Charging port</option>
-                <option>Back glass</option><option>Camera</option><option>Water damage</option>
-                <option>Speaker or mic</option><option>Buttons</option><option>Not sure</option>
-              </select>
-            </div>
-            <div class="field"><label for="quality">Part quality</label>
-              <select id="quality">
-                <option>Not sure yet</option><option>Economy</option><option>Standard</option><option>Premium</option>
-              </select>
-            </div>
-            <div class="field"><label for="date">Day</label><input id="date" type="date" required></div>
-            <div class="field"><label for="time">Time</label>
-              <select id="time" required>
-                <option value="">Choose</option>
-                <option>Morning</option><option>Midday</option><option>Afternoon</option><option>Evening</option><option>Anytime</option>
-              </select>
-            </div>
-            <div class="field" id="addrField"><label for="address">Address</label><input id="address" autocomplete="street-address" required></div>
-            <div class="field full"><label for="notes">Notes (optional)</label><textarea id="notes"></textarea></div>
-          </div>
-          <button class="btn submit" type="submit">Send request</button>
-          <p class="note" id="note">Opens a text to (210) 724-2800. Trip fee quoted when we confirm.</p>
-        </form>
-
-        <div class="sent hidden" id="sent" aria-live="polite">
-          <h3>One more tap.</h3>
-          <p>Hit send in your messages app. If it didn't open, text this to <span id="sentNum"></span>.</p>
-          <pre id="msg"></pre>
-          <div class="actions">
-            <a class="btn" id="smsBtn" href="#">Open messages</a>
-            <button class="linkbtn" id="copyBtn" type="button">Copy text</button>
-          </div>
+        <div class="done hidden" id="done" tabindex="-1" aria-live="polite">
+          <div class="check" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg></div>
+          <h3>Request sent.</h3>
+          <p>We'll text you at <b id="doneNum" style="color:var(--ink)"></b> to confirm.</p>
+          <div class="sum" id="doneSum"></div>
         </div>
       </div>
     </div>
@@ -386,23 +465,59 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <section id="visit" class="mist center">
     <div class="w">
       <h2>Walk-ins welcome.</h2>
-      <p class="lede">No appointment needed.</p>
-      <div class="visit" style="text-align:left">
-        <div class="card">
-          <p class="small">The shop</p>
-          <p class="big">9055 Marbach Rd<br>Suite 105<br>San Antonio, TX</p>
-          <a class="more" href="https://www.google.com/maps/search/?api=1&query=9055+Marbach+Rd+Suite+105+San+Antonio+TX">Directions</a>
-        </div>
+      <p class="lede">No appointment needed at the shop.</p>
+      <div class="visit">
         <div class="card">
           <div class="row">
+            <p class="small">The shop</p>
+            <p class="big">9055 Marbach Rd, Suite 105<br>San Antonio, TX</p>
+            <a class="more" href="https://www.google.com/maps/search/?api=1&query=9055+Marbach+Rd+Suite+105+San+Antonio+TX">Directions</a>
+          </div>
+          <div class="row">
             <p class="small">Shop</p>
-            <a class="big" href="tel:+12107733548" style="color:var(--ink)">(210) 773-3548</a>
+            <a class="big" href="tel:+12107733548">(210) 773-3548</a>
           </div>
           <div class="row">
             <p class="small">Mobile repair</p>
-            <a class="big" href="tel:+12107242800" style="color:var(--ink)">(210) 724-2800</a>
+            <a class="big" href="tel:+12107242800">(210) 724-2800</a>
           </div>
         </div>
+        <div class="card">
+          <p class="small">Hours</p>
+          <ul class="hours" id="hours">
+            <li data-d="1"><span>Monday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="2"><span>Tuesday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="3"><span>Wednesday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="4"><span>Thursday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="5"><span>Friday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="6"><span>Saturday</span><span>10 AM – 8 PM</span></li>
+            <li data-d="0"><span>Sunday</span><span>12 PM – 6 PM</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="center">
+    <div class="w">
+      <h2>Questions.</h2>
+      <div class="faq">
+        <details>
+          <summary>Do I need an appointment?</summary>
+          <p>Not at the shop. Walk in any time we're open. For mobile repair, book a time above or call (210) 724-2800.</p>
+        </details>
+        <details>
+          <summary>Which screen should I pick?</summary>
+          <p>Aftermarket is the best price. Premium OLED is our best aftermarket screen for iPhone 13 Pro and newer Pro models. Original is a refurbished original or a genuine Apple part, closest to factory. Not sure? Pick "help me choose" and we'll recommend one for your phone.</p>
+        </details>
+        <details>
+          <summary>How much is the mobile trip fee?</summary>
+          <p>It depends on how far you are from the shop. We'll quote it when we text you to confirm, before anything is booked.</p>
+        </details>
+        <details>
+          <summary>Do you fix more than phones?</summary>
+          <p>Yes. iPads, tablets and more, plus soldering, unlocking and data recovery. Call and ask about your device.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -411,35 +526,103 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
 <footer>
   <div class="w">
-    <span>Copyright <span id="yr"></span> IFixPhones. San Antonio, TX.</span>
-    <span>ifixphones.net</span>
+    <span>© <span id="yr"></span> iFixPhones. 9055 Marbach Rd, Suite 105, San Antonio, TX.</span>
+    <a href="mailto:ifixphones9055@gmail.com">ifixphones9055@gmail.com</a>
   </div>
 </footer>
 
 <div class="bar">
   <a href="tel:+12107733548">Call shop</a>
-  <a class="pri" href="#book">Book mobile</a>
+  <a class="pri" href="#book">Book a repair</a>
 </div>
 
 <script>
 (function(){
-  var $ = function(id){return document.getElementById(id)};
+  var EMAIL = 'ifixphones9055@gmail.com';
+  var $ = function(id){ return document.getElementById(id); };
   $('yr').textContent = new Date().getFullYear();
 
-  // the crack mends shortly after load
+  // the cracked screen mends after load
   var hurt = $('hurt');
-  setTimeout(function(){ hurt.classList.add('mend'); }, 700);
+  if (hurt) setTimeout(function(){ hurt.classList.add('mend'); }, 700);
 
-  try{
-    var d = new Date();
-    $('date').min = new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);
-  }catch(e){}
+  // ---- hours (San Antonio time) ----
+  // open/close in minutes from midnight; 0 = Sunday
+  var HOURS = {0:[720,1080],1:[600,1200],2:[600,1200],3:[600,1200],4:[600,1200],5:[600,1200],6:[600,1200]};
+  var DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-  var LINES = {
-    mobile:{num:'+12107242800', label:'(210) 724-2800'},
-    store:{num:'+12107733548', label:'(210) 773-3548'}
-  };
+  function shopNow(){
+    try{
+      var parts = new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23',weekday:'short'}).formatToParts(new Date());
+      var o = {}; parts.forEach(function(p){ o[p.type] = p.value; });
+      var wd = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday);
+      return {y:+o.year, m:+o.month, d:+o.day, dow:wd, min:(+o.hour)*60 + (+o.minute)};
+    }catch(e){
+      var n = new Date();
+      return {y:n.getFullYear(), m:n.getMonth()+1, d:n.getDate(), dow:n.getDay(), min:n.getHours()*60+n.getMinutes()};
+    }
+  }
+  function fmt(min){
+    var h = Math.floor(min/60), m = min%60, ap = h >= 12 ? 'PM' : 'AM';
+    var hh = h % 12 || 12;
+    return hh + (m ? ':' + (m<10?'0':'') + m : '') + ' ' + ap;
+  }
+  function pad(n){ return (n<10?'0':'') + n; }
+
+  var now = shopNow();
+  var todayISO = now.y + '-' + pad(now.m) + '-' + pad(now.d);
+
+  // open / closed pill
+  (function(){
+    var h = HOURS[now.dow], el = $('status'), txt;
+    if (now.min >= h[0] && now.min < h[1]) {
+      el.classList.add('open');
+      txt = '<b>Open now</b> until ' + fmt(h[1]);
+    } else if (now.min < h[0]) {
+      txt = '<b>Closed</b>, opens ' + fmt(h[0]) + ' today';
+    } else {
+      var nd = (now.dow + 1) % 7;
+      txt = '<b>Closed</b>, opens ' + fmt(HOURS[nd][0]) + ' tomorrow';
+    }
+    el.querySelector('span').innerHTML = txt;
+    var li = document.querySelector('#hours li[data-d="' + now.dow + '"]');
+    if (li) li.classList.add('today');
+  })();
+
+  // ---- booking ----
   var mode = 'mobile';
+  var dateEl = $('date'), timeEl = $('time');
+  dateEl.min = todayISO;
+  // book up to 60 days out
+  (function(){
+    var t = new Date(now.y, now.m-1, now.d + 60);
+    dateEl.max = t.getFullYear() + '-' + pad(t.getMonth()+1) + '-' + pad(t.getDate());
+  })();
+
+  function fillTimes(){
+    var v = dateEl.value;
+    timeEl.innerHTML = '';
+    if (!v) { timeEl.disabled = true; timeEl.innerHTML = '<option value="">Pick a day first</option>'; return; }
+    var p = v.split('-'), dt = new Date(+p[0], +p[1]-1, +p[2]);
+    var h = HOURS[dt.getDay()];
+    // last start one hour before close
+    var start = h[0], end = h[1] - 60;
+    if (v === todayISO) {
+      var earliest = Math.ceil((now.min + 60) / 30) * 30; // at least an hour from now
+      start = Math.max(start, earliest);
+    }
+    var opts = ['<option value="">Choose a time</option>'];
+    for (var m = start; m <= end; m += 30) opts.push('<option>' + fmt(m) + '</option>');
+    if (opts.length === 1) {
+      timeEl.innerHTML = '<option value="">No times left today</option>';
+      timeEl.disabled = true;
+      return;
+    }
+    timeEl.innerHTML = opts.join('');
+    timeEl.disabled = false;
+  }
+  dateEl.addEventListener('change', fillTimes);
+  dateEl.addEventListener('input', fillTimes);
 
   function setMode(m){
     mode = m;
@@ -449,66 +632,94 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     $('addrField').classList.toggle('hidden', !mob);
     $('address').required = mob;
     $('note').textContent = mob
-      ? 'Opens a text to (210) 724-2800. Trip fee quoted when we confirm.'
-      : 'Opens a text to (210) 773-3548. Walk-ins are always welcome too.';
+      ? 'Trip fee quoted when we confirm. Nothing to pay now.'
+      : 'Walk-ins are always welcome too. Nothing to pay now.';
   }
-  $('optMobile').addEventListener('click', function(){setMode('mobile')});
-  $('optStore').addEventListener('click', function(){setMode('store')});
+  $('optMobile').addEventListener('click', function(){ setMode('mobile'); });
+  $('optStore').addEventListener('click', function(){ setMode('store'); });
+  document.querySelectorAll('[data-mode]').forEach(function(a){
+    a.addEventListener('click', function(){ setMode(a.getAttribute('data-mode')); });
+  });
 
-  function nice(v){
-    if(!v) return '';
+  $('repair').addEventListener('change', function(){
+    $('qualityField').classList.toggle('hidden', this.value !== 'Screen');
+  });
+
+  function niceDate(v){
     var p = v.split('-');
-    return new Date(+p[0], +p[1]-1, +p[2]).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    return new Date(+p[0], +p[1]-1, +p[2]).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   }
+  function showErr(msg){ var e = $('err'); e.innerHTML = msg; e.classList.remove('hidden'); }
+
+  ['name','phone','device','repair','date','time','address'].forEach(function(id){
+    $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); $('err').classList.add('hidden'); });
+    $(id).addEventListener('change', function(){ this.parentNode.classList.remove('bad'); });
+  });
 
   $('form').addEventListener('submit', function(e){
     e.preventDefault();
+    if ($('hp').value) return; // bot
+
     var need = ['name','phone','device','repair','date','time'];
-    if(mode === 'mobile') need.push('address');
+    if (mode === 'mobile') need.push('address');
     var first = null;
     need.forEach(function(id){
       var el = $(id), bad = !el.value.trim();
       el.parentNode.classList.toggle('bad', bad);
-      if(bad && !first) first = el;
+      if (bad && !first) first = el;
     });
-    if(first){ first.focus(); return; }
+    var digits = $('phone').value.replace(/\D/g,'');
+    if (!first && (digits.length < 10 || digits.length > 11)) {
+      $('phone').parentNode.classList.add('bad'); first = $('phone');
+      showErr('Please enter a 10-digit phone number.');
+    } else if (first) {
+      showErr('Please fill in the highlighted fields.');
+    }
+    if (first) { first.focus(); return; }
 
-    var line = LINES[mode];
-    var body = [
-      (mode === 'mobile' ? 'Mobile repair request' : 'In-store appointment request'),
-      'Name: ' + $('name').value.trim(),
-      'Phone: ' + $('phone').value.trim(),
-      'Device: ' + $('device').value.trim(),
-      'Repair: ' + $('repair').value,
-      'Parts: ' + $('quality').value,
-      'When: ' + nice($('date').value) + ', ' + $('time').value
-    ];
-    if(mode === 'mobile') body.push('Address: ' + $('address').value.trim());
-    if($('notes').value.trim()) body.push('Notes: ' + $('notes').value.trim());
-    var text = body.join('\n');
+    var where = mode === 'mobile' ? 'Mobile (we go to customer)' : 'At the shop';
+    var when = niceDate($('date').value) + ' at ' + $('time').value;
+    var data = {
+      _subject: 'New ' + (mode === 'mobile' ? 'MOBILE' : 'shop') + ' booking: ' + $('repair').value + ' – ' + $('device').value.trim(),
+      _template: 'table',
+      _captcha: 'false',
+      'Where': where,
+      'When': when,
+      'Name': $('name').value.trim(),
+      'Phone': $('phone').value.trim(),
+      'Device': $('device').value.trim(),
+      'Repair': $('repair').value
+    };
+    if ($('repair').value === 'Screen') data['Screen'] = $('quality').value;
+    if (mode === 'mobile') data['Address'] = $('address').value.trim();
+    if ($('notes').value.trim()) data['Notes'] = $('notes').value.trim();
 
-    var href = 'sms:' + line.num + '?&body=' + encodeURIComponent(text);
-    $('msg').textContent = text;
-    $('sentNum').textContent = line.label;
-    $('smsBtn').href = href;
-    $('sent').classList.remove('hidden');
-    $('sent').scrollIntoView({behavior:'smooth', block:'center'});
-    try{ window.location.href = href; }catch(err){}
+    var btn = $('submit');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    $('err').classList.add('hidden');
+
+    fetch('https://formsubmit.co/ajax/' + EMAIL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(data)
+    }).then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(res){
+      if (!res.ok || String(res.j.success) === 'false') throw new Error('send');
+      $('doneNum').textContent = data.Phone;
+      $('doneSum').innerHTML =
+        '<b>' + data.Repair + '</b> on ' + escapeHtml(data.Device) + '<br>' +
+        when + '<br>' + (mode === 'mobile' ? escapeHtml(data.Address) : '9055 Marbach Rd, Suite 105');
+      $('formWrap').classList.add('hidden');
+      $('done').classList.remove('hidden');
+      $('done').focus();
+    })
+    .catch(function(){
+      btn.disabled = false; btn.textContent = 'Request appointment';
+      showErr('We couldn’t send that. Please call or text <a href="tel:+12107242800">(210) 724-2800</a> and we’ll book you in.');
+    });
   });
 
-  ['name','phone','device','repair','date','time','address'].forEach(function(id){
-    $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); });
-  });
-
-  $('copyBtn').addEventListener('click', function(){
-    var b = this;
-    try{
-      navigator.clipboard.writeText($('msg').textContent).then(function(){
-        b.textContent = 'Copied';
-        setTimeout(function(){ b.textContent = 'Copy text'; }, 1800);
-      }, function(){ b.textContent = 'Select the text above to copy'; });
-    }catch(e){ b.textContent = 'Select the text above to copy'; }
-  });
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 })();
 </script>
 </body>
