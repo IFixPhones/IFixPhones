@@ -185,6 +185,39 @@ section{padding:clamp(72px,10vw,120px) 0}
 .fine{max-width:640px;margin:28px auto 0;font-size:14px;color:var(--graphite);line-height:1.5}
 @media (max-width:820px){.tiers{grid-template-columns:1fr}.tier .fits{padding-top:14px}}
 
+
+/* screen comparison */
+.cmp{margin-top:48px;background:var(--mist);border-radius:28px;padding:clamp(22px,4vw,44px);text-align:left}
+.cmp .seg{max-width:460px;margin:0 auto 34px;background:#e8e8ed}
+.cmpbody{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,5vw,56px);align-items:center}
+@media (max-width:760px){.cmpbody{grid-template-columns:1fr}}
+.cmpstage{display:flex;justify-content:center}
+.cmpstage .dev{--pw:clamp(150px,22vw,200px)}
+.shot{position:absolute;inset:0;background:#000;transition:filter .5s ease}
+.shot .sky{position:absolute;inset:0;background:radial-gradient(38% 22% at 62% 30%,#ffd27a 0%,#ff7a45 35%,transparent 70%),radial-gradient(60% 30% at 20% 78%,#5b3cff 0%,transparent 70%),radial-gradient(50% 26% at 85% 88%,#00c2a8 0%,transparent 70%)}
+.shot .t{position:absolute;left:0;right:0;top:44%;text-align:center;color:#fff;font-weight:600;font-size:clamp(28px,4vw,38px);letter-spacing:-.03em}
+.shot .lift{position:absolute;inset:0;background:#3a3d48;mix-blend-mode:lighten;opacity:0;transition:opacity .5s ease}
+.shot.incell{filter:saturate(.72) brightness(.9)}
+.shot.incell .lift{opacity:.55}
+.shot.oled{filter:saturate(1) brightness(1)}
+.shot.original{filter:saturate(1.18) contrast(1.06) brightness(1.04)}
+.cmpinfo .tag{font-size:14px;font-weight:600;color:var(--graphite)}
+.cmpinfo h3{font-size:clamp(30px,4vw,40px);margin-top:4px}
+.cmpinfo .desc{color:var(--graphite);margin-top:10px;line-height:1.5;max-width:42ch}
+.rates{list-style:none;margin-top:24px;border-top:1px solid var(--line)}
+.rates li{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:16px}
+.dots{display:flex;gap:5px}
+.dots i{width:10px;height:10px;border-radius:50%;background:#d2d2d7;transition:background .3s ease}
+.dots i.on{background:var(--ink)}
+.rates .val{font-weight:600}
+.cmpinfo .fits{margin-top:18px;font-size:14px;color:var(--ink);font-weight:500}
+.illus{font-size:12px;color:var(--graphite);text-align:center;margin-top:22px}
+
+/* quote */
+.quote{max-width:660px;margin:40px auto 0;text-align:left}
+.quote .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.alt{text-align:center;font-size:15px;color:var(--graphite);margin-top:16px}
+
 /* mobile */
 .route{width:100%;max-width:640px;margin:48px auto 0;height:auto}
 .route .path{stroke-dasharray:6 8}
@@ -261,6 +294,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       <li class="hide-s"><a href="#repairs">Repairs</a></li>
       <li class="hide-s"><a href="#screens">Screens</a></li>
       <li class="hide-s"><a href="#mobile">Mobile</a></li>
+      <li class="hide-s"><a href="#quote">Free quote</a></li>
       <li><a href="#visit">Hours</a></li>
       <li><a class="call" href="tel:+12107733548">Call</a></li>
     </ul>
@@ -355,30 +389,36 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <section id="screens" class="center">
     <div class="w">
       <h2>Pick your screen.</h2>
-      <p class="lede">Three options. We'll tell you exactly which part goes in your phone.</p>
-      <div class="tiers" style="--card:var(--mist)">
-        <div class="tier" style="background:var(--mist)">
-          <div class="tag">Best price</div>
-          <div class="meter" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
-          <h3>Aftermarket</h3>
-          <p>A quality replacement screen at the lowest price.</p>
-          <div class="fits">Most iPhone models</div>
+      <p class="lede">Three options. Tap to compare. We'll always tell you exactly which part goes in your phone.</p>
+      <div class="cmp">
+        <div class="seg" role="tablist" aria-label="Screen type">
+          <button type="button" role="tab" data-t="incell" aria-pressed="false">Incell</button>
+          <button type="button" role="tab" data-t="oled" aria-pressed="true">OLED</button>
+          <button type="button" role="tab" data-t="original" aria-pressed="false">Original</button>
         </div>
-        <div class="tier pick" style="background:var(--mist)">
-          <div class="tag">Most popular on Pro models</div>
-          <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></div>
-          <h3>Premium OLED</h3>
-          <p>Our best aftermarket screen. Deep blacks and sharp, bright color.</p>
-          <div class="fits">iPhone 13 Pro and Pro Max and newer Pro models</div>
-        </div>
-        <div class="tier" style="background:var(--mist)">
-          <div class="tag">Closest to factory</div>
-          <div class="meter" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></div>
-          <h3>Original</h3>
-          <p>A refurbished original screen, or a brand-new genuine Apple part for a higher price.</p>
-          <div class="fits">Ask us for your model</div>
+        <div class="cmpbody">
+          <div class="cmpstage" aria-hidden="true">
+            <div class="dev phone pill ti-natural">
+              <i class="k l" style="top:17%;height:5%"></i><i class="k l" style="top:25%;height:9%"></i><i class="k l" style="top:36%;height:9%"></i><i class="k r" style="top:27%;height:14%"></i>
+              <div class="scr"><div class="shot oled" id="shot"><div class="sky"></div><div class="lift"></div><div class="t">9:41</div></div></div>
+            </div>
+          </div>
+          <div class="cmpinfo" aria-live="polite">
+            <div class="tag" id="cTag">Our best aftermarket screen</div>
+            <h3 id="cName">Premium OLED</h3>
+            <p class="desc" id="cDesc">True deep blacks and bright, sharp color like the original, for a lot less.</p>
+            <ul class="rates">
+              <li><span>Black levels</span><span class="dots" data-r="black"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Color</span><span class="dots" data-r="color"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Brightness</span><span class="dots" data-r="bright"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Touch feel</span><span class="dots" data-r="touch"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Price</span><span class="val" id="cPrice">$$</span></li>
+            </ul>
+            <div class="fits" id="cFits">iPhone 13 Pro and Pro Max and newer Pro models</div>
+          </div>
         </div>
       </div>
+      <p class="illus">Screens shown are illustrations of the difference, not photos.</p>
       <p class="fine">Newer iPhones may show a parts notice in Settings after a screen replacement. Your phone works the same, and we'll walk you through it before we start.</p>
     </div>
   </section>
@@ -400,6 +440,31 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         <text x="600" y="88" fill="#86868b" font-size="13" text-anchor="middle" font-family="-apple-system,Inter,sans-serif">You</text>
       </svg>
       <p class="fee">Trip fee depends on distance. We'll quote it when we confirm your time.</p>
+    </div>
+  </section>
+
+  <section id="quote" class="mist center">
+    <div class="w">
+      <h2>Free quote.</h2>
+      <p class="lede">Tell us what's wrong. We'll text you a price.</p>
+      <div class="quote">
+        <form id="qform" novalidate>
+          <div class="fields">
+            <div class="field"><label for="qdevice">Device</label><input id="qdevice" placeholder="iPhone 15 Pro Max" required></div>
+            <div class="field"><label for="qphone">Your phone</label><input id="qphone" type="tel" inputmode="tel" autocomplete="tel" required></div>
+            <div class="field full"><label for="qissue">What's wrong?</label><textarea id="qissue" placeholder="Cracked screen, still works. Lines on the display." required></textarea></div>
+          </div>
+          <div class="hp" aria-hidden="true"><label for="qhp">Leave empty</label><input id="qhp" tabindex="-1" autocomplete="off"></div>
+          <p class="err hidden" id="qerr" role="alert"></p>
+          <button class="btn submit" type="submit" id="qsubmit">Get my free quote</button>
+        </form>
+        <div class="done hidden" id="qdone" tabindex="-1" aria-live="polite" style="background:#fff">
+          <div class="check" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg></div>
+          <h3>Got it.</h3>
+          <p>We'll text your quote to <b id="qdoneNum" style="color:var(--ink)"></b>.</p>
+        </div>
+        <p class="alt">Easier to show us? <a href="sms:+12107242800">Text a photo to (210) 724-2800</a></p>
+      </div>
     </div>
   </section>
 
@@ -431,8 +496,8 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
               <div class="field full hidden" id="qualityField"><label for="quality">Screen</label>
                 <select id="quality" name="Screen">
                   <option>Not sure, help me choose</option>
-                  <option>Aftermarket</option>
-                  <option>Premium OLED (iPhone 13 Pro and newer Pro models)</option>
+                  <option>Incell (best price)</option>
+                  <option>OLED (iPhone 13 Pro and newer Pro models)</option>
                   <option>Original (refurbished or genuine Apple)</option>
                 </select>
               </div>
@@ -508,7 +573,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         </details>
         <details>
           <summary>Which screen should I pick?</summary>
-          <p>Aftermarket is the best price. Premium OLED is our best aftermarket screen for iPhone 13 Pro and newer Pro models. Original is a refurbished original or a genuine Apple part, closest to factory. Not sure? Pick "help me choose" and we'll recommend one for your phone.</p>
+          <p>Incell is the best price. OLED is our best aftermarket screen, for iPhone 13 Pro and newer Pro models. Original is a refurbished original or a genuine Apple part, closest to factory. Tap through the comparison above to see the difference. Not sure? Pick "help me choose" and we'll recommend one for your phone.</p>
         </details>
         <details>
           <summary>How much is the mobile trip fee?</summary>
@@ -718,6 +783,59 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       showErr('We couldn’t send that. Please call or text <a href="tel:+12107242800">(210) 724-2800</a> and we’ll book you in.');
     });
   });
+
+
+  // ---- screen comparison ----
+  var TIERS = {
+    incell:{tag:'Best price', name:'Incell', desc:'An LCD-style replacement at the lowest price. Blacks look a little gray and colors are softer, and it can use a bit more battery.', r:{black:2,color:3,bright:3,touch:3}, price:'$', fits:'Most iPhone models'},
+    oled:{tag:'Our best aftermarket screen', name:'OLED', desc:'True deep blacks and bright, sharp color like the original, for a lot less.', r:{black:5,color:4,bright:4,touch:4}, price:'$$', fits:'iPhone 13 Pro and Pro Max and newer Pro models'},
+    original:{tag:'Closest to factory', name:'Original', desc:'A refurbished original screen, or a brand-new genuine Apple part for a higher price. Factory color, brightness and touch.', r:{black:5,color:5,bright:5,touch:5}, price:'$$$', fits:'Ask us for your model'}
+  };
+  function pickTier(t){
+    var d = TIERS[t];
+    document.querySelectorAll('.cmp .seg button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-t') === t)); });
+    $('shot').className = 'shot ' + t;
+    $('cTag').textContent = d.tag; $('cName').textContent = d.name; $('cDesc').textContent = d.desc;
+    $('cPrice').textContent = d.price; $('cFits').textContent = d.fits;
+    document.querySelectorAll('.dots').forEach(function(el){
+      var n = d.r[el.getAttribute('data-r')];
+      el.setAttribute('aria-label', n + ' out of 5');
+      el.querySelectorAll('i').forEach(function(i, k){ i.classList.toggle('on', k < n); });
+    });
+  }
+  document.querySelectorAll('.cmp .seg button').forEach(function(b){
+    b.addEventListener('click', function(){ pickTier(b.getAttribute('data-t')); });
+  });
+  pickTier('oled');
+
+  // ---- free quote ----
+  $('qform').addEventListener('submit', function(e){
+    e.preventDefault();
+    if ($('qhp').value) return;
+    var ids = ['qdevice','qphone','qissue'], first = null;
+    ids.forEach(function(id){ var el = $(id), bad = !el.value.trim(); el.parentNode.classList.toggle('bad', bad); if (bad && !first) first = el; });
+    var dg = $('qphone').value.replace(/\D/g,'');
+    var qe = $('qerr');
+    if (!first && (dg.length < 10 || dg.length > 11)) { first = $('qphone'); first.parentNode.classList.add('bad'); qe.textContent = 'Please enter a 10-digit phone number.'; qe.classList.remove('hidden'); }
+    else if (first) { qe.textContent = 'Please fill in the highlighted fields.'; qe.classList.remove('hidden'); }
+    if (first) { first.focus(); return; }
+    qe.classList.add('hidden');
+    var b = $('qsubmit'); b.disabled = true; b.textContent = 'Sending…';
+    var data = {_subject:'Quote request: ' + $('qdevice').value.trim(), _template:'table', _captcha:'false',
+      'Device':$('qdevice').value.trim(), 'Phone':$('qphone').value.trim(), 'Issue':$('qissue').value.trim()};
+    fetch('https://formsubmit.co/ajax/' + EMAIL, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(data)})
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
+      .then(function(res){
+        if (!res.ok || String(res.j.success) === 'false') throw new Error('send');
+        $('qdoneNum').textContent = data.Phone;
+        $('qform').classList.add('hidden'); $('qdone').classList.remove('hidden'); $('qdone').focus();
+      })
+      .catch(function(){
+        b.disabled = false; b.textContent = 'Get my free quote';
+        qe.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107242800">(210) 724-2800</a> instead.'; qe.classList.remove('hidden');
+      });
+  });
+  ['qdevice','qphone','qissue'].forEach(function(id){ $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); }); });
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 })();
