@@ -503,7 +503,7 @@ function saveSettings(patch){
 render();
 var loadTimer = setTimeout(function(){ if (S.status === 'loading' || S.cacheOnly) { S.slow = true; render(); } }, 10000);
 
-var NTFY_TOPIC = 'ifixphones-alerts-q7m2x9k4v8';
+var PO_TOKEN = 'a5kkcfdzh96mzd9vvq56cof48ncp38', PO_USER = 'uku53twtd8174esng6mszeyofke9kh';
 var FB_CONFIG = {
   apiKey: "AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI",
   authDomain: "ifixphones-ca10e.firebaseapp.com",
@@ -583,7 +583,7 @@ function alertNew(title, body, go){
 function askNotify(){ try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); } catch(e) {} }
 document.addEventListener('pointerdown', function once(){ askNotify(); try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} document.removeEventListener('pointerdown', once); });
 function pushPhone(title, msg){
-  try { fetch('https://ntfy.sh/', {method:'POST', body: JSON.stringify({topic:NTFY_TOPIC, title:title, message:msg, tags:['wrench'], click:'https://ifixphones.net/tickets.html'})}).catch(function(){}); } catch(e) {}
+  try { fetch('https://api.pushover.net/1/messages.json', {method:'POST', mode:'no-cors', body: new URLSearchParams({token:PO_TOKEN, user:PO_USER, title:title, message:msg, url:'https://ifixphones.net/tickets.html', url_title:'Open tickets'})}).catch(function(){}); } catch(e) {}
 }
 
 function startData(){
@@ -936,7 +936,7 @@ function settingsView(){
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushTickets"'+(S.settings.pushTickets!==false?' checked':'')+'>Also send a phone alert when a ticket is checked in</label>' +
-    '<div class="match" style="margin-top:14px"><b>Alerts on your phone, even when it’s closed:</b> install the free <b>ntfy</b> app (App Store or Google Play), tap <b>+</b>, and subscribe to <b style="user-select:all">'+NTFY_TOPIC+'</b>. Keep this name private.</div>' +
+    '<div class="match" style="margin-top:14px"><b>Phone alerts</b> go to the <b>Pushover</b> app. Install it and sign in with the shop’s Pushover account on any phone that should get alerts.</div>' +
     '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div>' +
   '</div>' +
   '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +

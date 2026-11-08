@@ -800,7 +800,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
   // ---- send requests straight to the shop's ticket app ----
   var FS_URL = 'https://firestore.googleapis.com/v1/projects/ifixphones-ca10e/databases/(default)/documents/requests?key=AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI';
-  var NTFY_TOPIC = 'ifixphones-alerts-q7m2x9k4v8';
+  var PO_TOKEN = 'a5kkcfdzh96mzd9vvq56cof48ncp38', PO_USER = 'uku53twtd8174esng6mszeyofke9kh';
   function sendRequest(o, alertTitle, alertMsg){
     var f = {};
     Object.keys(o).forEach(function(k){
@@ -809,7 +809,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     });
     return fetch(FS_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields: f})})
       .then(function(r){ if (!r.ok) throw new Error('send'); 
-        try { fetch('https://ntfy.sh/', {method:'POST', body: JSON.stringify({topic:NTFY_TOPIC, title:alertTitle, message:alertMsg, tags:['iphone'], priority:4, click:'https://ifixphones.net/tickets.html'})}).catch(function(){}); } catch(e) {}
+        try { fetch('https://api.pushover.net/1/messages.json', {method:'POST', mode:'no-cors', body: new URLSearchParams({token:PO_TOKEN, user:PO_USER, title:alertTitle, message:alertMsg, priority:'1', url:'https://ifixphones.net/tickets.html', url_title:'Open tickets'})}).catch(function(){}); } catch(e) {}
         return true; });
   }
   function apptTime(day, t){
