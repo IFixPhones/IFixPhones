@@ -705,8 +705,8 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     if (!v) { timeEl.disabled = true; timeEl.innerHTML = '<option value="">Pick a day first</option>'; return; }
     var p = v.split('-'), dt = new Date(+p[0], +p[1]-1, +p[2]);
     var h = HOURS[dt.getDay()];
-    // last start one hour before close
-    var start = h[0], end = h[1] - 60;
+    // bookable right up to closing time
+    var start = h[0], end = h[1];
     if (v === todayISO) {
       var earliest = Math.ceil((now.min + 60) / 30) * 30; // at least an hour from now
       start = Math.max(start, earliest);

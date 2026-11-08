@@ -990,7 +990,7 @@ function pad2(n){ return (n<10?'0':'') + n; }
 function isoDay(d){ return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate()); }
 function parseDay(v){ var p = String(v||'').split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
 function fmtMin(min){ var h = Math.floor(min/60), m = min%60, ap = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + (m ? ':' + pad2(m) : '') + ' ' + ap; }
-function dayTimes(day){ var h = BHOURS[parseDay(day).getDay()], out = []; for (var m = h[0]; m <= h[1]-60; m += 30) out.push(fmtMin(m)); return out; }
+function dayTimes(day){ var h = BHOURS[parseDay(day).getDay()], out = []; for (var m = h[0]; m <= h[1]; m += 30) out.push(fmtMin(m)); return out; }
 function timeToMs(day, t){ var m = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(String(t||'').trim()); if (!day || !m) return 0; var d = parseDay(day); d.setHours((+m[1]) % 12 + (/pm/i.test(m[3]) ? 12 : 0), +(m[2]||0), 0, 0); return d.getTime(); }
 function niceDay(day){ return parseDay(day).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
 function whenStr(day, t){ return parseDay(day).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) + ' at ' + t; }
