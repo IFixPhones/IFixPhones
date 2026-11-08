@@ -475,12 +475,24 @@ function pill(k){ var s = SMAP[k] || SMAP['in']; return '<span class="pill" styl
 function subtotal(t){ return r2((t.items||[]).reduce(function(a,i){ return a + (i.apvSt === 'pending' || i.apvSt === 'declined' ? 0 : num(i.price)); }, 0)); }
 function discountAmt(t){ return Math.min(subtotal(t), num(t.discount)); }
 function taxRateOf(t){ return t.taxExempt ? 0 : num(t.taxRate); }
-function taxAmt(t){ return r2((subtotal(t) - discountAmt(t)) * taxRateOf(t) / 100); }
+function rHE(n){ // round to cents, half to even (same as Square)
+  var x = Math.round(Number(n||0) * 100 * 1e6) / 1e6, f = Math.floor(x), d = Math.round((x - f) * 1e6) / 1e6;
+  var c = d > 0.5 ? f + 1 : d < 0.5 ? f : (f % 2 === 0 ? f : f + 1);
+  return c / 100;
+}
+function taxAmt(t){ return rHE((subtotal(t) - discountAmt(t)) * taxRateOf(t) / 100); }
+function cardFee(amount, taxRate){ // Square: 3% of the amount (tax included), then sales tax on that fee
+  var sr = surRate(); if (!sr || !amount) return {fee:0, tax:0, all:0};
+  var fee = rHE(amount * sr / 100), tx = rHE(fee * num(taxRate) / 100);
+  return {fee:fee, tax:tx, all:r2(fee + tx)};
+}
+function withCard(amount, t){ return r2(amount + cardFee(amount, taxRateOf(t||{})).all); }
 function total(t){ return r2(subtotal(t) - discountAmt(t) + taxAmt(t)); }
 function netSales(t){ return r2(subtotal(t) - discountAmt(t)); }
 function balance(t){ return Math.max(0, r2(total(t) - num(t.deposit))); }
 function collected(t){ return r2(total(t) + num(t.surcharge) + num(t.depSurcharge)); }
-function cardFees(t){ return r2(num(t.surcharge) + num(t.depSurcharge)); }
+function cardFees(t){ return r2(num(t.surcharge) + num(t.depSurcharge) - num(t.surTax) - num(t.depSurTax)); }
+function allTax(t){ return r2(taxAmt(t) + num(t.surTax) + num(t.depSurTax)); }
 function payLabel(t){ if (t.payMethod === 'Split' && t.split) return t.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + '); return t.payMethod || ''; }
 function byMethod(t){ // amounts per method for a paid ticket (deposit counted in its own method)
   var o = {}, add = function(k, v){ k = k || 'Not recorded'; o[k] = r2((o[k]||0) + v); };
@@ -955,7 +967,7 @@ function reportsView(){
   else { start = Date.now() - 30*86400000; }
   var inR = function(ts){ return ts && ts >= start; };
   var paid = S.tickets.filter(function(t){ return t.paid && inR(t.paidAt); });
-  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + taxAmt(t); }, 0), surC = paid.reduce(function(a,t){ return a + cardFees(t); }, 0);
+  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + allTax(t); }, 0), surC = paid.reduce(function(a,t){ return a + cardFees(t); }, 0);
   var pcost = paid.reduce(function(a,t){ return a + partsCost(t); }, 0);
   var created = S.tickets.filter(function(t){ return inR(t.createdAt); }).length;
   var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
@@ -1570,7 +1582,7 @@ function closeoutData(){
   var inD = function(ts){ return ts >= a && ts < b; };
   var paid = S.tickets.filter(function(t){ return t.paid && inD(t.paidAt); });
   var by = {}; paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ by[k] = r2((by[k]||0) + o[k]); }); });
-  var taxC = paid.reduce(function(s2,t){ return s2 + taxAmt(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + cardFees(t); }, 0);
+  var taxC = paid.reduce(function(s2,t){ return s2 + allTax(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + cardFees(t); }, 0);
   var deps = S.tickets.filter(function(t){ return inD(t.createdAt) && num(t.deposit); });
   var bbOut = (S.bb||[]).filter(function(x){ return inD(x.createdAt) && num(x.paid); });
   var bbIn = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inD(x.soldAt); });
@@ -1631,12 +1643,12 @@ function payBox(t){
     $('#py-split', m).style.display = meth === 'Split payment' ? '' : 'none';
     var isCredit = CARDISH.indexOf(meth) > -1 && sr;
     $('#py-card', m).style.display = isCredit ? '' : 'none';
-    if (isCredit) $('#py-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(r2(bal * (1 + sr/100))) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee (' + money(r2(bal * sr/100)) + '). If Square shows it as a <b>debit</b> card, choose Debit card above instead.</span>';
+    if (isCredit) $('#py-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(withCard(bal, d)) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee (' + money(cardFee(bal, taxRateOf(d)).fee) + ') plus ' + money(cardFee(bal, taxRateOf(d)).tax) + ' tax on the fee, the same as Square. If Square shows it as a <b>debit</b> card, choose Debit card above instead.</span>';
     var cin = num($('#py-in', m).value);
     $('#py-chg', m).textContent = cin ? (cin >= bal ? 'Change: ' + money(r2(cin - bal)) : 'That’s ' + money(r2(bal - cin)) + ' short') : '';
     var a1 = num($('#py-a1', m).value); $('#py-a2', m).value = a1 ? r2(Math.max(0, bal - a1)) : '';
-    var m2 = $('#py-m2', m).value; $('#py-splith', m).textContent = a1 && CARDISH.indexOf(m2) > -1 && sr ? 'Charge ' + money(r2((bal - a1) * (1 + sr/100))) + ' on Square for the card part (includes ' + sr + '%).' : '';
-    $('#py-ok', m).textContent = 'Mark ' + money(isCredit ? r2(bal * (1 + sr/100)) : bal) + ' paid';
+    var m2 = $('#py-m2', m).value; $('#py-splith', m).textContent = a1 && CARDISH.indexOf(m2) > -1 && sr ? 'Charge ' + money(withCard(r2(bal - a1), d)) + ' on Square for the card part (includes ' + sr + '%).' : '';
+    $('#py-ok', m).textContent = 'Mark ' + money(isCredit ? withCard(bal, d) : bal) + ' paid';
   }
   m.addEventListener('click', function(e){ var c = e.target.closest('[data-acc]'); if (!c) return; var k = c.getAttribute('data-acc'); adds[k] = !adds[k]; c.setAttribute('aria-pressed', String(!!adds[k])); upd(); });
   upd(); m.addEventListener('input', upd); m.addEventListener('change', upd);
@@ -1650,13 +1662,13 @@ function payBox(t){
       var a1 = num($('#py-a1', m).value), a2 = r2(bal - a1), m1 = $('#py-m1', m).value, m2 = $('#py-m2', m).value;
       if (!a1 || a1 >= bal) { err.textContent = 'Enter the first amount (less than ' + money(bal) + ').'; return; }
       f.payMethod = 'Split'; f.split = [{m:m1, a:a1}, {m:m2, a:a2}];
-      var sc = 0; f.split.forEach(function(x){ if (CARDISH.indexOf(x.m) > -1 && sr) sc += r2(x.a * sr / 100); });
+      var sc = 0, stx = 0; f.split.forEach(function(x){ if (CARDISH.indexOf(x.m) > -1 && sr) { var cf = cardFee(x.a, taxRateOf(d)); sc += cf.all; stx += cf.tax; } }); f.surTax = r2(stx);
       if (sc) { f.surcharge = r2(sc); f.surMethod = 'Credit card'; }
       log += ' (' + f.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + ') + ')' + (sc ? ' + ' + money(sc) + ' card fee' : '');
     } else {
       log += ' by ' + meth;
       if (meth === 'Cash' && num($('#py-in', m).value)) { f.cashIn = num($('#py-in', m).value); if (f.cashIn < bal) { err.textContent = 'Cash received is less than the amount due.'; return; } }
-      if (CARDISH.indexOf(meth) > -1 && sr) { f.surcharge = r2(bal * sr / 100); f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' credit card fee (' + sr + '%)'; }
+      if (CARDISH.indexOf(meth) > -1 && sr) { var cf2 = cardFee(bal, taxRateOf(d)); f.surcharge = cf2.all; f.surTax = cf2.tax; f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' credit card fee (' + sr + '%)'; }
     }
     if (added.length) log += '; added ' + added.map(function(a){ return a.name; }).join(', ');
     S.lastPay = meth === 'Split payment' ? S.lastPay : meth;
@@ -1685,7 +1697,7 @@ function receiptDoc(t){
     '<p style="margin-top:14px"><b>Receipt · Ticket #'+esc(t.num)+'</b><br>'+esc(dt(t.paidAt||Date.now()))+'<br>'+esc(c.name||'')+' · '+esc(d.model||'')+'</p>' +
     '<table>' + rows + tr('Subtotal', money(subtotal(t))) + (discountAmt(t) ? tr('Discount' + (t.discountNote ? ' (' + esc(t.discountNote) + ')' : ''), '−' + money(discountAmt(t))) : '') +
       tr('Sales tax' + (taxRateOf(t) ? ' (' + taxRateOf(t) + '%)' : t.taxExempt ? ' (exempt)' : ''), money(taxAmt(t))) + tr('Total', money(total(t)), 1) +
-      (num(t.surcharge) ? tr('Credit card surcharge', money(t.surcharge)) : '') +
+      (num(t.surcharge) ? tr('Credit card fee (with tax)', money(t.surcharge)) : '') +
       (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') + (num(t.depSurcharge) ? tr('Credit card fee on deposit', money(t.depSurcharge)) : '') +
       tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(total(t) - num(t.deposit) + num(t.surcharge))), 1) +
       (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
@@ -2171,11 +2183,11 @@ function renderSheet(){
   }).join('');
   var tot = total(t), dep = num(t.deposit), bal = balance(t);
   var payBlock = t.paid
-    ? (num(t.surcharge) ? '<div class="tot"><span>Card surcharge</span><span>'+money(t.surcharge)+'</span></div>' : '') +
+    ? (num(t.surcharge) ? '<div class="tot"><span>Credit card fee (with tax)</span><span>'+money(t.surcharge)+'</span></div>' : '') +
       '<div class="tot" style="color:var(--green);font-weight:600"><span>Paid'+(payLabel(t)?' · '+esc(payLabel(t)):'')+'</span><span>'+esc(dt(t.paidAt))+'</span></div>' +
       (t.cashIn ? '<div class="tot t2"><span>Cash received / change</span><span>'+money(t.cashIn)+' / '+money(r2(t.cashIn - (t.payMethod==='Cash' ? bal : 0)))+'</span></div>' : '') +
       '<div class="acts"><button class="btn sm ghost" data-act="receipt">Print receipt</button><a class="btn sm ghost" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(receiptText(t))+'">Text receipt</a>' + (ro?'':'<button class="link" data-act="unpay">Undo payment</button>') + '</div>'
-    : (surRate() && bal ? '<div class="tot t2"><span>If paid by credit card (+'+surRate()+'%)</span><span>'+money(r2(bal * (1 + surRate()/100)))+'</span></div>' : '') + (ro ? '' : '<div class="acts"><button class="btn sm" data-act="pay">Take payment · '+money(bal)+'</button></div>');
+    : (surRate() && bal ? '<div class="tot t2"><span>If paid by credit card (+'+surRate()+'%)</span><span>'+money(withCard(bal, t))+'</span></div>' : '') + (ro ? '' : '<div class="acts"><button class="btn sm" data-act="pay">Take payment · '+money(bal)+'</button></div>');
 
   var checklist = function(which){
     var m = t[which] || {};
@@ -2588,9 +2600,9 @@ function updateTotal(){
   if (sm) sm.innerHTML = '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
     '<div class="tot"><span>Sales tax'+(tmp.taxExempt ? ' (exempt)' : ' ('+num(NT.taxRate)+'%)')+'</span><span>'+money(taxAmt(tmp))+'</span></div>' + (num(($('#tf-dep')||{}).value) ? '<div class="tot"><span>Deposit</span><span>−'+money(num($('#tf-dep').value))+'</span></div>' : '');
   var sr = surRate(), tc = $('#tf-card');
-  if (tc) tc.innerHTML = sr && total(tmp) ? '<div class="tot" style="color:var(--blue)"><span>If paid by credit card (+'+sr+'%)</span><span>'+money(r2(total(tmp) * (1 + sr/100)))+'</span></div>' : '';
+  if (tc) tc.innerHTML = sr && total(tmp) ? '<div class="tot" style="color:var(--blue)"><span>If paid by credit card (+'+sr+'%)</span><span>'+money(withCard(total(tmp), tmp))+'</span></div>' : '';
   var dh = $('#tf-dephint'), dv = num(($('#tf-dep')||{}).value), dm = ($('#tf-depm')||{}).value;
-  if (dh) dh.innerHTML = sr && dv && CARDISH.indexOf(dm) > -1 ? 'Charge <b>'+money(r2(dv * (1 + sr/100)))+'</b> on Square (deposit + '+sr+'% card fee)' : '';
+  if (dh) dh.innerHTML = sr && dv && CARDISH.indexOf(dm) > -1 ? 'Charge <b>'+money(withCard(dv, tmp))+'</b> on Square (deposit + '+sr+'% card fee)' : '';
 }
 
 function submitForm(t, m, closeForm){
@@ -2617,7 +2629,8 @@ function submitForm(t, m, closeForm){
     items: items,
     deposit: num($('#tf-dep').value),
     depMethod: num($('#tf-dep').value) ? $('#tf-depm').value : '',
-    depSurcharge: num($('#tf-dep').value) && CARDISH.indexOf($('#tf-depm').value) > -1 ? r2(num($('#tf-dep').value) * surRate() / 100) : 0,
+    depSurcharge: num($('#tf-dep').value) && CARDISH.indexOf($('#tf-depm').value) > -1 ? cardFee(num($('#tf-dep').value), $('#tf-tex').checked ? 0 : NT.taxRate).all : 0,
+    depSurTax: num($('#tf-dep').value) && CARDISH.indexOf($('#tf-depm').value) > -1 ? cardFee(num($('#tf-dep').value), $('#tf-tex').checked ? 0 : NT.taxRate).tax : 0,
     discount: num($('#tf-disc').value),
     discountNote: $('#tf-discn').value.trim().slice(0,40),
     taxExempt: $('#tf-tex').checked,
