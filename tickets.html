@@ -179,6 +179,20 @@ button.stat:hover{box-shadow:inset 0 0 0 1px var(--line)}
 
 /* settings */
 .panel{background:#fff;border-radius:var(--r);padding:22px 24px;margin-bottom:14px}
+.tbadge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;margin-left:6px;border-radius:9px;background:#e30000;color:#fff;font-size:11px;font-weight:700;vertical-align:1px}
+.bkh{font-size:13px;font-weight:600;color:var(--graphite);text-transform:uppercase;letter-spacing:.04em;margin:22px 4px 10px}
+.bkh:first-child{margin-top:4px}
+.bk{background:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;border-left:4px solid transparent}
+.bk.new{border-left-color:var(--blue)}
+.bk .when{font-weight:600;font-size:16px}
+.bk .who{font-size:15px}
+.bk .meta{color:var(--graphite);font-size:14px}
+.bk .note{background:var(--mist);border-radius:10px;padding:8px 10px;font-size:14px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.bk .side{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.bk .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tagk{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.02em}
+.tagk.mob{background:#fff1e0;color:#b25000}.tagk.shop{background:#e8f1fd;color:#0058b0}.tagk.q{background:#f0eafc;color:#6a3fc1}.tagk.ok{background:#e6f4ea;color:#1a7f37}.tagk.gr{background:#f0f0f2;color:#6e6e73}
+@media (max-width:620px){.bk{grid-template-columns:1fr}.bk .side{text-align:left;align-items:flex-start;flex-direction:row}}
 .panel h2{font-size:19px;letter-spacing:-.02em}
 .panel p.d{color:var(--graphite);font-size:14px;margin:4px 0 14px}
 .techs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -202,6 +216,14 @@ select.in{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:14px}
 .seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.sigwrap{margin-top:14px}
+.sigpad{position:relative;border:1.5px dashed var(--line);border-radius:12px;background:#fff;height:150px;touch-action:none}
+.sigpad canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:12px;cursor:crosshair}
+.sigpad .ph{position:absolute;left:0;right:0;bottom:16px;text-align:center;color:#a1a1a6;font-size:13px;pointer-events:none}
+.sigpad .ln{position:absolute;left:24px;right:24px;bottom:40px;border-top:1px solid #d2d2d7;pointer-events:none}
+.sigpad.has .ph{display:none}
+.sigbar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:13px;color:var(--graphite)}
+.sigimg{display:block;max-width:100%;height:90px;object-fit:contain;background:#fff;border:1px solid var(--line2);border-radius:10px;padding:6px}
 .check input{width:18px;height:18px;margin-top:1px;accent-color:var(--blue);flex:none}
 
 /* checklist */
@@ -338,7 +360,7 @@ var DEFAULT_TECHS = ['Mark','Ray','David'];
 var SUPPLIERS = ['MobileSentrix','Injured Gadgets','Phone LCD Parts','Wholesale Gadget Parts','Amazon','Other'];
 var PSTAT = [['needed','Needs order'],['ordered','Ordered'],['arrived','Arrived'],['used','Installed']];
 var PSMAP = {}; PSTAT.forEach(function(p){ PSMAP[p[0]] = p[1]; });
-var VIEWS = [['tickets','Tickets'],['parts','Parts'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
+var VIEWS = [['tickets','Tickets'],['bookings','Bookings'],['parts','Parts'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
 var SHOP = {name:'iFixPhones', addr:'9055 Marbach Rd, Suite 105, San Antonio, TX', shop:'(210) 773-3548', mobile:'(210) 724-2800', web:'ifixphones.net'};
 
 /* ---------- state ---------- */
@@ -481,6 +503,7 @@ function saveSettings(patch){
 render();
 var loadTimer = setTimeout(function(){ if (S.status === 'loading' || S.cacheOnly) { S.slow = true; render(); } }, 10000);
 
+var NTFY_TOPIC = 'ifixphones-alerts-q7m2x9k4v8';
 var FB_CONFIG = {
   apiKey: "AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI",
   authDomain: "ifixphones-ca10e.firebaseapp.com",
@@ -525,11 +548,72 @@ function gate(msg){
   };
 }
 
+/* ---------- alerts ---------- */
+var BOOT = Date.now(), seenTickets = null, seenReqs = null, actx = null;
+function ding(){
+  if (S.settings.sound === false) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    [[880,0],[1318.5,0.16]].forEach(function(n){
+      var o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime + n[1];
+      o.type = 'sine'; o.frequency.value = n[0];
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.45);
+      o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + 0.5);
+    });
+  } catch(e) {}
+}
+var titleT = 0;
+function alertNew(title, body, go){
+  ding();
+  toast(title + (body ? ' · ' + body.split('\n')[0] : ''));
+  try {
+    if (window.Notification && Notification.permission === 'granted' && (document.hidden || !document.hasFocus())) {
+      var n = new Notification(title, {body: body, icon: 'icon-192.png', tag: title + body});
+      n.onclick = function(){ window.focus(); if (go) go(); n.close(); };
+    }
+  } catch(e) {}
+  if (document.hidden || !document.hasFocus()) {
+    clearInterval(titleT); var on = false, base = 'iFixPhones Tickets';
+    titleT = setInterval(function(){ document.title = (on = !on) ? '● ' + title : base; }, 1000);
+    var stop = function(){ clearInterval(titleT); document.title = base; window.removeEventListener('focus', stop); };
+    window.addEventListener('focus', stop);
+  }
+}
+function askNotify(){ try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission(); } catch(e) {} }
+document.addEventListener('pointerdown', function once(){ askNotify(); try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} document.removeEventListener('pointerdown', once); });
+function pushPhone(title, msg){
+  try { fetch('https://ntfy.sh/', {method:'POST', body: JSON.stringify({topic:NTFY_TOPIC, title:title, message:msg, tags:['wrench'], click:'https://ifixphones.net/tickets.html'})}).catch(function(){}); } catch(e) {}
+}
+
 function startData(){
   var db = firebase.firestore();
+  seenTickets = null; seenReqs = null; S.reqs = []; S.reqsErr = false;
   S.db = db; S.status = 'loading'; render();
+  unsubs.push(db.collection('requests').orderBy('createdAt','desc').limit(300).onSnapshot(function(snap){
+    S.reqs = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    if (seenReqs && !snap.metadata.fromCache) {
+      snap.docChanges().forEach(function(ch){
+        if (ch.type !== 'added' || seenReqs[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
+        var r = ch.doc.data() || {};
+        if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
+        else alertNew(r.where === 'mobile' ? 'New MOBILE booking' : 'New shop booking', (r.whenText||'') + '\n' + (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
+      });
+    }
+    if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
+    render();
+  }, function(){ S.reqsErr = true; render(); }));
   unsubs.push(db.collection('tickets').orderBy('createdAt','desc').limit(2000).onSnapshot({includeMetadataChanges:true}, function(snap){
     S.tickets = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    if (seenTickets && !snap.metadata.fromCache) {
+      snap.docChanges().forEach(function(ch){
+        if (ch.type !== 'added' || seenTickets[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
+        var t = ch.doc.data() || {};
+        if ((t.createdAt||0) < BOOT) return;
+        alertNew('New ticket #' + t.num, (t.customer && t.customer.name || '') + ' · ' + (t.device && t.device.model || '') + (t.createdBy ? ' · by ' + t.createdBy : ''), function(){ openTicket(ch.doc.id); });
+      });
+    }
+    if (!snap.metadata.fromCache) { seenTickets = seenTickets || {}; S.tickets.forEach(function(t){ seenTickets[t.id] = 1; }); }
     S.status = 'ready';
     S.cacheOnly = !!snap.metadata.fromCache;
     if (!snap.metadata.fromCache) { clearTimeout(loadTimer); S.slow = false; }
@@ -590,9 +674,11 @@ function render(){
   maybeAskWho();
 }
 
+function newReqCount(){ return (S.reqs||[]).filter(function(r){ return r.status === 'new'; }).length; }
+function tabBadge(v){ if (v !== 'bookings') return ''; var n = newReqCount(); return n ? '<span class="tbadge" aria-label="'+n+' new">'+n+'</span>' : ''; }
 function topbar(){
   var tabs = VIEWS.map(function(t){
-    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+'</button>';
+    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+tabBadge(t[0])+'</button>';
   }).join('');
   return '<header class="top"><div class="tin">' +
     '<div class="brand">iFixPhones<span>Tickets</span></div>' +
@@ -604,7 +690,7 @@ function topbar(){
 }
 function mobileTabs(){
   return '<nav class="tabs mtabs" aria-label="Sections">' + VIEWS.map(function(t){
-    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+'</button>';
+    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+tabBadge(t[0])+'</button>';
   }).join('') + '</nav>';
 }
 
@@ -619,6 +705,7 @@ function body(){
   if (S.view === 'parts') return note + partsView();
   if (S.view === 'reports') return note + reportsView();
   if (S.view === 'settings') return note + settingsView();
+  if (S.view === 'bookings') return note + bookingsView();
   return note + ticketsView();
 }
 
@@ -846,11 +933,73 @@ function settingsView(){
     '<div class="techs">' + (techs || '<span class="muted">No one added yet.</span>') + '</div>' +
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
   '</div>' +
+  '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
+    '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
+    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushTickets"'+(S.settings.pushTickets!==false?' checked':'')+'>Also send a phone alert when a ticket is checked in</label>' +
+    '<div class="match" style="margin-top:14px"><b>Alerts on your phone, even when it’s closed:</b> install the free <b>ntfy</b> app (App Store or Google Play), tap <b>+</b>, and subscribe to <b style="user-select:all">'+NTFY_TOPIC+'</b>. Keep this name private.</div>' +
+    '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div>' +
+  '</div>' +
+  '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
+    '<div class="f" style="max-width:360px"><label for="lblsize">Label size</label><select class="in" id="lblsize" data-setting="labelSize">' + Object.keys(LABELS).map(function(k){ return '<option value="'+k+'"'+((S.settings.labelSize||'brother62')===k?' selected':'')+'>'+esc(LABELS[k].name)+'</option>'; }).join('') + '</select></div>' +
+    '<label class="check" style="margin-top:12px"><input type="checkbox" data-setting="autoLabel"'+(S.settings.autoLabel?' checked':'')+'>Print a label automatically after check-in</label>' +
+  '</div>' +
   '<div class="panel"><h2>Back up your tickets</h2><p class="d">Download every ticket as a spreadsheet file (CSV). Good to do once a month.</p>' +
     (S.dl ? '<button class="btn ghost" data-act="csv">Download CSV</button>' : '<span class="muted">Downloads aren’t available in this view.</span>') +
   '</div>' +
   '<div class="panel"><h2>Privacy</h2><p class="d">Passcodes are deleted automatically when a ticket is marked Picked up or Cancelled, as your repair policy promises. Only the shop Google account can open tickets.</p></div>' +
   '<div class="panel"><h2>Account</h2><p class="d">Signed in as '+esc(S.authUser ? S.authUser.email : '')+'</p><button class="btn ghost" data-act="signout">Sign out</button></div>';
+}
+
+/* ---------- bookings ---------- */
+function reqBox(r){
+  var isQ = r.kind === 'quote';
+  var tag = isQ ? '<span class="tagk q">Quote</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
+  var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
+  var first = String(r.name||'').split(' ')[0];
+  var msg = isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
+    : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + (r.where==='mobile' ? '. We’ll text you when we’re on the way.' : ' at 9055 Marbach Rd, Suite 105.') + ' Reply here if anything changes.';
+  var when = isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
+  var late = !isQ && r.apptAt && r.apptAt < Date.now() && (r.status === 'new' || r.status === 'confirmed');
+  return '<div class="bk'+(r.status==='new'?' new':'')+'">' +
+    '<div><div class="when">'+when+(late?' <span style="color:var(--red);font-size:13px;font-weight:600">· time passed</span>':'')+'</div>' +
+      '<div class="who">'+(r.name ? '<b>'+esc(r.name)+'</b> · ' : '')+'<a href="tel:'+esc(e164(r.phone))+'">'+esc(fmtPhone(r.phone))+'</a></div>' +
+      '<div class="meta">'+esc(r.device||'')+(r.repair ? ' · '+esc(r.repair) : '')+(r.screen && !/not sure/i.test(r.screen) ? ' · '+esc(r.screen.replace(/\s*\(.*\)$/,'')) : '')+'</div>' +
+      (r.address ? '<div class="meta">📍 <a href="https://maps.google.com/?q='+encodeURIComponent(r.address)+'" target="_blank" rel="noopener">'+esc(r.address)+'</a></div>' : '') +
+      (r.notes ? '<div class="note">'+esc(r.notes)+'</div>' : '') +
+    '</div>' +
+    '<div class="side">'+tag+st+'<span class="t2">'+esc(rel(r.createdAt))+'</span></div>' +
+    '<div class="acts">' +
+      '<a class="btn sm ghost" href="tel:'+esc(e164(r.phone))+'">Call</a>' +
+      '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(msg)+'" data-req="'+esc(r.id)+'" data-reqsms="1">'+(isQ?'Text quote':'Text to confirm')+'</a>' +
+      (r.status === 'new' && !isQ ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="confirmed">Mark confirmed</button>' : '') +
+      (r.status !== 'done' && r.status !== 'cancel' ? '<button class="btn sm" data-act="rqticket" data-id="'+esc(r.id)+'">Make ticket</button>' : '') +
+      (r.status !== 'done' && r.status !== 'cancel' ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="done">'+(isQ?'Quote sent':'Done')+'</button><button class="link red" data-act="rq" data-id="'+esc(r.id)+'" data-v="cancel">Cancel</button>' : '<button class="link" data-act="rq" data-id="'+esc(r.id)+'" data-v="new">Reopen</button><button class="link red" data-act="rqdel" data-id="'+esc(r.id)+'">Delete</button>') +
+    '</div></div>';
+}
+function bookingsView(){
+  var all = S.reqs || [];
+  if (S.reqsErr) return '<div class="panel empty"><h3>Bookings can’t load</h3><p>Update the Firebase rules (see the setup steps), then reload.</p></div>';
+  var sod = new Date(); sod.setHours(0,0,0,0);
+  var newOnes = all.filter(function(r){ return r.status === 'new'; }).sort(function(a,b){ return (a.apptAt||a.createdAt) - (b.apptAt||b.createdAt); });
+  var upcoming = all.filter(function(r){ return r.status === 'confirmed'; }).sort(function(a,b){ return (a.apptAt||0) - (b.apptAt||0); });
+  var past = all.filter(function(r){ return r.status === 'done' || r.status === 'cancel'; }).slice(0, 30);
+  if (!all.length) return '<div class="panel empty"><h3>No bookings yet</h3><p>Appointments and quote requests from ifixphones.net show up here right away, with a ding.</p></div>';
+  return (newOnes.length ? '<h3 class="bkh">New · needs a reply</h3>' + newOnes.map(reqBox).join('') : '') +
+    (upcoming.length ? '<h3 class="bkh">Confirmed</h3>' + upcoming.map(reqBox).join('') : '') +
+    (!newOnes.length && !upcoming.length ? '<div class="panel empty" style="padding:30px"><h3>All caught up</h3><p>No new bookings right now.</p></div>' : '') +
+    (past.length ? '<h3 class="bkh">Handled</h3>' + past.map(reqBox).join('') : '');
+}
+function reqById(id){ var a = S.reqs||[]; for (var i=0;i<a.length;i++) if (a[i].id === id) return a[i]; return null; }
+function patchReq(id, fields){
+  var r = reqById(id); if (r) { Object.assign(r, fields); render(); }
+  return enqueue('requests/'+id, function(){ return retryOnce(function(){ return S.db.doc('requests/'+id).update(Object.assign({updatedAt:Date.now(), handledBy:who()}, fields)); }); }).catch(writeErr);
+}
+var SITE_REPAIR = {'Screen':'Screen','Battery':'Battery','Charging port':'Charging port','Back glass':'Back glass','Camera':'Rear camera','Water damage':'Water damage','Speaker or mic':'Loudspeaker','Buttons':'Buttons','Not sure':'Diagnostic'};
+function reqToTicket(r){
+  var part = /incell/i.test(r.screen) ? 'Incell' : /oled/i.test(r.screen) ? 'OLED' : /original/i.test(r.screen) ? 'Refurbished original' : '';
+  ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
+    items: [{repair: SITE_REPAIR[r.repair] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: part, price:'', desc: SITE_REPAIR[r.repair] ? '' : (r.notes||'').slice(0,120)}],
+    reqId: r.id, notes: r.notes||''});
 }
 
 /* keep search focus across re-renders */
@@ -967,6 +1116,7 @@ function renderSheet(){
       '</div>' +
       partsCard(t, ro) +
 
+      '<div class="card"><h3>Customer signature</h3>' + (t.sig ? '<img class="sigimg" alt="Customer signature" src="'+esc(t.sig)+'"><p class="hint">Signed '+esc(dt(t.sigAt))+'</p>' : '<p class="hint">Not signed yet.</p>') + (ro ? '' : '<div class="acts"><button class="btn sm ghost" data-act="sign">'+(t.sig?'Sign again':'Get signature')+'</button></div>') + '</div>' +
       '<div class="card"><h3>Before repair</h3>'+checklist('pre')+'</div>' +
       '<div class="card"><h3>After repair</h3>'+checklist('post')+'</div>' +
 
@@ -976,7 +1126,8 @@ function renderSheet(){
       '</div>' +
     '</div>' +
     '<div class="sfoot">' +
-      (S.dl ? '<button class="btn ghost sm" data-act="print">Print ticket</button>' : '') +
+      '<button class="btn ghost sm" data-act="print">Print ticket</button>' +
+      '<button class="btn ghost sm" data-act="label">Print label</button>' +
       '<span class="grow"></span>' +
       (ro ? '' : '<button class="link red" data-act="delete">Delete</button>') +
     '</div>';
@@ -1140,10 +1291,11 @@ function ticketForm(existing, prefill){
   var t = existing ? clone(existing) : null;
   NT = {
     editId: t ? t.id : null,
-    type: t ? (t.type||'shop') : 'shop',
-    items: t && t.items && t.items.length ? clone(t.items) : [{repair:'Screen', part:'', price:''}]
+    type: t ? (t.type||'shop') : (prefill && prefill.type) || 'shop',
+    items: t && t.items && t.items.length ? clone(t.items) : (prefill && prefill.items ? clone(prefill.items) : [{repair:'Screen', part:'', price:''}]),
+    reqId: prefill && prefill.reqId || null
   };
-  var c = t && t.customer || (prefill ? clone(prefill) : {}), d = t && t.device || {};
+  var c = t && t.customer || (prefill ? clone(prefill) : {}), d = t && t.device || (prefill && prefill.model ? {model:prefill.model, brand:guessBrand(prefill.model)} : {});
   var pre = t && t.pre || {};
   var techOpts = '<option value="">Unassigned</option>' + (S.settings.techs||[]).map(function(n){ var s = t ? n === t.assigned : n === S.me; return '<option'+(s?' selected':'')+'>'+esc(n)+'</option>'; }).join('');
   var warrOpts = WARR.map(function(w){ return '<option'+((t ? w===(t.warranty||'None') : w==='None')?' selected':'')+'>'+w+'</option>'; }).join('');
@@ -1188,7 +1340,8 @@ function ticketForm(existing, prefill){
         '<div class="f" style="margin-top:14px"><label for="tf-dmg">Existing damage</label><textarea class="in" id="tf-dmg" placeholder="Cracked back glass, dent on bottom left corner, scratches on screen…">'+esc(t&&t.damage)+'</textarea></div>' +
         '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
       '</div>' +
-      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms and Incell no-warranty were explained.</span></label></div>') +
+      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms and Incell no-warranty were explained.</span></label>' +
+        '<div class="sigwrap"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
     '</div>' +
     '<div class="mfoot"><span class="err" id="tf-err" role="alert"></span><button type="button" class="btn ghost" data-tf-close>Cancel</button><button type="submit" class="btn" id="tf-save">'+(t?'Save changes':'Check in')+'</button></div>' +
   '</form>';
@@ -1196,6 +1349,8 @@ function ticketForm(existing, prefill){
   m._pre = clone(pre);
   renderItems();
   fillModels();
+  var SIG = t ? null : sigPad($('#tf-sig', m), function(){ var a = $('#tf-agree', m); if (a) a.checked = true; });
+  m._sig = SIG;
   requestAnimationFrame(function(){ m.classList.add('on'); var p0 = prefill ? $('#tf-brand', m) : $('#tf-phone', m); if (p0) p0.focus(); if (prefill) lookupCustomer(); });
 
   function closeForm(){ m.remove(); NT = null; document.removeEventListener('keydown', esc1, true); }
@@ -1205,6 +1360,7 @@ function ticketForm(existing, prefill){
   m.addEventListener('click', function(e){
     var el = e.target;
     if (el.closest('[data-tf-close]')) { closeForm(); return; }
+    if (el.closest('[data-sigclear]')) { if (SIG) SIG.clear(); return; }
     var ty = el.closest('[data-tftype]');
     if (ty) { NT.type = ty.getAttribute('data-tftype'); $$('[data-tftype]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b === ty)); }); $('#tf-addrl').textContent = NT.type === 'mobile' ? 'Address (where we’re going)' : 'Address (optional)'; if (NT.type==='mobile') $('#tf-addr').focus(); return; }
     if (el.closest('[data-additem]')) { syncItems(); NT.items.push({repair:'Battery', part:'', price:''}); renderItems(); var r = $$('.irow select', m); if (r.length) r[r.length-2].focus(); return; }
@@ -1338,14 +1494,19 @@ function submitForm(t, m, closeForm){
   var body = Object.assign(data, {
     num: nextNum(), status:'in', createdAt:now, updatedAt:now, createdBy:who(),
     paid:false, payMethod:'', paidAt:0, agreed:true, post:{}, parts:[],
+    sig: (m._sig && m._sig.has()) ? m._sig.data() : '', sigAt: (m._sig && m._sig.has()) ? now : 0,
     log:[logEntry('checked in the device')].concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
   });
+  var reqId = NT.reqId;
   var ref = S.db.collection('tickets').doc();
   retryOnce(function(){ return ref.set(body); }).then(function(){
     if (!byId(ref.id)) { var loc = clone(body); loc.id = ref.id; S.tickets.unshift(loc); }
     closeForm(); toast('Ticket #' + body.num + ' created');
     S.filter = 'active'; S.q = ''; render();
     openTicket(ref.id);
+    if (reqId) patchReq(reqId, {status:'done', ticketId: ref.id, ticketNum: body.num});
+    if (S.settings.pushTickets !== false) pushPhone('New ticket #' + body.num, (body.customer.name||'') + ' · ' + (body.device.model||'') + ' · ' + repairsText(body) + ' · by ' + who());
+    if (S.settings.autoLabel) { var nt2 = byId(ref.id); if (nt2) setTimeout(function(){ printLabel(nt2); }, 400); }
   }).catch(function(e){
     btn.disabled = false; btn.textContent = 'Check in';
     if (e && e.code === 'resource-exhausted') err.textContent = 'Storage is full. Export and delete old tickets in Settings.';
@@ -1367,7 +1528,8 @@ function ticketDoc(t){
     'table{width:100%;border-collapse:collapse}td{padding:5px 0;border-bottom:1px solid #eee;vertical-align:top}small{color:#666}' +
     '.g{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}.cl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 14px;font-size:12px}' +
     '.box{border:1.5px solid #1d1d1f;border-radius:8px;padding:10px 12px;margin-top:14px;font-size:12px}' +
-    '.sig{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:26px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}' +
+    '.sig{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:26px}.sig>div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}' +
+    '.sig>.sv{border-top:0;padding:0;display:flex;flex-direction:column;justify-content:flex-end}.sv img{height:60px;width:auto;align-self:flex-start}.sv b{font-size:13px;color:#1d1d1f;font-weight:400;padding-bottom:4px}.sv span{display:block;border-top:1px solid #1d1d1f;padding-top:4px}' +
     '@media print{body{margin:0}}</style></head><body>' +
     '<div class="hd"><div><h1>iFixPhones</h1><div>'+esc(SHOP.addr)+'</div><div>Shop '+esc(SHOP.shop)+' · Mobile '+esc(SHOP.mobile)+' · '+esc(SHOP.web)+'</div></div>' +
     '<div style="text-align:right"><div style="font-size:20px;font-weight:700">Ticket #'+esc(t.num)+'</div><div>'+esc(dt(t.createdAt))+'</div><div>'+esc(t.type==='mobile'?'Mobile repair':'In-store repair')+'</div></div></div>' +
@@ -1381,14 +1543,96 @@ function ticketDoc(t){
     '<p><b>Existing damage:</b> '+esc(t.damage||'None noted')+(t.liquid?' · <b>Signs of liquid damage</b>':'')+'</p>' +
     '<div class="box"><b>Please read.</b> Back up your data; we aren’t responsible for data loss. Opening a phone carries risks even when done correctly, including damage to the original screen, loss of water resistance and parts notices in Settings. We warranty a part only when our supplier does; Incell parts have no warranty. Any new cracks, pressure marks, frame damage or liquid voids the warranty. Payment is due when the repair is done. Full policy: ifixphones.net/policy.html</div>' +
     '<p style="margin-top:12px">I agree to the iFixPhones Warranty and Repair Policy and approve the repairs listed above.</p>' +
-    '<div class="sig"><div>Customer signature</div><div>Date</div></div>' +
+    (t.sig ? '<div class="sig"><div class="sv"><img src="'+esc(t.sig)+'" alt=""><span>Customer signature</span></div><div class="sv"><b>'+esc(dateOnly(t.sigAt))+'</b><span>Date</span></div></div>' : '<div class="sig"><div>Customer signature</div><div>Date</div></div>') +
     '</body></html>';
 }
 
-async function printTicket(t){
-  if (!S.dl) return;
-  try { await S.dl.save({filename:'iFixPhones-ticket-'+t.num+'.html', data:ticketDoc(t)}); toast('Saved. Open the file and print it.'); }
-  catch(e){ if (e && e.code === 'declined') return; if (e && e.code === 'rate_limited') toast('One moment, then try again.'); else toast('Couldn’t save the file here.'); }
+function printHtml(html){
+  var old = document.getElementById('printframe'); if (old) old.remove();
+  var f = document.createElement('iframe');
+  f.id = 'printframe'; f.setAttribute('aria-hidden','true');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  document.body.appendChild(f);
+  var d = f.contentWindow.document; d.open(); d.write(html); d.close();
+  var go = function(){ try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e) { toast('Couldn’t open the printer.'); } };
+  var imgs = d.images, left = imgs.length;
+  if (!left) setTimeout(go, 150);
+  else Array.prototype.forEach.call(imgs, function(im){ if (im.complete) { if (!--left) setTimeout(go, 150); } else { im.onload = im.onerror = function(){ if (!--left) setTimeout(go, 150); }; } });
+}
+function printTicket(t){ printHtml(ticketDoc(t)); }
+
+var LABELS = {
+  'brother62': {name:'Brother 62 × 29 mm (DK-1209)', w:62, h:29},
+  'dymo30252': {name:'DYMO 1-1/8″ × 3-1/2″ (30252)', w:89, h:28},
+  'dymo30334': {name:'DYMO 2-1/4″ × 1-1/4″ (30334)', w:57, h:32},
+  'zebra2x1': {name:'Zebra / Rollo 2″ × 1″', w:51, h:25}
+};
+function labelDoc(t){
+  var L = LABELS[S.settings.labelSize] || LABELS.brother62;
+  var c = t.customer||{}, d = t.device||{};
+  var small = L.w < 60;
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label #'+esc(t.num)+'</title><style>' +
+    '@page{size:'+L.w+'mm '+L.h+'mm;margin:0}*{margin:0;padding:0;box-sizing:border-box}' +
+    'html,body{width:'+L.w+'mm;height:'+L.h+'mm}body{font-family:Arial,Helvetica,sans-serif;color:#000;padding:1.6mm 2.2mm;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}' +
+    '.r{display:flex;justify-content:space-between;align-items:baseline;gap:2mm}.n{font-size:'+(small?13:16)+'pt;font-weight:800;letter-spacing:-.3px}.dt{font-size:7pt}' +
+    '.c{font-size:'+(small?8.5:10)+'pt;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s{font-size:'+(small?7:8)+'pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '</style></head><body>' +
+    '<div class="r"><span class="n">#'+esc(t.num)+'</span><span class="dt">'+esc(new Date(t.createdAt||Date.now()).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))+(t.type==='mobile'?' · MOBILE':'')+'</span></div>' +
+    '<div class="c">'+esc(c.name)+' · '+esc(fmtPhone(c.phone))+'</div>' +
+    '<div class="s">'+esc(d.model)+' — '+esc(repairsText(t))+'</div>' +
+    '<div class="s">'+(d.passcode ? 'Code: '+esc(d.passcode)+' · ' : '')+'Tech: '+esc(t.assigned||'—')+'</div>' +
+    '</body></html>';
+}
+function printLabel(t){ printHtml(labelDoc(t)); }
+
+/* signature pad */
+function sigPad(box, onSign){
+  if (!box) return null;
+  var cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), drawing = false, has = false, last = null;
+  function size(){
+    var r = box.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var img = has ? cv.toDataURL() : null;
+    cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.height * dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1d1d1f';
+    if (img) { var im = new Image(); im.onload = function(){ ctx.drawImage(im, 0, 0, r.width, r.height); }; im.src = img; }
+  }
+  requestAnimationFrame(size);
+  function pt(e){ var r = cv.getBoundingClientRect(); return {x:e.clientX - r.left, y:e.clientY - r.top}; }
+  cv.addEventListener('pointerdown', function(e){ e.preventDefault(); drawing = true; last = pt(e); try { cv.setPointerCapture(e.pointerId); } catch(x) {} ctx.beginPath(); ctx.arc(last.x, last.y, 1.1, 0, Math.PI*2); ctx.fillStyle = '#1d1d1f'; ctx.fill(); mark(); });
+  cv.addEventListener('pointermove', function(e){ if (!drawing) return; var p = pt(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){ cv.addEventListener(ev, function(){ drawing = false; }); });
+  function mark(){ if (!has) { has = true; box.classList.add('has'); if (onSign) onSign(); } }
+  return {
+    has: function(){ return has; },
+    clear: function(){ ctx.clearRect(0, 0, cv.width, cv.height); has = false; box.classList.remove('has'); },
+    data: function(){
+      // shrink to a small PNG on white
+      var w = 480, h = Math.round(w * cv.height / cv.width), o = document.createElement('canvas'); o.width = w; o.height = h;
+      var c2 = o.getContext('2d'); c2.fillStyle = '#fff'; c2.fillRect(0,0,w,h); c2.drawImage(cv, 0, 0, w, h);
+      return o.toDataURL('image/png');
+    }
+  };
+}
+function signBox(t){
+  var m = document.createElement('div');
+  m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','sg-t');
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-sg-close></div><div class="mbox" style="position:relative;z-index:41;width:min(620px,100%);margin-top:8vh"><div class="mhead"><h2 id="sg-t">Customer signature · #'+esc(t.num)+'</h2><button class="x" data-sg-close aria-label="Close">✕</button></div><div class="mbody">' +
+    '<p class="muted" style="margin-bottom:12px">I agree to the iFixPhones Warranty and Repair Policy and approve the repairs on this ticket: <b>'+esc(repairsText(t))+'</b>'+(total(t)?' · '+money(total(t)):'')+'.</p>' +
+    '<div class="sigpad" id="sg-pad" style="height:190px"><div class="ln"></div><canvas></canvas><div class="ph">Sign here</div></div>' +
+    '<div class="sigbar"><span>'+esc((t.customer||{}).name||'')+'</span><button type="button" class="link" data-sg-clear>Clear</button></div>' +
+    '</div><div class="mfoot"><span class="err" id="sg-err" role="alert"></span><button class="btn ghost" data-sg-close>Cancel</button><button class="btn" data-sg-save>Save signature</button></div></div>';
+  document.body.appendChild(m);
+  var pad = sigPad($('#sg-pad', m));
+  requestAnimationFrame(function(){ m.classList.add('on'); });
+  m.addEventListener('click', function(e){
+    if (e.target.closest('[data-sg-close]')) { m.remove(); return; }
+    if (e.target.closest('[data-sg-clear]')) { pad.clear(); return; }
+    if (e.target.closest('[data-sg-save]')) {
+      if (!pad.has()) { $('#sg-err', m).textContent = 'Have the customer sign first.'; return; }
+      var live = byId(t.id); if (live) patchTicket(live, {sig: pad.data(), sigAt: Date.now(), agreed:true}, [logEntry('got the customer’s signature')]);
+      m.remove(); toast('Signature saved');
+    }
+  });
 }
 
 function csvCell(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }
@@ -1489,6 +1733,12 @@ document.addEventListener('click', async function(e){
     }
     case 'edit': if (t) ticketForm(t); break;
     case 'print': if (t) printTicket(t); break;
+    case 'label': if (t) printLabel(t); break;
+    case 'rq': { var rid = a.getAttribute('data-id'), rv = a.getAttribute('data-v'); if (rv === 'cancel' && !confirm('Cancel this booking?')) break; patchReq(rid, {status: rv}); break; }
+    case 'rqdel': { var did = a.getAttribute('data-id'); if (!confirm('Delete this booking for good?')) break; S.reqs = (S.reqs||[]).filter(function(r){ return r.id !== did; }); render(); enqueue('requests/'+did, function(){ return retryOnce(function(){ return S.db.doc('requests/'+did).delete(); }); }).catch(writeErr); break; }
+    case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
+    case 'testalert': alertNew('Test alert', 'This is how new bookings will look.'); pushPhone('Test alert', 'Phone alerts are working.'); break;
+    case 'sign': if (t) signBox(t); break;
     case 'delete': {
       if (!t) break;
       var ok3 = await confirmBox('Delete ticket #' + t.num + '?', 'This removes the ticket and its history for everyone. It can’t be undone. To keep a record, cancel it instead.', 'Delete ticket', true);
@@ -1503,7 +1753,10 @@ document.addEventListener('click', async function(e){
 
 document.addEventListener('change', function(e){
   if (e.target.closest('.modal')) return;
-  var el = e.target; var t = S.openId ? byId(S.openId) : null;
+  var el = e.target;
+  var sk = el.getAttribute('data-setting');
+  if (sk) { var o = {}; o[sk] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(o); toast('Saved'); return; }
+  var t = S.openId ? byId(S.openId) : null;
   if (!t) return;
   if (el.getAttribute('data-act') === 'assign') {
     var v = el.value;

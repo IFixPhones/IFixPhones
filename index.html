@@ -758,32 +758,28 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     }
     if (first) { first.focus(); return; }
 
-    var where = mode === 'mobile' ? 'Mobile (we go to customer)' : 'At the shop';
     var when = niceDate($('date').value) + ' at ' + $('time').value;
     var data = {
-      _subject: 'New ' + (mode === 'mobile' ? 'MOBILE' : 'shop') + ' booking: ' + $('repair').value + ' – ' + $('device').value.trim(),
-      _template: 'table',
-      _captcha: 'false',
-      'Where': where,
-      'When': when,
-      'Name': $('name').value.trim(),
-      'Phone': $('phone').value.trim(),
-      'Device': $('device').value.trim(),
-      'Repair': $('repair').value
+      Phone: $('phone').value.trim(), Device: $('device').value.trim(), Repair: $('repair').value,
+      Address: mode === 'mobile' ? $('address').value.trim() : ''
     };
-    if ($('repair').value === 'Screen') data['Screen'] = $('quality').value;
-    if (mode === 'mobile') data['Address'] = $('address').value.trim();
-    if ($('notes').value.trim()) data['Notes'] = $('notes').value.trim();
+    var req = {
+      kind:'booking', status:'new', where: mode === 'mobile' ? 'mobile' : 'shop',
+      name: $('name').value.trim().slice(0,80), phone: data.Phone.slice(0,24), device: data.Device.slice(0,80),
+      repair: data.Repair.slice(0,40), screen: data.Repair === 'Screen' ? $('quality').value.slice(0,80) : '',
+      day: $('date').value, time: $('time').value, whenText: when.slice(0,60),
+      apptAt: apptTime($('date').value, $('time').value),
+      address: data.Address.slice(0,200), notes: $('notes').value.trim().slice(0,500),
+      createdAt: Date.now()
+    };
 
     var btn = $('submit');
     btn.disabled = true; btn.textContent = 'Sending…';
     $('err').classList.add('hidden');
 
-    fetch('https://formsubmit.co/ajax/' + EMAIL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify(data)
-    }).then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
+    sendRequest(req, (mode === 'mobile' ? '🚗 New MOBILE booking' : '🏪 New shop booking'),
+      when + '\n' + req.name + ' · ' + req.device + ' · ' + req.repair + (mode === 'mobile' ? '\n' + req.address : ''))
+    .then(function(){ return {ok:true, j:{}}; })
     .then(function(res){
       if (!res.ok || String(res.j.success) === 'false') throw new Error('send');
       $('doneNum').textContent = data.Phone;
@@ -800,6 +796,27 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     });
   });
 
+
+
+  // ---- send requests straight to the shop's ticket app ----
+  var FS_URL = 'https://firestore.googleapis.com/v1/projects/ifixphones-ca10e/databases/(default)/documents/requests?key=AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI';
+  var NTFY_TOPIC = 'ifixphones-alerts-q7m2x9k4v8';
+  function sendRequest(o, alertTitle, alertMsg){
+    var f = {};
+    Object.keys(o).forEach(function(k){
+      var v = o[k];
+      f[k] = typeof v === 'number' ? {integerValue: String(Math.round(v))} : {stringValue: String(v == null ? '' : v).slice(0, 500)};
+    });
+    return fetch(FS_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields: f})})
+      .then(function(r){ if (!r.ok) throw new Error('send'); 
+        try { fetch('https://ntfy.sh/', {method:'POST', body: JSON.stringify({topic:NTFY_TOPIC, title:alertTitle, message:alertMsg, tags:['iphone'], priority:4, click:'https://ifixphones.net/tickets.html'})}).catch(function(){}); } catch(e) {}
+        return true; });
+  }
+  function apptTime(day, t){
+    var m = /^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i.exec(String(t||'').trim()); if (!day || !m) return 0;
+    var h = (+m[1]) % 12 + (/pm/i.test(m[3]) ? 12 : 0);
+    var p = day.split('-'); return new Date(+p[0], +p[1]-1, +p[2], h, +(m[2]||0)).getTime();
+  }
 
   // ---- screen comparison ----
   var TIERS = {
@@ -837,10 +854,10 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     if (first) { first.focus(); return; }
     qe.classList.add('hidden');
     var b = $('qsubmit'); b.disabled = true; b.textContent = 'Sending…';
-    var data = {_subject:'Quote request: ' + $('qdevice').value.trim(), _template:'table', _captcha:'false',
-      'Device':$('qdevice').value.trim(), 'Phone':$('qphone').value.trim(), 'Issue':$('qissue').value.trim()};
-    fetch('https://formsubmit.co/ajax/' + EMAIL, {method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(data)})
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return {ok:r.ok, j:j}; }); })
+    var data = {Device:$('qdevice').value.trim(), Phone:$('qphone').value.trim(), Issue:$('qissue').value.trim()};
+    sendRequest({kind:'quote', status:'new', where:'', name:'', phone:data.Phone.slice(0,24), device:data.Device.slice(0,80), repair:'', screen:'', day:'', time:'', whenText:'', apptAt:0, address:'', notes:data.Issue.slice(0,500), createdAt:Date.now()},
+      '💬 New quote request', data.Device + '\n' + data.Issue.slice(0,140))
+      .then(function(){ return {ok:true, j:{}}; })
       .then(function(res){
         if (!res.ok || String(res.j.success) === 'false') throw new Error('send');
         $('qdoneNum').textContent = data.Phone;
