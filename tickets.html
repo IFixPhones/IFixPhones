@@ -95,6 +95,18 @@ a{color:var(--link);text-decoration:none}
 .apv:last-child{border-bottom:0}
 .stockpick{display:flex;gap:8px;margin-top:8px}
 .mlist{display:flex;flex-direction:column;gap:8px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start}
+@media (max-width:900px){.board{grid-template-columns:1fr 1fr}}
+.bcol{background:#ebebef;border-radius:var(--r);padding:10px;min-height:60vh}
+.bch{display:flex;justify-content:space-between;font-weight:700;font-size:15px;padding:4px 6px 10px}
+.bcard{display:block;width:100%;text-align:left;border:0;background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.bcard.late{box-shadow:inset 3px 0 0 var(--red)}
+.bcard .bt{display:flex;gap:8px;align-items:center}.bcard .bt .t2{margin-left:auto}
+.bcard .bd{font-weight:600;font-size:16px;margin-top:4px}
+.bcard .bf{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px}
+.bcard .av{display:inline-flex;width:24px;height:24px;border-radius:50%;background:#1d1d1f;color:#fff;font-size:11px;align-items:center;justify-content:center}
+.board-full .top,.board-full .mtabs{display:none}.board-full .wrap{padding-top:16px}
+.board-full .bcard .bd{font-size:19px}
 .mblock{background:#fff;border-radius:var(--r);overflow:hidden}
 .mhead2{width:100%;border:0;background:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;text-align:left;font-size:15px}
 .msum{display:flex;gap:6px;align-items:center}
@@ -416,7 +428,7 @@ var WARR = ['None','30 days','90 days','6 months','1 year'];
 var CHECKS = [['power','Powers on'],['display','Display'],['touch','Touch'],['bio','Face ID / Touch ID'],['fcam','Front camera'],['rcam','Rear camera'],['ear','Earpiece'],['spk','Loudspeaker'],['mic','Microphone'],['charge','Charging'],['btn','Buttons'],['net','Wi-Fi / cellular']];
 var PAY = ['Cash','Credit card','Debit card','Apple / Google Pay','Zelle','Cash App','Venmo','Other'];
 var CARDISH = ['Credit card','Apple / Google Pay','Card'];
-function surRate(){ return S.settings.surchargeRate == null ? 3 : num(S.settings.surchargeRate); }
+function surRate(){ return S.settings.surchargeOff ? 0 : (num(S.settings.surchargeRate) > 0 ? Math.min(3, num(S.settings.surchargeRate)) : 3); }
 function r2(n){ return Math.round((Number(n)||0) * 100) / 100; }
 var DEFAULT_TECHS = ['Mark','Ray','David'];
 var SUPPLIERS = ['MobileSentrix','XcellParts/Balad','Phone LCD Parts','Amazon','Other'];
@@ -433,7 +445,7 @@ var S = {
   view:'tickets', filter:'active', q:'',
   openId:null, me:null
 };
-try { S.me = localStorage.getItem('ifx_tech') || null; } catch(e) {}
+try { S.me = localStorage.getItem('ifx_tech') || null; S.tMode = localStorage.getItem('ifx_tmode') || 'list'; } catch(e) {}
 
 /* ---------- helpers ---------- */
 function $(s, r){ return (r||document).querySelector(s); }
@@ -442,7 +454,7 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(
 function digits(s){ return String(s||'').replace(/\D/g,''); }
 function fmtPhone(s){ var d = digits(s); if (d.length === 11 && d[0] === '1') d = d.slice(1); if (d.length === 10) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); return s || ''; }
 function e164(s){ var d = digits(s); if (d.length === 10) return '+1' + d; if (d.length === 11 && d[0]==='1') return '+' + d; return d; }
-function money(n){ n = Number(n)||0; return '$' + (Math.round(n*100) % 100 ? n.toFixed(2) : String(Math.round(n))); }
+function money(n){ n = Number(n)||0; if (n < 0) return '−' + money(-n); return '$' + (Math.round(n*100) % 100 ? n.toFixed(2) : String(Math.round(n))); }
 function num(n){ var v = parseFloat(String(n).replace(/[^0-9.]/g,'')); return isFinite(v) ? Math.round(v*100)/100 : 0; }
 function initials(n){ n = String(n||'?').trim(); var p = n.split(/\s+/); return ((p[0]||'?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
 function dt(t){ if (!t) return ''; var d = new Date(t); return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
@@ -478,7 +490,7 @@ function byMethod(t){ // amounts per method for a paid ticket (deposit counted i
   if (num(t.surcharge)) add(t.surMethod || 'Credit card', num(t.surcharge));
   return o;
 }
-function itemName(i){ return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv) && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
+function itemName(i){ return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv || i.repair === 'Accessory') && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
 function repairsText(t){ return (t.items||[]).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
 function who(){ return S.me || 'Staff'; }
 function byId(id){ for (var i=0;i<S.tickets.length;i++) if (S.tickets[i].id === id) return S.tickets[i]; return null; }
@@ -676,6 +688,7 @@ function startData(){
         if (ch.type !== 'added' || seenReqs[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
         var r = ch.doc.data() || {};
         if (r.kind === 'sell') alertNew('Someone wants to sell a phone', (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
+        else if (r.kind === 'checkin') alertNew('Online check-in · ' + (r.whenText||''), (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'business') alertNew('New school / business request', (r.org||'') + ' · ' + (r.name||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
         else alertNew(r.where === 'mobile' ? 'New MOBILE booking' : 'New shop booking', (r.whenText||'') + '\n' + (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
@@ -697,6 +710,9 @@ function startData(){
     });
     if (!snap.metadata.fromCache) { seenApv = {}; snap.docs.forEach(function(d){ seenApv[d.id] = (d.data()||{}).status; }); }
   }, function(){}));
+  unsubs.push(db.collection('customers').onSnapshot(function(snap){ var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.custs = o; render(); }, function(){}));
+  unsubs.push(db.collection('expenses').orderBy('at','desc').limit(1500).onSnapshot(function(snap){ S.exp = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
+  unsubs.push(db.collection('clock').orderBy('in','desc').limit(400).onSnapshot(function(snap){ S.clock = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
   unsubs.push(db.doc('public/site').onSnapshot(function(snap){ S.pub = snap.exists ? clone(snap.data()) : {}; render(); }, function(){}));
   unsubs.push(db.collection('avail').onSnapshot(function(snap){
     var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.avail = o; render();
@@ -771,6 +787,7 @@ function render(){
   if (S.openId) renderSheet(); else if (S.profile) renderProfile();
   maybeAskWho();
   if (S.status === 'ready' && !S.cacheOnly) backfillStatus();
+  if (S.status === 'ready' && /#t=\d+/.test(location.hash||'')) setTimeout(checkHash, 50);
 }
 
 function newReqCount(){ return (S.reqs||[]).filter(function(r){ return r.status === 'new'; }).length; }
@@ -865,8 +882,11 @@ function ticketsView(){
   var tAp = (S.reqs||[]).filter(function(r){ return isBooking(r) && (r.status === 'new' || r.status === 'confirmed') && r.apptAt >= sod.getTime() && r.apptAt < sod.getTime() + 86400e3; }).sort(function(a,b){ return a.apptAt - b.apptAt; });
   var strip = tAp.length ? '<div class="todayap"><b>Today:</b>' + tAp.map(function(r){ return '<button class="chip" data-act="rqshow" data-id="'+esc(r.id)+'">'+esc(r.time)+' · '+esc(String(r.name||fmtPhone(r.phone)).split(' ')[0])+(r.where==='mobile'?' · 🚗':'')+'</button>'; }).join('') + '</div>' : '';
   var fu = followups();
+  var bk = backupDue() ? '<div class="todayap"><span>💾 <b>Weekly backup is due.</b> It saves a copy of every ticket to this computer.</span><button class="btn sm ghost" data-act="csv" style="margin-left:auto">Back up now</button></div>' : '';
   var fuStrip = fu.length ? '<div class="todayap" style="background:#fff8e6"><span>🔔 <b>'+fu.length+' follow-up'+(fu.length>1?'s':'')+'</b>: ' + esc([['review','review request'],['pickup','pickup reminder']].map(function(k){ var n = fu.filter(function(f){ return f.kind === k[0]; }).length; return n ? n + ' ' + k[1] + (n>1?'s':'') : ''; }).filter(Boolean).join(', ')) + '</span><button class="btn sm" data-act="followups" style="margin-left:auto">Open</button></div>' : '';
-  return fuStrip + strip + stats + bar + '<div class="list">' + rows + '</div>';
+  var mode = '<div class="bkbar" style="margin:-4px 0 12px"><div class="seg" role="group" aria-label="Layout"><button data-act="tmode" data-v="list" aria-pressed="'+(S.tMode!=='board')+'">List</button><button data-act="tmode" data-v="board" aria-pressed="'+(S.tMode==='board')+'">Shop screen</button></div>'+(S.tMode==='board'?'<button class="btn sm ghost" data-act="fullboard" style="margin-left:auto">Full screen</button>':'')+'</div>';
+  if (S.tMode === 'board') return fuStrip + mode + boardView();
+  return bk + fuStrip + strip + mode + stats + bar + '<div class="list">' + rows + '</div>';
 }
 
 function rowHtml(t){
@@ -897,8 +917,8 @@ function rowSub(t){
 function partsView(){
   S.pMode = S.pMode || 'order';
   var low = lowCount();
-  var seg = '<div class="bkbar"><div class="seg" role="group" aria-label="Parts view"><button data-act="pmode" data-v="order" aria-pressed="'+(S.pMode==='order')+'">On order</button><button data-act="pmode" data-v="stock" aria-pressed="'+(S.pMode==='stock')+'">In stock'+(low?' <span class="tbadge" style="background:#b25000">'+low+'</span>':'')+'</button></div></div>';
-  return seg + (S.pMode === 'stock' ? stockView() : partsView0());
+  var seg = '<div class="bkbar"><div class="seg" role="group" aria-label="Parts view"><button data-act="pmode" data-v="order" aria-pressed="'+(S.pMode==='order')+'">On order</button><button data-act="pmode" data-v="stock" aria-pressed="'+(S.pMode==='stock')+'">In stock'+(low?' <span class="tbadge" style="background:#b25000">'+low+'</span>':'')+'</button><button data-act="pmode" data-v="rma" aria-pressed="'+(S.pMode==='rma')+'">Returns</button></div></div>';
+  return seg + (S.pMode === 'stock' ? stockView() : S.pMode === 'rma' ? returnsView() : partsView0());
 }
 function partsView0(){
   var all = [];
@@ -959,9 +979,9 @@ function reportsView(){
   var dur = function(ms){ return !ms ? '—' : ms < 3600e3 ? Math.max(1, Math.round(ms/60000)) + ' min' : ms < 86400e3 ? (Math.round(ms/360000)/10) + ' hrs' : (Math.round(ms/8640000)/10) + ' days'; };
   var techRows = Object.keys(byTech).sort(function(a,b){ return byTech[b].n - byTech[a].n; });
   var maxN = techRows.reduce(function(m,k){ return Math.max(m, byTech[k].n); }, 1);
-  var techTbl = techRows.length ? '<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>Technician</th><th>Repairs</th><th></th><th>Avg time to ready</th><th>Warranty returns</th><th class="right">Paid</th></tr></thead><tbody>' + techRows.map(function(k){
+  var techTbl = techRows.length ? '<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>Technician</th><th>Repairs</th><th></th><th>Avg time to ready</th><th>Warranty returns</th><th class="right">Sales</th><th class="right">Commission</th></tr></thead><tbody>' + techRows.map(function(k){
     var o = byTech[k];
-    return '<tr><td>'+esc(k)+'</td><td style="width:70px">'+o.n+'</td><td style="min-width:80px"><div class="barw"><i style="width:'+Math.round(o.n/maxN*100)+'%"></i></div></td><td>'+dur(o.tn ? o.tsum/o.tn : 0)+'</td><td'+(o.wr?' style="color:var(--red);font-weight:600"':'')+'>'+o.wr+'</td><td class="right amt">'+money(o.rev)+'</td></tr>';
+    return '<tr><td>'+esc(k)+'</td><td style="width:70px">'+o.n+'</td><td style="min-width:80px"><div class="barw"><i style="width:'+Math.round(o.n/maxN*100)+'%"></i></div></td><td>'+dur(o.tn ? o.tsum/o.tn : 0)+'</td><td'+(o.wr?' style="color:var(--red);font-weight:600"':'')+'>'+o.wr+'</td><td class="right amt">'+money(o.rev)+'</td><td class="right amt">'+(commPct(k)?money(r2(o.rev*commPct(k)/100))+' <span class="t2">('+commPct(k)+'%)</span>':'<span class="t2">—</span>')+'</td></tr>';
   }).join('') + '</tbody></table></div>' : '<p class="muted">No repairs picked up in this period.</p>';
   var rep = {};
   S.tickets.filter(function(t){ return inR(t.createdAt); }).forEach(function(t){ (t.items||[]).forEach(function(i){ var k = ((i.repair === 'Other repair' || i.repair === 'Other') ? 'Other repair' : i.repair) + (i.part ? ' · ' + i.part : ''); rep[k] = (rep[k]||0) + 1; }); });
@@ -973,6 +993,8 @@ function reportsView(){
   var pmTbl = Object.keys(pm).length ? '<table class="rtable"><tbody>' + Object.keys(pm).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(pm[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No payments in this period.</p>';
   return seg + tiles +
     (RP === 'today' ? closeoutPanel() : '') +
+    '<div class="rgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><b>'+money(revenue - pcost)+'</b><span>After part costs</span></div><div class="stat"><b>'+money((S.exp||[]).filter(function(x){ return x.at >= start; }).reduce(function(a,x){ return a + num(x.amt); }, 0))+'</b><span>Expenses</span></div><div class="stat"><b style="color:var(--green)">'+money(revenue - pcost - (S.exp||[]).filter(function(x){ return x.at >= start; }).reduce(function(a,x){ return a + num(x.amt); }, 0))+'</b><span>Real profit (after parts and expenses)</span></div></div>' +
+    expensesPanel(start) + clockPanel() +
     '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period. Warranty returns count against the tech who did the original repair.</p>'+techTbl+'</div>' +
     '<div class="g2"><div class="panel"><h2>Most common repairs</h2><p class="d">From tickets checked in this period.</p>'+repTbl+'</div>' +
     '<div class="panel"><h2>Payments</h2><p class="d">By payment method.</p>'+pmTbl+'</div></div>' +
@@ -1019,6 +1041,7 @@ function renderProfile(){
         '<dl class="kv" style="margin-top:14px"><dt>Address</dt><dd>'+(addr?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr)+'">'+esc(addr)+'</a>':'<span class="muted">Not on file</span>')+'</dd>' +
         '<dt>Email</dt><dd>'+(email?esc(email):'<span class="muted">Not on file</span>')+'</dd>' +
         '<dt>Repairs</dt><dd>'+list.length+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Last visit</dt><dd>'+esc(dateOnly(list[0].createdAt))+'</dd></dl></div>' +
+      custNotesCard(S.profile) +
       '<div class="card"><h3>Devices</h3><div class="devs">'+devHtml+'</div></div>' +
       '<div class="card"><h3>Repair history</h3>'+hist+'</div>' +
     '</div>';
@@ -1049,10 +1072,12 @@ function settingsView(){
   var techs = (S.settings.techs||[]).map(function(n, i){
     return '<span class="tchip"><span class="av">'+esc(initials(n))+'</span>'+esc(n)+(S.canWrite?'<button data-act="rmtech" data-i="'+i+'" aria-label="Remove '+esc(n)+'">×</button>':'')+'</span>';
   }).join('');
-  return '<div class="panel"><h2>Team</h2><p class="d">Everyone who works on repairs. Each action on a ticket is saved with the name of whoever is working.</p>' +
+  var comm = '<h3 style="margin-top:18px;font-size:15px">Commission</h3><p class="hint" style="margin-bottom:8px">% of each tech’s repair sales (before tax). Leave at 0 for none. Shows in Reports.</p><div class="g3" style="max-width:640px">' + (S.settings.techs||[]).map(function(n){ return '<div class="f"><label>'+esc(n)+' %</label><input class="in" inputmode="decimal" data-comm="'+esc(n)+'" value="'+esc(commPct(n)||'')+'" placeholder="0"></div>'; }).join('') + '</div>';
+  return '<div class="panel"><h2>Team</h2><p class="d">Everyone who works on repairs. Each action on a ticket is saved with the name of whoever is working.</p>' + 
     '<div class="techs">' + (techs || '<span class="muted">No one added yet.</span>') + '</div>' +
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
-  '</div>' +
+    comm +
+  '</div>' + backupPanel() +
   siteSettingsPanel() +
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
@@ -1062,8 +1087,12 @@ function settingsView(){
   '</div>' +
   '<div class="panel"><h2>Tax and payments</h2><p class="d">New tickets add sales tax automatically. Texas taxes phone repair (parts and labor). San Antonio’s rate is 8.25%.</p>' +
     '<div class="g2" style="max-width:520px"><div class="f"><label for="set-tax">Sales tax %</label><input class="in" id="set-tax" inputmode="decimal" data-setting="taxRate" value="'+esc(S.settings.taxRate == null ? 8.25 : S.settings.taxRate)+'"></div>' +
-    '<div class="f"><label for="set-sur">Credit card surcharge %</label><input class="in" id="set-sur" inputmode="decimal" data-setting="surchargeRate" value="'+esc(surRate())+'"></div></div>' +
-    '<div class="match" style="margin-top:12px"><b>Card surcharge:</b> turn it on in <b>Square</b> (Dashboard → Settings → Payments → Credit card surcharges) and use the same % here. Square only charges it on credit cards, never debit, and prints it on the receipt. Square caps it at 3% and gives you a sign to post at the counter. Set this to 0 if you ever turn the surcharge off in Square.</div>' +
+    '<div class="f"><label for="set-sur">Credit card surcharge %</label><input class="in" id="set-sur" inputmode="decimal" data-setting="surchargeRate" value="'+esc(surRate() || 3)+'"></div></div>' +
+    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="surchargeOff"'+(S.settings.surchargeOff?' checked':'')+'>Turn the credit card surcharge off</label>' +
+    '<h3 style="margin-top:18px;font-size:15px">Accessory prices</h3><p class="hint" style="margin-bottom:8px">Offered at checkout. Tax is added automatically.</p>' +
+    '<div class="g2" style="max-width:520px">' + ACCS.map(function(a){ return '<div class="f"><label for="acc-'+a.k+'">'+esc(a.name)+'</label><input class="in" id="acc-'+a.k+'" inputmode="decimal" data-setting="acc_'+a.k+'" value="'+esc(accPrice(a.k))+'"></div>'; }).join('') + '</div>' +
+    '<h3 style="margin-top:18px;font-size:15px">Repeat customers</h3><div class="g2" style="max-width:520px"><div class="f"><label for="set-lv">Discount on visit #</label><input class="in" id="set-lv" inputmode="numeric" data-setting="loyaltyVisit" value="'+esc(loyaltyVisit())+'"></div><div class="f"><label for="set-lp">Discount %</label><input class="in" id="set-lp" inputmode="decimal" data-setting="loyaltyPct" value="'+esc(loyaltyPct())+'"></div></div>' +
+    '<div class="match" style="margin-top:12px"><b>Card surcharge:</b> turn it on in <b>Square</b> (Dashboard → Settings → Payments → Credit card surcharges) and use the same % here. Square only charges it on credit cards, never debit, and prints it on the receipt. Credit cards get 3% added on the total (tax included). Debit cards and cash don’t. Square gives you a sign to post at the counter.</div>' +
   '</div>' +
   '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
     '<div class="f" style="max-width:360px"><label for="lblsize">Label size</label><select class="in" id="lblsize" data-setting="labelSize">' + Object.keys(LABELS).map(function(k){ return '<option value="'+k+'"'+((S.settings.labelSize||'brother62')===k?' selected':'')+'>'+esc(LABELS[k].name)+'</option>'; }).join('') + '</select></div>' +
@@ -1119,6 +1148,7 @@ function siteSettingsPanel(){
   return '<div class="panel"><h2>Website</h2><p class="d">These show on ifixphones.net and update instantly.</p>' +
     '<div class="f" style="max-width:520px"><label for="revurl">Google review link</label><div class="inline" style="margin:0"><input class="in" id="revurl" placeholder="https://g.page/r/…/review" value="'+esc(pub.reviewUrl||'')+'"><button class="btn dark" data-act="saverev">Save</button></div>' +
     '<p class="hint">Google Business Profile → <b>Ask for reviews</b> → copy the link. It’s used for the website’s review button and the review texts.</p></div>' +
+    '<div class="acts" style="margin-top:14px"><button class="btn sm ghost" data-act="checkinsign">Print counter sign (scan to check in)</button></div>' +
     '<h3 style="margin-top:20px;font-size:15px">Price guide</h3><p class="hint" style="margin-bottom:8px">Starting prices shown on the website. Leave empty to hide the price guide.</p>' +
     (rows ? '<table class="rtable"><tbody>'+rows+'</tbody></table>' : '') +
     '<form class="inline" data-form="addprice" style="flex-wrap:wrap"><input class="in" id="pg-model" placeholder="Model, e.g. iPhone 13" style="flex:2;min-width:150px"><select class="in" id="pg-rep" style="flex:1.4;min-width:130px">'+['Screen','Screen (OLED)','Screen (Original)','Battery','Charging port','Back glass','Camera'].map(function(x){ return '<option>'+x+'</option>'; }).join('')+'</select><input class="in" id="pg-from" inputmode="decimal" placeholder="From $" style="flex:.8;min-width:80px"><button class="btn dark" type="submit">Add</button></form>' +
@@ -1396,7 +1426,8 @@ function bbBox(item, pre){
     '<div class="g2" style="margin-top:10px" id="bb-soldw"><div class="f"><label for="bb-sold">Sold for</label><input class="in" id="bb-sold" inputmode="decimal" value="'+esc(b.soldPrice||'')+'"></div><div class="f"><label for="bb-buyer">Buyer (optional)</label><input class="in" id="bb-buyer" value="'+esc(b.buyerName||'')+'"></div></div>' +
     '<div class="f" style="margin-top:10px"><label for="bb-notes">Notes</label><textarea class="in" id="bb-notes" style="min-height:56px">'+esc(b.notes||'')+'</textarea></div>' +
     '<div id="bb-prof" class="match" style="margin-top:12px"></div>',
-    (item ? '<button class="link red" id="bb-del" style="margin-right:auto">Delete</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="bb-save">Save</button>', true);
+    (item ? '<button class="link red" id="bb-del" style="margin-right:auto">Delete</button><button class="btn ghost" id="bb-wipe">Data-wipe certificate</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="bb-save">Save</button>', true);
+  var wb = $('#bb-wipe', m); if (wb) wb.addEventListener('click', function(){ printHtml(wipeDoc(item)); });
   function prof(){
     var sold = $('#bb-st', m).value === 'sold';
     $('#bb-soldw', m).style.display = sold ? '' : 'none';
@@ -1571,44 +1602,66 @@ function closeoutDoc(){
 }
 
 /* ---------- payments ---------- */
+var ACCS = [{k:'caseReg', name:'Case · Regular', def:15},{k:'caseDef', name:'Case · Defender', def:30},{k:'spReg', name:'Screen protector · Regular', def:10},{k:'spPriv', name:'Screen protector · Privacy', def:20}];
+function accPrice(k){ var v = S.settings['acc_' + k]; if (v != null && v !== '') return num(v); return ACCS.filter(function(a){ return a.k === k; })[0].def; }
+function loyaltyVisit(){ return num(S.settings.loyaltyVisit) || 3; }
+function loyaltyPct(){ return S.settings.loyaltyPct == null || S.settings.loyaltyPct === '' ? 10 : num(S.settings.loyaltyPct); }
+function visitNo(t){ var k = custKey(t.customer); return S.tickets.filter(function(x){ return x.status !== 'cancel' && custKey(x.customer) === k && (x.createdAt||0) <= (t.createdAt||Date.now()); }).length; }
 function payBox(t){
-  var bal = balance(t), sr = surRate();
+  var sr = surRate(), adds = {};
   var m = modalShell('py', 'Take payment · #' + esc(t.num),
-    '<div class="tot b" style="font-size:20px;margin-bottom:12px"><span>Amount due</span><span>'+money(bal)+'</span></div>' +
-    '<div class="f"><label for="py-m">Paid by</label><select class="in" id="py-m">'+PAY.concat(['Split payment']).map(function(p){ return '<option'+(p===(S.lastPay||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div>' +
+    '<div class="f" style="margin-bottom:14px"><label>Add accessories</label><div class="chips" style="margin-top:4px;flex-wrap:wrap;overflow:visible">' + ACCS.map(function(a){ return '<button type="button" class="chip" data-acc="'+a.k+'" aria-pressed="false">'+esc(a.name)+' <i>'+money(accPrice(a.k))+'</i></button>'; }).join('') + '</div></div>' +
+    '<div id="py-sum"></div>' +
+    '<div class="f" style="margin-top:12px"><label for="py-m">Paid by</label><select class="in" id="py-m">'+PAY.concat(['Split payment']).map(function(p){ return '<option'+(p===(S.lastPay||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div>' +
     '<div id="py-cash" class="f" style="margin-top:12px"><label for="py-in">Cash received (optional)</label><input class="in" id="py-in" inputmode="decimal" placeholder="$"><p class="hint" id="py-chg"></p></div>' +
-    '<div id="py-sur" class="f" style="margin-top:12px"><label for="py-s">Card surcharge (from the Square receipt)</label><input class="in" id="py-s" inputmode="decimal" value="'+(sr ? r2(bal * sr / 100) : '')+'" placeholder="$0"><p class="hint">'+(sr ? 'Square adds '+sr+'% to credit cards only. If the customer’s card was debit, Square won’t add it, so set this to 0.' : 'Turn on a surcharge in Settings → Tax and payments if you add one in Square.')+'</p></div>' +
+    '<div id="py-card" class="match" style="margin-top:12px"></div>' +
     '<div id="py-split" style="margin-top:12px"><div class="g2"><div class="f"><label for="py-m1">First payment</label><select class="in" id="py-m1">'+PAY.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a1">Amount</label><input class="in" id="py-a1" inputmode="decimal"></div></div>' +
-      '<div class="g2" style="margin-top:10px"><div class="f"><label for="py-m2">Second payment</label><select class="in" id="py-m2">'+PAY.map(function(p, i){ return '<option'+(i===1?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a2">Amount</label><input class="in" id="py-a2" inputmode="decimal" readonly></div></div></div>',
+      '<div class="g2" style="margin-top:10px"><div class="f"><label for="py-m2">Second payment</label><select class="in" id="py-m2">'+PAY.map(function(p, i){ return '<option'+(i===1?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a2">Amount</label><input class="in" id="py-a2" inputmode="decimal" readonly></div></div><p class="hint" id="py-splith"></p></div>',
     '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="py-ok">Mark paid</button>', true);
+  function draft(){
+    var live = byId(t.id) || t, items = (live.items||[]).slice();
+    ACCS.forEach(function(a){ if (adds[a.k]) items.push({repair:'Accessory', part:'', price:accPrice(a.k), desc:a.name}); });
+    return Object.assign({}, live, {items:items});
+  }
   function upd(){
-    var meth = $('#py-m', m).value;
+    var d = draft(), bal = balance(d), meth = $('#py-m', m).value;
+    $('#py-sum', m).innerHTML = '<div class="tot"><span>Repairs'+(Object.keys(adds).some(function(k){ return adds[k]; })?' + accessories':'')+'</span><span>'+money(subtotal(d))+'</span></div>' + (discountAmt(d)?'<div class="tot"><span>Discount</span><span>−'+money(discountAmt(d))+'</span></div>':'') + (taxAmt(d)?'<div class="tot"><span>Sales tax ('+taxRateOf(d)+'%)</span><span>'+money(taxAmt(d))+'</span></div>':'') + (num(d.deposit)?'<div class="tot"><span>Deposit paid</span><span>−'+money(d.deposit)+'</span></div>':'') + '<div class="tot b" style="font-size:20px"><span>Amount due</span><span>'+money(bal)+'</span></div>';
     $('#py-cash', m).style.display = meth === 'Cash' ? '' : 'none';
-    $('#py-sur', m).style.display = CARDISH.indexOf(meth) > -1 ? '' : 'none';
     $('#py-split', m).style.display = meth === 'Split payment' ? '' : 'none';
+    var isCredit = CARDISH.indexOf(meth) > -1 && sr;
+    $('#py-card', m).style.display = isCredit ? '' : 'none';
+    if (isCredit) $('#py-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(r2(bal * (1 + sr/100))) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee (' + money(r2(bal * sr/100)) + '). If Square shows it as a <b>debit</b> card, choose Debit card above instead.</span>';
     var cin = num($('#py-in', m).value);
     $('#py-chg', m).textContent = cin ? (cin >= bal ? 'Change: ' + money(r2(cin - bal)) : 'That’s ' + money(r2(bal - cin)) + ' short') : '';
     var a1 = num($('#py-a1', m).value); $('#py-a2', m).value = a1 ? r2(Math.max(0, bal - a1)) : '';
+    var m2 = $('#py-m2', m).value; $('#py-splith', m).textContent = a1 && CARDISH.indexOf(m2) > -1 && sr ? 'Charge ' + money(r2((bal - a1) * (1 + sr/100))) + ' on Square for the card part (includes ' + sr + '%).' : '';
+    $('#py-ok', m).textContent = 'Mark ' + money(isCredit ? r2(bal * (1 + sr/100)) : bal) + ' paid';
   }
+  m.addEventListener('click', function(e){ var c = e.target.closest('[data-acc]'); if (!c) return; var k = c.getAttribute('data-acc'); adds[k] = !adds[k]; c.setAttribute('aria-pressed', String(!!adds[k])); upd(); });
   upd(); m.addEventListener('input', upd); m.addEventListener('change', upd);
   $('#py-ok', m).addEventListener('click', function(){
-    var meth = $('#py-m', m).value, err = $('#py-err', m);
+    var d = draft(), bal = balance(d), meth = $('#py-m', m).value, err = $('#py-err', m);
     var f = {paid:true, paidAt:Date.now(), surcharge:0, split:[], cashIn:0, payMethod:meth};
+    var added = ACCS.filter(function(a){ return adds[a.k]; });
+    if (added.length) f.items = d.items;
     var log = 'took payment of ' + money(bal);
     if (meth === 'Split payment') {
-      var a1 = num($('#py-a1', m).value), a2 = r2(bal - a1);
+      var a1 = num($('#py-a1', m).value), a2 = r2(bal - a1), m1 = $('#py-m1', m).value, m2 = $('#py-m2', m).value;
       if (!a1 || a1 >= bal) { err.textContent = 'Enter the first amount (less than ' + money(bal) + ').'; return; }
-      f.payMethod = 'Split'; f.split = [{m:$('#py-m1', m).value, a:a1}, {m:$('#py-m2', m).value, a:a2}];
-      log += ' (' + f.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + ') + ')';
+      f.payMethod = 'Split'; f.split = [{m:m1, a:a1}, {m:m2, a:a2}];
+      var sc = 0; f.split.forEach(function(x){ if (CARDISH.indexOf(x.m) > -1 && sr) sc += r2(x.a * sr / 100); });
+      if (sc) { f.surcharge = r2(sc); f.surMethod = 'Credit card'; }
+      log += ' (' + f.split.map(function(x){ return x.m + ' ' + money(x.a); }).join(' + ') + ')' + (sc ? ' + ' + money(sc) + ' card fee' : '');
     } else {
       log += ' by ' + meth;
       if (meth === 'Cash' && num($('#py-in', m).value)) { f.cashIn = num($('#py-in', m).value); if (f.cashIn < bal) { err.textContent = 'Cash received is less than the amount due.'; return; } }
-      if (CARDISH.indexOf(meth) > -1 && num($('#py-s', m).value)) { f.surcharge = r2(num($('#py-s', m).value)); f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' card surcharge'; if (f.surcharge > r2(bal * 0.03) + 0.01) { err.textContent = 'Card surcharges can’t be more than 3%.'; return; } }
+      if (CARDISH.indexOf(meth) > -1 && sr) { f.surcharge = r2(bal * sr / 100); f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' credit card fee (' + sr + '%)'; }
     }
+    if (added.length) log += '; added ' + added.map(function(a){ return a.name; }).join(', ');
     S.lastPay = meth === 'Split payment' ? S.lastPay : meth;
     m.remove();
     var live = byId(t.id); if (live) patchTicket(live, f, [logEntry(log)]);
-    toast('Paid' + (f.cashIn ? ' · change ' + money(r2(f.cashIn - bal)) : ''));
+    toast('Paid ' + money(r2(bal + f.surcharge)) + (f.cashIn ? ' · change ' + money(r2(f.cashIn - bal)) : ''));
   });
 }
 function receiptText(t){
@@ -1637,6 +1690,158 @@ function receiptDoc(t){
       (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
     '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (/incell/i.test(repairsText(t)) ? '. Incell parts have no warranty.' : '') + '<br>Warranty covers the part only when our supplier does; cracks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' +
     '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
+}
+
+/* ---------- scanning ---------- */
+function ticketUrl(t){ return 'https://ifixphones.net/tickets.html#t=' + t.num; }
+function openByNum(n){
+  var t = S.tickets.filter(function(x){ return String(x.num) === String(n); })[0];
+  if (!t) { toast('Ticket #' + n + ' not found'); return; }
+  Array.prototype.forEach.call(document.querySelectorAll('.modal'), function(x){ if (!x.id || x.id !== 'tform') x.remove(); });
+  S.view = 'tickets'; render(); openTicket(t.id); toast('Opened #' + n);
+}
+(function(){
+  var buf = '', last = 0, startEl = null;
+  document.addEventListener('keydown', function(e){
+    var now = Date.now();
+    if (now - last > 60) { buf = ''; startEl = document.activeElement; }
+    last = now;
+    if (e.key === 'Enter') {
+      var mt = /tickets\.html#t=(\d+)/i.exec(buf) || /^IFX-?(\d+)$/i.exec(buf);
+      if (mt && buf.length >= 5) {
+        e.preventDefault(); e.stopPropagation();
+        var el = startEl; if (el && 'value' in el && typeof el.value === 'string' && el.value.slice(-buf.length) === buf) { el.value = el.value.slice(0, -buf.length); el.dispatchEvent(new Event('input', {bubbles:true})); }
+        openByNum(mt[1]); buf = ''; return;
+      }
+      buf = ''; return;
+    }
+    if (e.key && e.key.length === 1) buf += e.key;
+  }, true);
+  window.addEventListener('hashchange', checkHash);
+})();
+function checkHash(){
+  var mt = /#t=(\d+)/.exec(location.hash || '');
+  if (!mt || S.status !== 'ready') return;
+  try { history.replaceState(null, '', location.pathname); } catch(e) {}
+  openByNum(mt[1]);
+}
+
+/* ---------- shop screen ---------- */
+function boardView(){
+  var cols = [['in','Checked in'],['part','Waiting on part'],['repair','Repairing'],['ready','Ready for pickup']];
+  var name = function(c){ var p = String((c||{}).name||'').trim().split(/\s+/); return p[0] + (p[1] ? ' ' + p[1][0] + '.' : ''); };
+  return '<div class="board">' + cols.map(function(c){
+    var list = S.tickets.filter(function(t){ return t.status === c[0]; }).sort(function(a,b){ return (a.dueAt||a.createdAt) - (b.dueAt||b.createdAt); });
+    return '<div class="bcol"><div class="bch" style="color:'+SMAP[c[0]].c+'"><span>'+c[1]+'</span><b>'+list.length+'</b></div>' + list.map(function(t){
+      var late = isOverdue(t), age = rel(t.createdAt);
+      return '<button class="bcard'+(late?' late':'')+'" data-act="open" data-id="'+esc(t.id)+'"><div class="bt"><b>#'+esc(t.num)+'</b>'+(t.type==='mobile'?'<span class="mobtag">Mobile</span>':'')+'<span class="t2">'+esc(age)+'</span></div>' +
+        '<div class="bd">'+esc((t.device||{}).model||'')+'</div><div class="t2">'+esc(repairsText(t))+'</div>' +
+        '<div class="bf"><span>'+esc(name(t.customer))+'</span><span>'+(t.assigned?'<span class="av">'+esc(initials(t.assigned))+'</span>':'<span class="t2">No tech</span>')+'</span></div>' +
+        (t.dueAt && c[0] !== 'ready' ? '<div class="duel '+(late?'late':'wait')+'">'+(late?'Was due ':'Due ')+esc(dueText(t.dueAt))+'</div>' : '') + '</button>';
+    }).join('') + '</div>';
+  }).join('') + '</div>';
+}
+
+/* ---------- mobile route ---------- */
+function routeUrl(){
+  var sod = new Date(); sod.setHours(0,0,0,0); var a = sod.getTime(), b = a + 86400e3;
+  var stops = (S.reqs||[]).filter(function(r){ return r.where === 'mobile' && (r.status === 'new' || r.status === 'confirmed') && r.apptAt >= a && r.apptAt < b && r.address; }).sort(function(x,y){ return x.apptAt - y.apptAt; }).map(function(r){ return r.address; });
+  S.tickets.filter(function(t){ return t.type === 'mobile' && ['in','part','repair'].indexOf(t.status) > -1 && t.address && (!t.dueAt || (t.dueAt >= a && t.dueAt < b)); }).forEach(function(t){ if (stops.indexOf(t.address) < 0) stops.push(t.address); });
+  if (!stops.length) return '';
+  var shop = '9055 Marbach Rd Suite 105, San Antonio, TX';
+  return 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(shop) + '&destination=' + encodeURIComponent(stops[stops.length-1]) + (stops.length > 1 ? '&waypoints=' + encodeURIComponent(stops.slice(0, -1).join('|')) : '') + '&travelmode=driving';
+}
+
+function backupDue(){ var lb = num(S.settings.lastBackup); return S.tickets.length >= 3 && (!lb || Date.now() - lb > 7*86400e3); }
+function backupPanel(){ var lb = num(S.settings.lastBackup); return '<div class="panel"><h2>Weekly backup</h2><p class="d">'+(lb ? 'Last backup '+esc(rel(lb))+'.' : 'No backup yet.')+' The app reminds you every 7 days.</p><button class="btn sm" data-act="csv">Back up now</button></div>'; }
+/* ---------- customer notes ---------- */
+function custInfo(c){ return (S.custs||{})[custKey(c)] || {}; }
+var FLAGS = {vip:['⭐ VIP','#14692c','#e5f5ea'], caution:['⚠️ Heads up','#9b2c27','#fbeceb']};
+function custBanner(t){
+  var ci = custInfo(t.customer); if (!ci.flag && !ci.note) return '';
+  var f = FLAGS[ci.flag];
+  return '<div class="card" style="'+(f?'background:'+f[2]:'')+'">' + (f ? '<b style="color:'+f[1]+'">'+f[0]+'</b>' : '<b>Customer note</b>') + (ci.note ? '<p style="margin-top:4px;white-space:pre-wrap">'+esc(ci.note)+'</p>' : '') + '</div>';
+}
+function custNotesCard(key){
+  var ci = (S.custs||{})[key] || {};
+  return '<div class="card"><h3>Notes about this customer</h3>' +
+    '<div class="seg" role="group" aria-label="Flag" style="margin-bottom:10px">' + [['','None'],['vip','⭐ VIP'],['caution','⚠️ Heads up']].map(function(x){ return '<button type="button" data-cflag="'+x[0]+'" aria-pressed="'+((ci.flag||'')===x[0])+'">'+x[1]+'</button>'; }).join('') + '</div>' +
+    '<textarea class="in" id="cnote" data-keep placeholder="Prefers texts, paid late before, always asks for OLED…">'+esc(ci.note||'')+'</textarea>' +
+    '<div class="acts"><button class="btn sm dark" data-act="savecnote" data-key="'+esc(key)+'">Save note</button></div><p class="hint">Every tech sees this on the customer’s tickets.</p></div>';
+}
+function saveCust(key, patch){
+  S.custs = S.custs || {}; S.custs[key] = Object.assign({}, S.custs[key]||{}, patch); render();
+  return enqueue('customers/'+key, function(){ return retryOnce(function(){ return S.db.doc('customers/'+key).set(Object.assign({updatedAt:Date.now(), by:who()}, patch), {merge:true}); }); }).then(function(){ toast('Saved'); }).catch(writeErr);
+}
+
+/* ---------- supplier returns (RMA) ---------- */
+var RMA = [['needed','Send back'],['sent','Sent, waiting on credit'],['credited','Credited']];
+function setRma(t, pid, v){
+  var parts = clone(t.parts||[]), p = parts.filter(function(x){ return x.id === pid; })[0]; if (!p) return;
+  if (v === 'needed' && !p.rma) { p.rma = 'needed'; p.rmaAt = Date.now(); }
+  else if (v === 'sent') { p.rma = 'sent'; p.rmaSentAt = Date.now(); }
+  else if (v === 'credited') { p.rma = 'credited'; p.rmaDoneAt = Date.now(); }
+  else if (v === 'none') { delete p.rma; }
+  patchTicket(t, {parts:parts}, [logEntry(v === 'needed' ? 'marked “' + p.name + '” defective, to send back to ' + (p.supplier||'the supplier') : v === 'none' ? 'cancelled the return for “' + p.name + '”' : 'return for “' + p.name + '”: ' + (v === 'sent' ? 'sent back' : 'credit received'))]);
+}
+function returnsView(){
+  var all = [];
+  S.tickets.forEach(function(t){ (t.parts||[]).forEach(function(p){ if (p.rma) all.push({t:t, p:p}); }); });
+  if (!all.length) return '<div class="panel empty"><h3>No returns</h3><p>When a part is bad, open the ticket and tap <b>Defective</b> on the part. It shows up here until your supplier credits you.</p></div>';
+  return RMA.map(function(g){
+    var rows = all.filter(function(x){ return x.p.rma === g[0]; }); if (!rows.length) return '';
+    if (g[0] === 'credited') rows = rows.slice(-20);
+    return '<section class="pgroup"><h2>'+g[1]+' <i>'+rows.length+'</i></h2><div class="plist">' + rows.map(function(x){
+      var nx = g[0] === 'needed' ? ['sent','Mark sent'] : g[0] === 'sent' ? ['credited','Mark credited'] : null;
+      return '<div class="prow"><button class="open" data-act="open" data-id="'+esc(x.t.id)+'"><div class="t1">'+esc(x.p.name)+'</div><div class="t2">#'+esc(x.t.num)+' · '+esc((x.t.device||{}).model||'')+'</div></button><div class="hide-s"><div class="t1" style="font-weight:500">'+esc(x.p.supplier||'—')+'</div><div class="t2">'+(x.p.orderNo?'Order '+esc(x.p.orderNo):'')+'</div></div><div class="t2 hide-s">'+esc(rel(x.p.rmaDoneAt||x.p.rmaSentAt||x.p.rmaAt))+'</div><div class="amt right hide-s">'+(num(x.p.cost)?money(x.p.cost):'')+'</div>' +
+        (nx ? '<button class="btn sm ghost" data-act="rma" data-tid="'+esc(x.t.id)+'" data-pid="'+esc(x.p.id)+'" data-v="'+nx[0]+'">'+nx[1]+'</button>' : '<span class="tagk ok">Credited</span>') + '</div>';
+    }).join('') + '</div></section>';
+  }).join('') + '<p class="hint">Money waiting on credits: <b>'+money(all.filter(function(x){ return x.p.rma !== 'credited'; }).reduce(function(a,x){ return a + num(x.p.cost); }, 0))+'</b></p>';
+}
+
+/* ---------- expenses ---------- */
+var EXP_CATS = ['Parts order','Rent','Gas / mobile','Tools and supplies','Utilities','Payroll','Marketing','Other'];
+function expensesPanel(start){
+  var list = (S.exp||[]).filter(function(x){ return x.at >= start; }).sort(function(a,b){ return b.at - a.at; });
+  var tot = list.reduce(function(a,x){ return a + num(x.amt); }, 0);
+  var byC = {}; list.forEach(function(x){ byC[x.cat] = (byC[x.cat]||0) + num(x.amt); });
+  return '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Expenses</h2><b>'+money(tot)+'</b></div>' +
+    '<form class="inline" data-form="addexp" style="flex-wrap:wrap;margin-top:12px"><input class="in" id="ex-amt" inputmode="decimal" placeholder="$ amount" style="flex:.7;min-width:90px"><select class="in" id="ex-cat" style="flex:1;min-width:140px">'+EXP_CATS.map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select><input class="in" id="ex-note" placeholder="Note (optional)" maxlength="80" style="flex:1.5;min-width:140px"><input class="in" id="ex-date" type="date" value="'+isoDay(new Date())+'" style="flex:.9;min-width:130px"><button class="btn dark" type="submit">Add</button></form>' +
+    (Object.keys(byC).length ? '<table class="rtable" style="margin-top:10px"><tbody>' + Object.keys(byC).sort(function(a,b){ return byC[b]-byC[a]; }).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(byC[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '') +
+    (list.length ? '<details style="margin-top:8px"><summary class="link">Show each expense</summary><table class="rtable"><tbody>' + list.slice(0, 100).map(function(x){ return '<tr><td>'+esc(dateOnly(x.at))+'</td><td>'+esc(x.cat)+(x.note?' · '+esc(x.note):'')+'</td><td class="right amt">'+money(x.amt)+'</td><td class="right"><button class="link red" data-act="rmexp" data-id="'+esc(x.id)+'">Delete</button></td></tr>'; }).join('') + '</tbody></table></details>' : '<p class="muted" style="margin-top:8px">No expenses logged for this period.</p>') +
+  '</div>';
+}
+
+/* ---------- time clock ---------- */
+function openShift(n){ return (S.clock||[]).filter(function(x){ return x.who === n && !x.out; })[0]; }
+function clockToggle(n){
+  if (!n) { whoBox(); return; }
+  var sh = openShift(n), now = Date.now();
+  if (sh) { sh.out = now; render(); S.db.doc('clock/'+sh.id).update({out:now}).then(function(){ toast(n + ' clocked out · ' + hrs(now - sh.in)); }).catch(writeErr); }
+  else { var ref = S.db.collection('clock').doc(); S.clock = (S.clock||[]).concat([{id:ref.id, who:n, in:now, out:0}]); render(); ref.set({who:n, in:now, out:0}).then(function(){ toast(n + ' clocked in'); }).catch(writeErr); }
+}
+function hrs(ms){ var h = ms / 3600e3; return (Math.round(h * 10) / 10) + ' hrs'; }
+function clockPanel(){
+  var wk = new Date(); wk.setHours(0,0,0,0); wk.setDate(wk.getDate() - ((wk.getDay() + 6) % 7)); var ws = wk.getTime();
+  var techs = (S.settings.techs||[]).slice(); (S.clock||[]).forEach(function(x){ if (techs.indexOf(x.who) < 0) techs.push(x.who); });
+  var rows = techs.map(function(n){
+    var ms = (S.clock||[]).filter(function(x){ return x.who === n && x.in >= ws; }).reduce(function(a,x){ return a + ((x.out || Date.now()) - x.in); }, 0), on = openShift(n);
+    return '<tr><td>'+esc(n)+'</td><td>'+(on?'<span class="tagk ok">On since '+esc(new Date(on.in).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}))+'</span>':'<span class="t2">Off</span>')+'</td><td class="right">'+hrs(ms)+'</td><td class="right"><button class="btn sm '+(on?'ghost':'')+'" data-act="clock" data-v="'+esc(n)+'">'+(on?'Clock out':'Clock in')+'</button></td></tr>';
+  }).join('');
+  return '<div class="panel"><h2>Time clock</h2><p class="d">Hours this week (starting Monday).</p><table class="rtable"><tbody>'+rows+'</tbody></table></div>';
+}
+
+/* ---------- commission ---------- */
+function commPct(n){ var c = S.settings.commission || {}; return num(c[n]); }
+
+/* ---------- data-wipe certificate ---------- */
+function wipeDoc(b){
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Data erasure certificate</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;max-width:640px;margin:30px auto;padding:0 24px;font-size:14px;line-height:1.5}h1{font-size:24px;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin:18px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:first-child{color:#555;width:40%}.box{border:2px solid #1d1d1f;border-radius:12px;padding:22px}.sig{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:40px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:12px;color:#555}</style></head><body><div class="box">' +
+    '<h1>Certificate of Data Erasure</h1><div>iFixPhones · '+esc(SHOP.addr)+' · '+esc(SHOP.shop)+'</div>' +
+    '<table><tr><td>Device</td><td><b>'+esc(b.model)+(b.storage?' · '+esc(b.storage):'')+'</b></td></tr><tr><td>IMEI / serial</td><td>'+esc(b.imei||'—')+'</td></tr><tr><td>Date erased</td><td>'+esc(dateOnly(Date.now()))+'</td></tr>' +
+    '<tr><td>Method</td><td>Activation lock (Find My / Google) removed by owner, then factory reset with “Erase All Content and Settings”, which permanently deletes encrypted user data.</td></tr><tr><td>Verified by</td><td>'+esc(who())+'</td></tr></table>' +
+    '<p>iFixPhones certifies that all personal data, accounts and settings on the device above were permanently erased and the device was restored to factory settings.</p>' +
+    '<div class="sig"><div>Technician signature</div><div>Date</div></div></div></body></html>';
 }
 
 /* ---------- bookings ---------- */
@@ -1677,14 +1882,14 @@ function holdsSlot(r){ return isBooking(r) && r.status !== 'cancel'; }
 
 function reqBox(r){
   var isQ = r.kind !== 'booking';
-  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
+  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : r.kind === 'checkin' ? '<span class="tagk" style="background:#e6f0fc;color:#0058b0">Online check-in</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
   var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
   var first = String(r.name||'').split(' ')[0];
   var place = r.where === 'mobile' ? '' : ' at 9055 Marbach Rd, Suite 105';
   var msg = r.kind === 'sell' ? 'Hi ' + (first||'there') + ', this is iFixPhones about the ' + (r.device||'phone') + ' you want to sell. We can offer $' : r.kind === 'business' ? 'Hi ' + (first||'there') + ', this is iFixPhones following up on your repair request' + (r.org ? ' for ' + r.org : '') + '. ' : isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
     : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + place + '.' + (r.where==='mobile' ? ' We’ll text you when we’re on the way.' : '') + ' Reply here if anything changes.';
   var rem = 'Hi ' + (first||'there') + ', reminder from iFixPhones: your ' + (r.repair||'repair') + ' appointment is ' + (sameDay(r.apptAt, Date.now()) ? 'today' : 'tomorrow') + ' at ' + (r.time||'') + place + '. Reply here if you need to change it.';
-  var when = r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
+  var when = r.kind === 'checkin' ? esc('Checked in online · ' + (r.whenText||'')) : r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
   var open = r.status === 'new' || r.status === 'confirmed';
   var late = !isQ && r.apptAt && r.apptAt < Date.now() - 3600e3 && open;
   var soon = !isQ && open && r.apptAt && r.apptAt > Date.now() && r.apptAt - Date.now() < 36*3600e3;
@@ -1716,7 +1921,7 @@ function bookingsView(){
   if (S.reqsErr) return '<div class="panel empty"><h3>Bookings can’t load</h3><p>Update the Firebase rules (see the setup steps), then reload.</p></div>';
   S.bkMode = S.bkMode || 'list';
   var bar = '<div class="bkbar"><div class="seg" role="group" aria-label="View"><button data-act="bkmode" data-v="list" aria-pressed="'+(S.bkMode==='list')+'">List</button><button data-act="bkmode" data-v="week" aria-pressed="'+(S.bkMode==='week')+'">Week</button></div>' +
-    '<span class="grow" style="flex:1"></span><button class="btn sm" data-act="addappt">+ Add appointment</button></div>';
+    '<span class="grow" style="flex:1"></span>' + (routeUrl() ? '<a class="btn sm ghost" href="'+esc(routeUrl())+'" target="_blank" rel="noopener">🚗 Today’s mobile route</a>' : '') + '<button class="btn sm" data-act="addappt">+ Add appointment</button></div>';
   return bar + (S.bkMode === 'week' ? weekView(all) : listView(all));
 }
 function listView(all){
@@ -1784,7 +1989,7 @@ function deleteReq(r){
 var SITE_REPAIR = {'Screen':'Screen','Battery':'Battery','Charging port':'Charging port','Back glass':'Back glass','Camera':'Rear camera','Water damage':'Water damage','Speaker or mic':'Loudspeaker','Buttons':'Buttons','Not sure':'Diagnostic'};
 function reqToTicket(r){
   var part = /incell/i.test(r.screen) ? 'Incell' : /oled/i.test(r.screen) ? 'OLED' : /original/i.test(r.screen) ? 'Refurbished original' : '';
-  ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
+  ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:r.email||'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
     items: [{repair: SITE_REPAIR[r.repair] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: part, price:'', desc: SITE_REPAIR[r.repair] ? '' : (r.notes||'').slice(0,120)}],
     reqId: r.id, notes: r.notes||''});
 }
@@ -2017,7 +2222,9 @@ function renderSheet(){
         '<dt>Existing damage</dt><dd>'+esc(t.damage||'None noted')+'</dd>' +
       '</dl></div>' +
 
+      custBanner(t) +
       '<div class="card"><h3>Repairs and payment</h3><table class="items">'+(items||'<tr><td class="muted">No repairs listed</td></tr>')+'</table>' +
+        (!t.paid && !ro && !num(t.discount) && loyaltyPct() && visitNo(t) >= loyaltyVisit() ? '<div class="match" style="margin:8px 0">⭐ <b>Repeat customer</b>, visit #' + visitNo(t) + '. <button class="link" data-act="loyal">Give ' + loyaltyPct() + '% off</button></div>' : '') +
         (discountAmt(t) || taxAmt(t) ? '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(t))+'</span></div>' : '') +
         (discountAmt(t) ? '<div class="tot"><span>Discount'+(t.discountNote?' · '+esc(t.discountNote):'')+'</span><span>−'+money(discountAmt(t))+'</span></div>' : '') +
         (taxAmt(t) ? '<div class="tot"><span>Sales tax ('+taxRateOf(t)+'%)</span><span>'+money(taxAmt(t))+'</span></div>' : (t.taxExempt ? '<div class="tot"><span>Sales tax</span><span class="t2">Exempt</span></div>' : '')) +
@@ -2058,7 +2265,7 @@ function renderSheet(){
 function partsCard(t, ro){
   var list = (t.parts||[]).map(function(p){
     var st = '<span class="pst" role="group" aria-label="Status of '+esc(p.name)+'">' + PSTAT.map(function(s){ return '<button data-act="pstat" data-tid="'+esc(t.id)+'" data-pid="'+esc(p.id)+'" data-v="'+s[0]+'" aria-pressed="'+(p.status===s[0])+'" '+(ro?'disabled':'')+'>'+s[1]+'</button>'; }).join('') + '</span>';
-    return '<div class="pitem"><div class="grow" style="min-width:150px"><div style="font-weight:600">'+esc(p.name)+'</div><div class="t2">'+esc(p.supplier||'')+(p.orderNo?' · Order '+esc(p.orderNo):'')+(num(p.cost)?' · '+money(p.cost):'')+'</div></div>'+st+(ro?'':'<button class="link red" data-act="rmpart" data-pid="'+esc(p.id)+'" aria-label="Remove '+esc(p.name)+'" style="font-size:13px">Remove</button>')+'</div>';
+    return '<div class="pitem"><div class="grow" style="min-width:150px"><div style="font-weight:600">'+esc(p.name)+(p.rma?' <span class="tagk" style="background:#fbeceb;color:#9b2c27">Defective · '+esc((RMA.filter(function(r){ return r[0]===p.rma; })[0]||[])[1]||'')+'</span>':'')+'</div><div class="t2">'+esc(p.supplier||'')+(p.orderNo?' · Order '+esc(p.orderNo):'')+(num(p.cost)?' · '+money(p.cost):'')+'</div></div>'+st+(ro?'':(p.rma?'<button class="link" data-act="rma" data-tid="'+esc(t.id)+'" data-pid="'+esc(p.id)+'" data-v="none" style="font-size:13px">Not defective</button>':'<button class="link" data-act="rma" data-tid="'+esc(t.id)+'" data-pid="'+esc(p.id)+'" data-v="needed" style="font-size:13px">Defective</button>')+'<button class="link red" data-act="rmpart" data-pid="'+esc(p.id)+'" aria-label="Remove '+esc(p.name)+'" style="font-size:13px">Remove</button>')+'</div>';
   }).join('');
   var arrivedAll = (t.parts||[]).length && !openParts(t).length && t.status === 'part';
   return '<div class="card"><h3>Parts</h3>' + (list || '<p class="muted" style="font-size:14px">No parts added. Add one if it needs to be ordered.</p>') +
@@ -2188,6 +2395,7 @@ function whoBox(){
   m.innerHTML = '<div class="scrim on" style="position:fixed"></div><div class="mbox sm" style="position:relative;z-index:41;margin-top:10vh"><div class="mhead"><h2 id="who-t">Who’s working?</h2>' + (S.me ? '<button class="x" data-who-close aria-label="Close">✕</button>' : '') + '</div><div class="mbody">' +
     '<p class="muted" style="margin-bottom:14px">Everything you do on tickets is saved under this name. You can switch any time from the top bar.</p>' +
     '<div class="pick">' + techs.map(function(n){ return '<button data-pick="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span>'+esc(n)+'</button>'; }).join('') + '</div>' +
+    (S.me ? '<div class="match" style="margin-top:14px;display:flex;align-items:center;gap:10px;justify-content:space-between"><span>'+esc(S.me)+' is '+(openShift(S.me)?'<b>clocked in</b>':'<b>not clocked in</b>')+'</span><button class="btn sm" data-wclock>'+(openShift(S.me)?'Clock out':'Clock in')+'</button></div>' : '') +
     '<form data-whoform style="margin-top:16px" class="inline"><label class="sr" for="whoname">Someone else</label><input class="in" id="whoname" placeholder="Someone else? Type a name" maxlength="30"><button class="btn dark" type="submit">Go</button></form>' +
     '</div></div>';
   document.body.appendChild(m);
@@ -2198,6 +2406,7 @@ function whoBox(){
     m.remove(); render(); toast('Working as ' + n);
   }
   m.addEventListener('click', function(e){
+    if (e.target.closest('[data-wclock]')) { clockToggle(S.me); m.remove(); return; }
     var b = e.target.closest('[data-pick]'); if (b) set(b.getAttribute('data-pick'));
     if (e.target.closest('[data-who-close]') || (e.target.classList.contains('scrim') && S.me)) m.remove();
   });
@@ -2500,6 +2709,8 @@ function printHtml(html){
 function printTicket(t){ printHtml(ticketDoc(t)); }
 
 var LABELS = {
+  'niimbot5030': {name:'Niimbot B1 · 50 × 30 mm', w:50, h:30},
+  'niimbot4030': {name:'Niimbot B1 · 40 × 30 mm', w:40, h:30},
   'brother62': {name:'Brother 62 × 29 mm (DK-1209)', w:62, h:29},
   'dymo30252': {name:'DYMO 1-1/8″ × 3-1/2″ (30252)', w:89, h:28},
   'dymo30334': {name:'DYMO 2-1/4″ × 1-1/4″ (30334)', w:57, h:32},
@@ -2508,18 +2719,18 @@ var LABELS = {
 function labelDoc(t){
   var L = LABELS[S.settings.labelSize] || LABELS.brother62;
   var c = t.customer||{}, d = t.device||{};
-  var small = L.w < 60;
+  var small = L.w < 60, qmm = Math.round(Math.min(L.h - 4, L.w * 0.4));
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Label #'+esc(t.num)+'</title><style>' +
     '@page{size:'+L.w+'mm '+L.h+'mm;margin:0}*{margin:0;padding:0;box-sizing:border-box}' +
-    'html,body{width:'+L.w+'mm;height:'+L.h+'mm}body{font-family:Arial,Helvetica,sans-serif;color:#000;padding:1.6mm 2.2mm;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}' +
-    '.r{display:flex;justify-content:space-between;align-items:baseline;gap:2mm}.n{font-size:'+(small?13:16)+'pt;font-weight:800;letter-spacing:-.3px}.dt{font-size:7pt}' +
-    '.c{font-size:'+(small?8.5:10)+'pt;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s{font-size:'+(small?7:8)+'pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-    '</style></head><body>' +
-    '<div class="r"><span class="n">#'+esc(t.num)+'</span><span class="dt">'+esc(new Date(t.createdAt||Date.now()).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))+(t.type==='mobile'?' · MOBILE':'')+'</span></div>' +
-    '<div class="c">'+esc(c.name)+' · '+esc(fmtPhone(c.phone))+'</div>' +
+    'html,body{width:'+L.w+'mm;height:'+L.h+'mm}body{font-family:Arial,Helvetica,sans-serif;color:#000;padding:1.6mm 2.2mm;display:flex;gap:2mm;align-items:center;overflow:hidden}.q{flex:none;width:'+qmm+'mm;height:'+qmm+'mm}.q svg{width:100%;height:100%;display:block}.tx{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:space-between}' +
+    '.r{display:flex;justify-content:space-between;align-items:baseline;gap:1mm}.n{font-size:'+(small?12:16)+'pt;font-weight:800;letter-spacing:-.3px}.dt{font-size:'+(small?6:7)+'pt;white-space:nowrap}' +
+    '.c{font-size:'+(small?8:10)+'pt;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s{font-size:'+(small?6.5:8)+'pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '</style></head><body><div class="q">'+qrSvg(ticketUrl(t), 120)+'</div><div class="tx">' +
+    '<div class="r"><span class="n">#'+esc(t.num)+'</span><span class="dt">'+esc(new Date(t.createdAt||Date.now()).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))+(t.type==='mobile'?(small?' · MOB':' · MOBILE'):'')+'</span></div>' +
+    '<div class="c">'+esc(c.name)+'</div>' +
     '<div class="s">'+esc(d.model)+' — '+esc(repairsText(t))+'</div>' +
-    '<div class="s">'+(d.passcode ? 'Code: '+esc(d.passcode)+' · ' : '')+'Tech: '+esc(t.assigned||'—')+'</div>' +
-    '</body></html>';
+    '<div class="s">'+esc(fmtPhone(c.phone))+(d.passcode ? ' · Code '+esc(d.passcode) : '')+(t.assigned ? ' · '+esc(t.assigned) : '')+'</div>' +
+    '</div></body></html>';
 }
 function printLabel(t){ printHtml(labelDoc(t)); }
 
@@ -2584,12 +2795,16 @@ async function exportCsv(){
       subtotal(t), discountAmt(t), taxAmt(t), total(t), num(t.surcharge), num(t.deposit), t.paid?'Yes':'No', payLabel(t), t.paidAt?dt(t.paidAt):'', t.assigned, t.warranty, t.damage, t.liquid?'Yes':'No', t.pickedUpAt?dt(t.pickedUpAt):'', t.dueAt?dt(t.dueAt):'',
       (t.parts||[]).map(function(p){ return p.name + ' (' + (p.supplier||'') + ', ' + PSMAP[p.status] + (p.orderNo?', order '+p.orderNo:'') + ')'; }).join('; '), partsCost(t), t.warrantyReturn?'Yes':'No'].map(csvCell).join(',');
   }));
-  try { await S.dl.save({filename:'iFixPhones-tickets-'+new Date().toISOString().slice(0,10)+'.csv', data:lines.join('\n')}); toast('Backup saved'); }
+  try { await S.dl.save({filename:'iFixPhones-tickets-'+new Date().toISOString().slice(0,10)+'.csv', data:lines.join('\n')}); toast('Backup saved'); saveSettings({lastBackup: Date.now()}); }
   catch(e){ if (e && e.code !== 'declined') toast('Couldn’t save the file here.'); }
 }
 
 /* ---------- events ---------- */
+document.addEventListener('fullscreenchange', function(){ if (!document.fullscreenElement) document.body.classList.remove('board-full'); });
+
 document.addEventListener('click', async function(e){
+  var cf = e.target.closest('[data-cflag]');
+  if (cf && S.profile) { saveCust(S.profile, {flag: cf.getAttribute('data-cflag')}); return; }
   var lk = e.target.closest('[data-rqconfirm],[data-rqremind]');
   if (lk) {
     var lr = reqById(lk.getAttribute('data-rqconfirm') || lk.getAttribute('data-rqremind'));
@@ -2675,6 +2890,14 @@ document.addEventListener('click', async function(e){
     case 'print': if (t) printTicket(t); break;
     case 'label': if (t) printLabel(t); break;
     case 'followups': followBox(); break;
+    case 'checkinsign': printHtml('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Check in sign</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;text-align:center;color:#1d1d1f;padding:40px}h1{font-size:54px;letter-spacing:-.03em;margin:10px 0}p{font-size:22px;color:#555}svg{margin:24px auto;display:block}</style></head><body><p style="font-weight:700;color:#1d1d1f">iFixPhones</p><h1>Skip the line.</h1><p>Scan with your phone camera to check in.</p>' + qrSvg('https://ifixphones.net/checkin.html', 320) + '<p>ifixphones.net/checkin.html</p></body></html>'); break;
+    case 'rma': { var rt = byId(a.getAttribute('data-tid')); if (rt) setRma(rt, a.getAttribute('data-pid'), a.getAttribute('data-v')); break; }
+    case 'clock': clockToggle(a.getAttribute('data-v')); break;
+    case 'rmexp': { var eid = a.getAttribute('data-id'); if (!confirm('Delete this expense?')) break; S.exp = (S.exp||[]).filter(function(x){ return x.id !== eid; }); render(); S.db.doc('expenses/'+eid).delete().catch(writeErr); break; }
+    case 'savecnote': { var ck = a.getAttribute('data-key'); saveCust(ck, {note: ($('#cnote')||{}).value || ''}); break; }
+    case 'tmode': S.tMode = a.getAttribute('data-v'); try { localStorage.setItem('ifx_tmode', S.tMode); } catch(x) {} render(); break;
+    case 'fullboard': { document.body.classList.toggle('board-full'); var de = document.documentElement; if (document.body.classList.contains('board-full')) { if (de.requestFullscreen) de.requestFullscreen().catch(function(){}); toast('Press Esc to exit full screen'); } break; }
+    case 'loyal': if (t) { var lp = loyaltyPct(); var dsc = r2(subtotal(t) * lp / 100); patchTicket(t, {discount:dsc, discountNote:'Repeat customer ' + lp + '%'}, [logEntry('gave a ' + lp + '% repeat-customer discount (' + money(dsc) + ')')]); toast(lp + '% off applied'); } break;
     case 'closeout': printHtml(closeoutDoc()); break;
     case 'pmode': S.pMode = a.getAttribute('data-v'); S.q = ''; render(); break;
     case 'stockadd': stockBox(null); break;
@@ -2722,6 +2945,8 @@ document.addEventListener('change', function(e){
   if (e.target.closest('.modal')) return;
   var el = e.target;
   if (el.hasAttribute && el.hasAttribute('data-photoin')) { var pt = S.openId ? byId(S.openId) : null; if (pt) addPhotos(pt, el.files); el.value = ''; return; }
+  var cm = el.getAttribute('data-comm');
+  if (cm) { var co = Object.assign({}, S.settings.commission||{}); co[cm] = num(el.value); saveSettings({commission: co}); toast('Saved'); return; }
   var sk = el.getAttribute('data-setting');
   if (sk) { var o = {}; o[sk] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(o); toast('Saved'); return; }
   var t = S.openId ? byId(S.openId) : null;
@@ -2761,6 +2986,13 @@ document.addEventListener('submit', function(e){
     patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('added part “' + part.name + '” from ' + sup)]);
     return;
   }
+  if (f.getAttribute('data-form') === 'addexp') {
+    var ea = num($('#ex-amt').value); if (!ea) { toast('Enter an amount'); $('#ex-amt').focus(); return; }
+    var ed = $('#ex-date').value ? parseDay($('#ex-date').value).getTime() + 12*3600e3 : Date.now();
+    var eref = S.db.collection('expenses').doc(); var eo = {amt:ea, cat:$('#ex-cat').value, note:$('#ex-note').value.trim().slice(0,80), at:ed, by:who(), createdAt:Date.now()};
+    S.exp = [Object.assign({id:eref.id}, eo)].concat(S.exp||[]); render();
+    eref.set(eo).then(function(){ toast('Expense added'); }).catch(writeErr); return;
+  }
   if (f.getAttribute('data-form') === 'addprice') {
     var pm = $('#pg-model').value.trim(), pf = num($('#pg-from').value);
     if (!pm || !pf) { toast('Enter a model and a starting price'); return; }
@@ -2780,9 +3012,11 @@ document.addEventListener('submit', function(e){
 document.addEventListener('keydown', function(e){
   if (e.key === 'Escape' && S.openId && !document.querySelector('.modal')) closeSheet();
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey && !/input|textarea|select/i.test((document.activeElement||{}).tagName||'') && !document.querySelector('.modal') && !S.openId && S.status === 'ready' && S.canWrite) {
-    e.preventDefault(); if (!S.me) whoBox(); else ticketForm(null);
+    e.preventDefault(); var kt = window.__lastKeyAt = Date.now();
+    setTimeout(function(){ if (window.__lastKeyAt !== kt || document.querySelector('.modal') || S.openId) return; if (!S.me) whoBox(); else ticketForm(null); }, 150);
   }
 });
+document.addEventListener('keydown', function(e){ if (e.key && e.key.length === 1 && !(e.key === 'n' || e.key === 'N')) window.__lastKeyAt = Date.now(); else if (e.key === 'Enter') window.__lastKeyAt = Date.now(); }, true);
 
 // keep "updated 5m ago" fresh
 setInterval(function(){ if (S.status === 'ready' && !document.querySelector('.modal') && !(document.activeElement && document.activeElement.id === 'q')) render(); }, 60000);
