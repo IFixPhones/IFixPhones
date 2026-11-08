@@ -149,6 +149,18 @@ h2{font-size:clamp(34px,6vw,56px);text-wrap:balance}
 @media (max-width:720px){.proof{grid-template-columns:repeat(2,minmax(0,1fr))}.proof div:nth-child(3){border-left:0}.proof div:nth-child(n+3){border-top:1px solid var(--line)}}
 
 section{padding:clamp(72px,10vw,120px) 0}
+.ptable{max-width:620px;margin:36px auto 0;background:#fff;border-radius:18px;overflow:hidden;text-align:left}
+.mist .ptable{background:#fff}
+.ptable .pr{display:flex;justify-content:space-between;gap:16px;padding:15px 20px;border-bottom:1px solid #ececf0;font-size:17px}
+.ptable .pr:last-child{border-bottom:0}
+.ptable .pr span:first-child b{font-weight:600}
+.ptable .pr span:last-child{color:var(--graphite);white-space:nowrap}
+.ptnote{font-size:14px;color:var(--graphite);margin-top:14px}
+.revbtn{display:inline-flex;align-items:center;gap:8px;margin-top:18px;border:1px solid #d2d2d7;border-radius:999px;padding:10px 18px;font-weight:500;background:#fff}
+.biz{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:40px auto 0;text-align:left;align-items:start}
+@media (max-width:760px){.biz{grid-template-columns:1fr}}
+.biz ul{list-style:none;display:grid;gap:12px;font-size:17px}
+.biz li{display:flex;gap:10px}.biz li b{color:var(--blue)}
 .mist{background:var(--mist)}
 .dark{background:#000;color:#f5f5f7}
 .dark .lede{color:#a1a1a6}
@@ -295,7 +307,9 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       <li class="hide-s"><a href="#screens">Screens</a></li>
       <li class="hide-s"><a href="#mobile">Mobile</a></li>
       <li class="hide-s"><a href="#quote">Free quote</a></li>
-      <li><a href="#visit">Hours</a></li>
+      <li class="hide-s"><a href="#sell">Sell</a></li>
+      <li><a href="status.html">Check repair</a></li>
+      <li class="hide-s"><a href="#visit">Hours</a></li>
       <li><a class="call" href="tel:+12107733548">Call</a></li>
     </ul>
   </div>
@@ -312,6 +326,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         <a class="btn" href="#book">Book a repair</a>
         <a class="more" href="sms:+12107242800">Text us</a>
         <a class="more" href="tel:+12107733548">Call (210) 773-3548</a>
+        <a class="more" href="status.html">Check my repair</a>
       </div>
     </div>
     <div class="lineup" aria-hidden="true">
@@ -445,6 +460,16 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     </div>
   </section>
 
+
+  <section id="prices" class="center hidden">
+    <div class="w">
+      <h2>Starting prices.</h2>
+      <p class="lede">Your exact price depends on your model and the part. Ask for a free quote anytime.</p>
+      <div class="ptable" id="ptable"></div>
+      <p class="ptnote">Prices are starting prices and can change with part costs. Tax not included.</p>
+    </div>
+  </section>
+
   <section id="quote" class="mist center">
     <div class="w">
       <h2>Free quote.</h2>
@@ -531,10 +556,74 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     </div>
   </section>
 
+
+  <section id="sell" class="mist center">
+    <div class="w">
+      <h2>Sell us your phone.</h2>
+      <p class="lede">Cracked, old or working. Tell us what you have and we’ll text you a cash offer.</p>
+      <div class="quote">
+        <form id="sform" novalidate>
+          <div class="fields">
+            <div class="field"><label for="smodel">Phone model</label><input id="smodel" placeholder="iPhone 14 Pro" required></div>
+            <div class="field"><label for="sstore">Storage</label><select id="sstore"><option>Not sure</option><option>64GB</option><option>128GB</option><option>256GB</option><option>512GB</option><option>1TB</option></select></div>
+            <div class="field"><label for="scond">Condition</label><select id="scond" required><option value="">Choose</option><option>Like new</option><option>Good</option><option>Fair</option><option>Cracked / broken</option><option>Parts only</option></select></div>
+            <div class="field"><label for="slock">Carrier</label><select id="slock"><option>Unlocked</option><option>AT&amp;T</option><option>T-Mobile</option><option>Verizon</option><option>Other / not sure</option></select></div>
+            <div class="field"><label for="sname">Your name</label><input id="sname" autocomplete="name" required></div>
+            <div class="field"><label for="sphone">Your phone</label><input id="sphone" type="tel" inputmode="tel" autocomplete="tel" required></div>
+            <div class="field full"><label for="snotes">Anything we should know? (optional)</label><textarea id="snotes" placeholder="Battery health 88%, small scratch on the back."></textarea></div>
+          </div>
+          <div class="hp" aria-hidden="true"><label for="shp">Leave empty</label><input id="shp" tabindex="-1" autocomplete="off"></div>
+          <p class="err hidden" id="serr" role="alert"></p>
+          <button class="btn submit" type="submit" id="ssubmit">Get my offer</button>
+          <p class="alt" style="margin-top:12px">Bring a photo ID when you sell. Phones must be paid off and signed out of iCloud or Google.</p>
+        </form>
+        <div class="done hidden" id="sdone" tabindex="-1" aria-live="polite" style="background:#fff">
+          <div class="check" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg></div>
+          <h3>Thanks!</h3>
+          <p>We’ll text an offer to <b id="sdoneNum" style="color:var(--ink)"></b> soon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="business" class="center">
+    <div class="w">
+      <h2>Schools and businesses.</h2>
+      <p class="lede">iPads, tablets and work phones. One contact, fast turnaround, pricing for groups of devices.</p>
+      <div class="biz">
+        <ul>
+          <li><b>✓</b><span>Better pricing when you send several devices</span></li>
+          <li><b>✓</b><span>iPad, iPhone, Android and tablet repairs</span></li>
+          <li><b>✓</b><span>We can come to you around San Antonio</span></li>
+          <li><b>✓</b><span>One contact and a ticket number for every device</span></li>
+        </ul>
+        <form id="bform" novalidate>
+          <div class="fields">
+            <div class="field full"><label for="borg">School or business</label><input id="borg" autocomplete="organization" required></div>
+            <div class="field"><label for="bname">Your name</label><input id="bname" autocomplete="name" required></div>
+            <div class="field"><label for="bphone">Phone</label><input id="bphone" type="tel" inputmode="tel" autocomplete="tel" required></div>
+            <div class="field full"><label for="bemail">Email</label><input id="bemail" type="email" autocomplete="email"></div>
+            <div class="field full"><label for="bdev">Devices and how many</label><input id="bdev" placeholder="About 25 iPads and 10 phones" required></div>
+            <div class="field full"><label for="bnotes">Anything else? (optional)</label><textarea id="bnotes"></textarea></div>
+          </div>
+          <div class="hp" aria-hidden="true"><label for="bhp">Leave empty</label><input id="bhp" tabindex="-1" autocomplete="off"></div>
+          <p class="err hidden" id="berr" role="alert"></p>
+          <button class="btn submit" type="submit" id="bsubmit">Contact us</button>
+        </form>
+        <div class="done hidden" id="bdone" tabindex="-1" aria-live="polite" style="background:var(--mist)">
+          <div class="check" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg></div>
+          <h3>Thank you.</h3>
+          <p>We’ll reach out within one business day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="visit" class="mist center">
     <div class="w">
       <h2>Walk-ins welcome.</h2>
       <p class="lede">No appointment needed at the shop.</p>
+      <a class="revbtn hidden" id="revbtn" href="#" target="_blank" rel="noopener">★ Review us on Google</a>
       <div class="visit">
         <div class="card">
           <div class="row">
@@ -608,7 +697,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 <footer>
   <div class="w">
     <span>© <span id="yr"></span> iFixPhones. 9055 Marbach Rd, Suite 105, San Antonio, TX.</span>
-    <span><a href="policy.html">Warranty and repair policy</a> · <a href="mailto:ifixphones9055@gmail.com">ifixphones9055@gmail.com</a></span>
+    <span><a href="status.html">Check my repair</a> · <a href="#business">Schools &amp; businesses</a> · <a href="policy.html">Warranty and repair policy</a> · <a href="mailto:ifixphones9055@gmail.com">ifixphones9055@gmail.com</a></span>
   </div>
 </footer>
 
@@ -947,6 +1036,64 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       });
   });
   ['qdevice','qphone','qissue'].forEach(function(id){ $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); }); });
+
+
+  // ---- shared request helper ----
+  function baseReq(kind){ return {kind:kind, status:'new', where:'', name:'', phone:'', device:'', repair:'', screen:'', day:'', time:'', whenText:'', apptAt:0, address:'', notes:'', createdAt:Date.now()}; }
+  function wireForm(o){
+    var form = $(o.form), errEl = $(o.err), btn = $(o.btn);
+    o.ids.forEach(function(id){ var el = $(id); if (el) { el.addEventListener('input', function(){ this.parentNode.classList.remove('bad'); }); el.addEventListener('change', function(){ this.parentNode.classList.remove('bad'); }); } });
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if ($(o.hp).value) return;
+      var first = null;
+      o.req.forEach(function(id){ var el = $(id), bad = !el.value.trim(); el.parentNode.classList.toggle('bad', bad); if (bad && !first) first = el; });
+      var dg = $(o.phone).value.replace(/\D/g,'');
+      if (!first && (dg.length < 10 || dg.length > 11)) { first = $(o.phone); first.parentNode.classList.add('bad'); errEl.textContent = 'Please enter a 10-digit phone number.'; errEl.classList.remove('hidden'); }
+      else if (first) { errEl.textContent = 'Please fill in the highlighted fields.'; errEl.classList.remove('hidden'); }
+      if (first) { first.focus(); return; }
+      errEl.classList.add('hidden');
+      var label = btn.textContent; btn.disabled = true; btn.textContent = 'Sending…';
+      var r = o.build();
+      sendRequest(r.data, r.title, r.msg).then(function(){
+        if (o.after) o.after(r.data);
+        form.classList.add('hidden'); $(o.done).classList.remove('hidden'); $(o.done).focus();
+      }).catch(function(){
+        btn.disabled = false; btn.textContent = label;
+        errEl.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107242800">(210) 724-2800</a> instead.'; errEl.classList.remove('hidden');
+      });
+    });
+  }
+  wireForm({form:'sform', err:'serr', btn:'ssubmit', hp:'shp', done:'sdone', phone:'sphone', ids:['smodel','scond','sname','sphone'], req:['smodel','scond','sname','sphone'],
+    build:function(){
+      var d = baseReq('sell'), st = $('sstore').value;
+      d.name = $('sname').value.trim().slice(0,80); d.phone = $('sphone').value.trim().slice(0,24);
+      d.device = ($('smodel').value.trim() + (st && st !== 'Not sure' ? ' ' + st : '')).slice(0,80);
+      d.repair = $('scond').value; d.screen = $('slock').value; d.notes = $('snotes').value.trim().slice(0,500);
+      return {data:d, title:'💵 Someone wants to sell a phone', msg:d.device + ' · ' + d.repair + ' · ' + d.screen + '\n' + d.name};
+    }, after:function(d){ $('sdoneNum').textContent = d.phone; }});
+  wireForm({form:'bform', err:'berr', btn:'bsubmit', hp:'bhp', done:'bdone', phone:'bphone', ids:['borg','bname','bphone','bdev'], req:['borg','bname','bphone','bdev'],
+    build:function(){
+      var d = baseReq('business');
+      d.org = $('borg').value.trim().slice(0,100); d.name = $('bname').value.trim().slice(0,80); d.phone = $('bphone').value.trim().slice(0,24);
+      d.email = $('bemail').value.trim().slice(0,100); d.device = $('bdev').value.trim().slice(0,80); d.notes = $('bnotes').value.trim().slice(0,500);
+      return {data:d, title:'🏫 New school / business request', msg:d.org + ' · ' + d.name + '\n' + d.device};
+    }});
+
+  // ---- price guide + review link (managed from the ticket app) ----
+  fetch('https://firestore.googleapis.com/v1/projects/ifixphones-ca10e/databases/(default)/documents/public/site?key=AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI', {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+      if (!j || !j.fields) return;
+      var f = j.fields;
+      var rv = f.reviewUrl && f.reviewUrl.stringValue;
+      if (rv && /^https:\/\//.test(rv)) { var rb = $('revbtn'); rb.href = rv; rb.classList.remove('hidden'); }
+      var arr = f.prices && f.prices.arrayValue && f.prices.arrayValue.values || [];
+      var rows = arr.map(function(v){ var m = v.mapValue && v.mapValue.fields || {}; var fr = m.from ? Number(m.from.integerValue || m.from.doubleValue || 0) : 0;
+        return {model:(m.model||{}).stringValue||'', repair:(m.repair||{}).stringValue||'', from:fr}; }).filter(function(x){ return x.model && x.from; });
+      if (!rows.length) return;
+      $('ptable').innerHTML = rows.map(function(x){ return '<div class="pr"><span><b>' + escapeHtml(x.model) + '</b> · ' + escapeHtml(x.repair) + '</span><span>from $' + (Math.round(x.from*100) % 100 ? x.from.toFixed(2) : Math.round(x.from)) + '</span></div>'; }).join('');
+      $('prices').classList.remove('hidden');
+    }).catch(function(){});
 
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 })();

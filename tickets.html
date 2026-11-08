@@ -16,6 +16,10 @@
 <script src="fb-app.js"></script>
 <script src="fb-auth.js"></script>
 <script src="fb-firestore.js"></script>
+<script>
+/* QR Code Generator for JavaScript, (c) 2009 Kazuhiko Arase, MIT license, http://www.d-project.com/ */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -70,11 +74,27 @@ a{color:var(--link);text-decoration:none}
 
 .wrap{max-width:1200px;margin:0 auto;padding:22px 20px 120px}
 .mtabs{display:none;margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-@media (max-width:820px){.mtabs{display:flex}.mtabs.tabs button{flex:1;padding:6px 4px;font-size:13px}}
+@media (max-width:820px){.mtabs{display:flex;scrollbar-width:none}.mtabs::-webkit-scrollbar{display:none}.mtabs.tabs button{flex:none;padding:6px 11px;font-size:13px}}
 
 /* stats */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
 .stat{background:#fff;border-radius:var(--r);padding:16px 18px;border:0;text-align:left;width:100%}
+.stk{display:grid;grid-template-columns:minmax(0,1.6fr) 120px 90px 90px auto;gap:12px;align-items:center;background:#fff;padding:10px 16px;border-bottom:1px solid var(--line2)}
+.stk:first-child{border-radius:var(--r) var(--r) 0 0}.stk:last-child{border-radius:0 0 var(--r) var(--r);border-bottom:0}
+.qty{display:inline-flex;align-items:center;gap:6px}.qty b{min-width:26px;text-align:center;font-size:16px}
+.qty button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:16px;line-height:1}
+.low{color:#b25000;font-weight:600}.out{color:var(--red);font-weight:600}
+@media (max-width:820px){.stk{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}.stk .hide-s{display:none}}
+.bb{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 110px 110px auto;gap:12px;align-items:center;background:#fff;padding:12px 16px;border-bottom:1px solid var(--line2)}
+@media (max-width:820px){.bb{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}.bb .hide-s{display:none}}
+.pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.pic{aspect-ratio:1;border-radius:10px;background:var(--mist) center/cover no-repeat;border:0;position:relative}
+.pic.add{display:flex;align-items:center;justify-content:center;flex-direction:column;font-size:13px;color:var(--blue);border:1.5px dashed #b9d3f6;background:#f5f9ff;cursor:pointer}
+.pic.add b{font-size:22px;line-height:1}
+.apv{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line2);font-size:14px;flex-wrap:wrap}
+.apv:last-child{border-bottom:0}
+.stockpick{display:flex;gap:8px;margin-top:8px}
+
 button.stat:hover{box-shadow:inset 0 0 0 1px var(--line)}
 .stat b{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
 .stat span{font-size:13px;color:var(--graphite)}
@@ -387,7 +407,7 @@ var DEFAULT_TECHS = ['Mark','Ray','David'];
 var SUPPLIERS = ['MobileSentrix','Injured Gadgets','Phone LCD Parts','Wholesale Gadget Parts','Amazon','Other'];
 var PSTAT = [['needed','Needs order'],['ordered','Ordered'],['arrived','Arrived'],['used','Installed']];
 var PSMAP = {}; PSTAT.forEach(function(p){ PSMAP[p[0]] = p[1]; });
-var VIEWS = [['tickets','Tickets'],['bookings','Bookings'],['parts','Parts'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
+var VIEWS = [['tickets','Tickets'],['bookings','Bookings'],['parts','Parts'],['buyback','Buyback'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
 var SHOP = {name:'iFixPhones', addr:'9055 Marbach Rd, Suite 105, San Antonio, TX', shop:'(210) 773-3548', mobile:'(210) 724-2800', web:'ifixphones.net'};
 
 /* ---------- state ---------- */
@@ -425,9 +445,9 @@ function rel(t){
 }
 function sameDay(a, b){ var x = new Date(a), y = new Date(b); return x.getFullYear()===y.getFullYear() && x.getMonth()===y.getMonth() && x.getDate()===y.getDate(); }
 function pill(k){ var s = SMAP[k] || SMAP['in']; return '<span class="pill" style="color:'+s.c+';background:'+s.bg+'"><i></i>'+esc(s.label)+'</span>'; }
-function total(t){ return (t.items||[]).reduce(function(a,i){ return a + num(i.price); }, 0); }
+function total(t){ return (t.items||[]).reduce(function(a,i){ return a + (i.apvSt === 'pending' || i.apvSt === 'declined' ? 0 : num(i.price)); }, 0); }
 function balance(t){ return Math.max(0, total(t) - num(t.deposit)); }
-function itemName(i){ return (i.repair === 'Other repair' || i.repair === 'Other') && i.desc ? i.desc : i.repair; }
+function itemName(i){ return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv) && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
 function repairsText(t){ return (t.items||[]).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
 function who(){ return S.me || 'Staff'; }
 function byId(id){ for (var i=0;i<S.tickets.length;i++) if (S.tickets[i].id === id) return S.tickets[i]; return null; }
@@ -507,6 +527,7 @@ function patchTicket(t, fields, logs){
   });
   t.log = log; t.updatedAt = body.updatedAt;
   renderSoon();
+  if (['status','items','device','dueAt','paid','type','customer','deposit'].some(function(k){ return k in fields; })) syncStatusSoon(t);
   return enqueue('tickets/'+t.id, function(){
     return retryOnce(function(){ return S.db.doc('tickets/'+t.id).update(body); });
   }).catch(writeErr);
@@ -623,13 +644,29 @@ function startData(){
       snap.docChanges().forEach(function(ch){
         if (ch.type !== 'added' || seenReqs[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
         var r = ch.doc.data() || {};
-        if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
+        if (r.kind === 'sell') alertNew('Someone wants to sell a phone', (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
+        else if (r.kind === 'business') alertNew('New school / business request', (r.org||'') + ' · ' + (r.name||''), function(){ S.view='bookings'; render(); });
+        else if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
         else alertNew(r.where === 'mobile' ? 'New MOBILE booking' : 'New shop booking', (r.whenText||'') + '\n' + (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
       });
     }
     if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
     render();
   }, function(){ S.reqsErr = true; render(); }));
+  unsubs.push(db.collection('inventory').onSnapshot(function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
+  unsubs.push(db.collection('buybacks').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){ S.bb = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
+  var seenApv = null;
+  unsubs.push(db.collection('approvals').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
+    snap.docs.forEach(function(d){
+      var a = d.data() || {};
+      if (a.status !== 'pending') {
+        if (seenApv && seenApv[d.id] === 'pending') alertNew('Customer ' + (a.status === 'approved' ? 'approved' : 'declined') + ' extra work', '#' + a.n + ' · ' + a.item + ' · ' + money(a.price), function(){ openTicket(a.tid); });
+        applyApproval(d.id, a);
+      }
+    });
+    if (!snap.metadata.fromCache) { seenApv = {}; snap.docs.forEach(function(d){ seenApv[d.id] = (d.data()||{}).status; }); }
+  }, function(){}));
+  unsubs.push(db.doc('public/site').onSnapshot(function(snap){ S.pub = snap.exists ? clone(snap.data()) : {}; render(); }, function(){}));
   unsubs.push(db.collection('avail').onSnapshot(function(snap){
     var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.avail = o; render();
   }, function(){}));
@@ -702,10 +739,11 @@ function render(){
   restoreSearchFocus();
   if (S.openId) renderSheet(); else if (S.profile) renderProfile();
   maybeAskWho();
+  if (S.status === 'ready' && !S.cacheOnly) backfillStatus();
 }
 
 function newReqCount(){ return (S.reqs||[]).filter(function(r){ return r.status === 'new'; }).length; }
-function tabBadge(v){ if (v !== 'bookings') return ''; var n = newReqCount(); return n ? '<span class="tbadge" aria-label="'+n+' new">'+n+'</span>' : ''; }
+function tabBadge(v){ if (v === 'parts') { var lc = lowCount(); return lc ? '<span class="tbadge" style="background:#b25000" aria-label="'+lc+' running low">'+lc+'</span>' : ''; } if (v !== 'bookings') return ''; var n = newReqCount(); return n ? '<span class="tbadge" aria-label="'+n+' new">'+n+'</span>' : ''; }
 function topbar(){
   var tabs = VIEWS.map(function(t){
     return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+tabBadge(t[0])+'</button>';
@@ -736,6 +774,7 @@ function body(){
   if (S.view === 'reports') return note + reportsView();
   if (S.view === 'settings') return note + settingsView();
   if (S.view === 'bookings') return note + bookingsView();
+  if (S.view === 'buyback') return note + buybackView();
   return note + ticketsView();
 }
 
@@ -794,7 +833,9 @@ function ticketsView(){
   var sod = new Date(); sod.setHours(0,0,0,0);
   var tAp = (S.reqs||[]).filter(function(r){ return isBooking(r) && (r.status === 'new' || r.status === 'confirmed') && r.apptAt >= sod.getTime() && r.apptAt < sod.getTime() + 86400e3; }).sort(function(a,b){ return a.apptAt - b.apptAt; });
   var strip = tAp.length ? '<div class="todayap"><b>Today:</b>' + tAp.map(function(r){ return '<button class="chip" data-act="rqshow" data-id="'+esc(r.id)+'">'+esc(r.time)+' · '+esc(String(r.name||fmtPhone(r.phone)).split(' ')[0])+(r.where==='mobile'?' · 🚗':'')+'</button>'; }).join('') + '</div>' : '';
-  return strip + stats + bar + '<div class="list">' + rows + '</div>';
+  var fu = followups();
+  var fuStrip = fu.length ? '<div class="todayap" style="background:#fff8e6"><span>🔔 <b>'+fu.length+' follow-up'+(fu.length>1?'s':'')+'</b>: ' + esc([['review','review request'],['pickup','pickup reminder']].map(function(k){ var n = fu.filter(function(f){ return f.kind === k[0]; }).length; return n ? n + ' ' + k[1] + (n>1?'s':'') : ''; }).filter(Boolean).join(', ')) + '</span><button class="btn sm" data-act="followups" style="margin-left:auto">Open</button></div>' : '';
+  return fuStrip + strip + stats + bar + '<div class="list">' + rows + '</div>';
 }
 
 function rowHtml(t){
@@ -823,6 +864,12 @@ function rowSub(t){
 }
 
 function partsView(){
+  S.pMode = S.pMode || 'order';
+  var low = lowCount();
+  var seg = '<div class="bkbar"><div class="seg" role="group" aria-label="Parts view"><button data-act="pmode" data-v="order" aria-pressed="'+(S.pMode==='order')+'">On order</button><button data-act="pmode" data-v="stock" aria-pressed="'+(S.pMode==='stock')+'">In stock'+(low?' <span class="tbadge" style="background:#b25000">'+low+'</span>':'')+'</button></div></div>';
+  return seg + (S.pMode === 'stock' ? stockView() : partsView0());
+}
+function partsView0(){
   var all = [];
   S.tickets.forEach(function(t){ (t.parts||[]).forEach(function(p){ if (p.status !== 'used' && t.status !== 'cancel' && t.status !== 'done') all.push({t:t, p:p}); }); });
   if (S.q) all = all.filter(function(x){ return (x.p.name + ' ' + x.p.supplier + ' ' + x.p.orderNo + ' ' + x.t.num + ' ' + (x.t.customer&&x.t.customer.name) + ' ' + (x.t.device&&x.t.device.model)).toLowerCase().indexOf(S.q.toLowerCase()) > -1; });
@@ -872,12 +919,19 @@ function reportsView(){
     '<div class="stat"><b>'+turnTxt+'</b><span>Average check-in to pickup</span></div>' +
   '</div>';
   var byTech = {};
-  done.forEach(function(t){ var k = t.assigned || 'Unassigned'; var o = byTech[k] || (byTech[k] = {n:0, rev:0}); o.n++; if (t.paid) o.rev += total(t); });
+  var tk = function(k){ return byTech[k] || (byTech[k] = {n:0, rev:0, tsum:0, tn:0, wr:0}); };
+  done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += total(t); var ra = readyAt(t); if (ra && ra > t.createdAt) { o.tsum += ra - t.createdAt; o.tn++; } });
+  S.tickets.filter(function(t){ return t.warrantyReturn && inR(t.createdAt); }).forEach(function(t){
+    var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && digits(x.customer&&x.customer.phone) === digits(t.customer&&t.customer.phone); }).sort(function(a,b){ return b.createdAt - a.createdAt; })[0];
+    tk((prev && prev.assigned) || t.assigned || 'Unassigned').wr++;
+  });
+  var dur = function(ms){ return !ms ? '—' : ms < 3600e3 ? Math.max(1, Math.round(ms/60000)) + ' min' : ms < 86400e3 ? (Math.round(ms/360000)/10) + ' hrs' : (Math.round(ms/8640000)/10) + ' days'; };
   var techRows = Object.keys(byTech).sort(function(a,b){ return byTech[b].n - byTech[a].n; });
   var maxN = techRows.reduce(function(m,k){ return Math.max(m, byTech[k].n); }, 1);
-  var techTbl = techRows.length ? '<table class="rtable"><thead><tr><th>Technician</th><th>Picked up</th><th></th><th class="right">Paid</th></tr></thead><tbody>' + techRows.map(function(k){
-    return '<tr><td>'+esc(k)+'</td><td style="width:90px">'+byTech[k].n+'</td><td><div class="barw"><i style="width:'+Math.round(byTech[k].n/maxN*100)+'%"></i></div></td><td class="right amt">'+money(byTech[k].rev)+'</td></tr>';
-  }).join('') + '</tbody></table>' : '<p class="muted">No repairs picked up in this period.</p>';
+  var techTbl = techRows.length ? '<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>Technician</th><th>Repairs</th><th></th><th>Avg time to ready</th><th>Warranty returns</th><th class="right">Paid</th></tr></thead><tbody>' + techRows.map(function(k){
+    var o = byTech[k];
+    return '<tr><td>'+esc(k)+'</td><td style="width:70px">'+o.n+'</td><td style="min-width:80px"><div class="barw"><i style="width:'+Math.round(o.n/maxN*100)+'%"></i></div></td><td>'+dur(o.tn ? o.tsum/o.tn : 0)+'</td><td'+(o.wr?' style="color:var(--red);font-weight:600"':'')+'>'+o.wr+'</td><td class="right amt">'+money(o.rev)+'</td></tr>';
+  }).join('') + '</tbody></table></div>' : '<p class="muted">No repairs picked up in this period.</p>';
   var rep = {};
   S.tickets.filter(function(t){ return inR(t.createdAt); }).forEach(function(t){ (t.items||[]).forEach(function(i){ var k = ((i.repair === 'Other repair' || i.repair === 'Other') ? 'Other repair' : i.repair) + (i.part ? ' · ' + i.part : ''); rep[k] = (rep[k]||0) + 1; }); });
   var repRows = Object.keys(rep).sort(function(a,b){ return rep[b]-rep[a]; }).slice(0,8);
@@ -887,7 +941,8 @@ function reportsView(){
   paid.forEach(function(t){ var k = t.payMethod || 'Not recorded'; pm[k] = (pm[k]||0) + total(t); });
   var pmTbl = Object.keys(pm).length ? '<table class="rtable"><tbody>' + Object.keys(pm).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(pm[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No payments in this period.</p>';
   return seg + tiles +
-    '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period, by who was assigned.</p>'+techTbl+'</div>' +
+    (RP === 'today' ? closeoutPanel() : '') +
+    '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period. Warranty returns count against the tech who did the original repair.</p>'+techTbl+'</div>' +
     '<div class="g2"><div class="panel"><h2>Most common repairs</h2><p class="d">From tickets checked in this period.</p>'+repTbl+'</div>' +
     '<div class="panel"><h2>Payments</h2><p class="d">By payment method.</p>'+pmTbl+'</div></div>' +
     '<p class="muted" style="font-size:13px">“After part costs” uses the part costs entered on tickets.</p>';
@@ -938,7 +993,8 @@ function renderProfile(){
     '</div>';
 }
 
-function customersView(){
+function customersView(){ return '<div class="bkbar"><span style="flex:1"></span><button class="btn sm ghost" data-act="warranty">Warranty check</button></div>' + customersView0(); }
+function customersView0(){
   var map = {};
   S.tickets.forEach(function(t){
     var k = custKey(t.customer);
@@ -966,6 +1022,7 @@ function settingsView(){
     '<div class="techs">' + (techs || '<span class="muted">No one added yet.</span>') + '</div>' +
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
   '</div>' +
+  siteSettingsPanel() +
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushTickets"'+(S.settings.pushTickets!==false?' checked':'')+'>Also send a phone alert when a ticket is checked in</label>' +
@@ -981,6 +1038,423 @@ function settingsView(){
   '</div>' +
   '<div class="panel"><h2>Privacy</h2><p class="d">Passcodes are deleted automatically when a ticket is marked Picked up or Cancelled, as your repair policy promises. Only the shop Google account can open tickets.</p></div>' +
   '<div class="panel"><h2>Account</h2><p class="d">Signed in as '+esc(S.authUser ? S.authUser.email : '')+'</p><button class="btn ghost" data-act="signout">Sign out</button></div>';
+}
+
+function openSms(u){ if (window.__noNav) { window.__lastSms = u; return; } location.href = u; }
+/* ---------- public status page sync ---------- */
+function pubKey(t){ var d = digits(t.customer && t.customer.phone).slice(-4); return d.length === 4 && t.num ? String(t.num) + '_' + d : ''; }
+function statusUrl(t){ var d = digits(t.customer && t.customer.phone).slice(-4); return 'https://ifixphones.net/status.html?n=' + t.num + '&p=' + d; }
+function pubStatus(t){
+  return {n: t.num, st: t.status, dev: (t.device && t.device.model) || '', rep: (t.items||[]).filter(function(i){ return i.apvSt !== 'pending'; }).map(function(i){ return itemName(i); }).join(', '),
+    due: (['in','part','repair'].indexOf(t.status) > -1 && t.dueAt) ? t.dueAt : 0, upd: Date.now(), mobile: t.type === 'mobile',
+    bal: (!t.paid && t.status === 'ready') ? balance(t) : 0, wait: (t.items||[]).some(function(i){ return i.apvSt === 'pending'; })};
+}
+var stTimers = {};
+function syncStatusSoon(t, oldKey){
+  clearTimeout(stTimers[t.id]);
+  stTimers[t.id] = setTimeout(function(){ syncStatus(t, oldKey); }, 700);
+}
+function syncStatus(t, oldKey){
+  if (!S.db) return;
+  var live = byId(t.id) || t, k = pubKey(live);
+  try {
+    if (oldKey && oldKey !== k) S.db.doc('status/' + oldKey).delete().catch(function(){});
+    if (k) S.db.doc('status/' + k).set(pubStatus(live)).catch(function(){});
+  } catch(e) {}
+}
+function dropStatus(t){ var k = pubKey(t); if (k && S.db) S.db.doc('status/' + k).delete().catch(function(){}); }
+function backfillStatus(){
+  if (S.settings.statusSynced || !S.settingsLoaded || !S.tickets.length) return;
+  S.settings.statusSynced = 1;
+  S.tickets.filter(function(t){ return ACTIVE.indexOf(t.status) > -1 || (t.updatedAt||0) > Date.now() - 30*86400e3; }).forEach(function(t, i){ setTimeout(function(){ syncStatus(t); }, i * 60); });
+  saveSettings({statusSynced: 1});
+}
+
+/* ---------- website settings (public) ---------- */
+function savePublic(patch){
+  S.pub = Object.assign({}, S.pub||{}, patch); render();
+  return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
+}
+function siteSettingsPanel(){
+  var pub = S.pub || {}, prices = pub.prices || [];
+  var rows = prices.map(function(r, i){
+    return '<tr><td>'+esc(r.model)+'</td><td>'+esc(r.repair)+'</td><td class="right amt">from '+money(r.from)+'</td><td class="right"><button class="link red" data-act="rmprice" data-i="'+i+'">Remove</button></td></tr>';
+  }).join('');
+  return '<div class="panel"><h2>Website</h2><p class="d">These show on ifixphones.net and update instantly.</p>' +
+    '<div class="f" style="max-width:520px"><label for="revurl">Google review link</label><div class="inline" style="margin:0"><input class="in" id="revurl" placeholder="https://g.page/r/…/review" value="'+esc(pub.reviewUrl||'')+'"><button class="btn dark" data-act="saverev">Save</button></div>' +
+    '<p class="hint">Google Business Profile → <b>Ask for reviews</b> → copy the link. It’s used for the website’s review button and the review texts.</p></div>' +
+    '<h3 style="margin-top:20px;font-size:15px">Price guide</h3><p class="hint" style="margin-bottom:8px">Starting prices shown on the website. Leave empty to hide the price guide.</p>' +
+    (rows ? '<table class="rtable"><tbody>'+rows+'</tbody></table>' : '') +
+    '<form class="inline" data-form="addprice" style="flex-wrap:wrap"><input class="in" id="pg-model" placeholder="Model, e.g. iPhone 13" style="flex:2;min-width:150px"><select class="in" id="pg-rep" style="flex:1.4;min-width:130px">'+['Screen','Screen (OLED)','Screen (Original)','Battery','Charging port','Back glass','Camera'].map(function(x){ return '<option>'+x+'</option>'; }).join('')+'</select><input class="in" id="pg-from" inputmode="decimal" placeholder="From $" style="flex:.8;min-width:80px"><button class="btn dark" type="submit">Add</button></form>' +
+  '</div>';
+}
+
+/* ---------- follow-ups ---------- */
+function reviewMsg(t){
+  var first = String((t.customer||{}).name||'').split(' ')[0] || 'there', url = (S.pub||{}).reviewUrl;
+  return 'Hi ' + first + ', thanks for choosing iFixPhones! If we took good care of your ' + ((t.device||{}).model||'device') + ', would you leave us a quick Google review? It really helps a small local shop.' + (url ? ' ' + url : '');
+}
+function pickupMsg(t){
+  var first = String((t.customer||{}).name||'').split(' ')[0] || 'there', d = daysSince(readyAt(t));
+  if (d >= 30) return 'Hi ' + first + ', this is iFixPhones. Your ' + ((t.device||{}).model||'device') + ' has been ready for ' + d + ' days. Per our repair policy, storage fees apply after 30 days and devices left 90 days are considered abandoned. Please pick it up at 9055 Marbach Rd, Suite 105 (Mon–Sat 10–8, Sun 12–6).';
+  return 'Hi ' + first + ', a friendly reminder that your ' + ((t.device||{}).model||'device') + ' is ready at iFixPhones, 9055 Marbach Rd, Suite 105. Open Mon–Sat 10–8, Sun 12–6.' + (!t.paid && balance(t) ? ' Balance due: ' + money(balance(t)) + '.' : '');
+}
+function followups(){
+  var out = [], now = Date.now(), sod = new Date(); sod.setHours(0,0,0,0);
+  S.tickets.forEach(function(t){
+    if (t.status === 'done' && t.pickedUpAt && !t.reviewAskedAt && !t.reviewSkip && t.pickedUpAt > now - 14*86400e3 && (t.pickedUpAt < sod.getTime() || t.pickedUpAt < now - 4*3600e3))
+      out.push({kind:'review', t:t, title:'Ask for a review', sub:'Picked up ' + rel(t.pickedUpAt), msg:reviewMsg(t), order:1});
+    if (t.status === 'ready') {
+      var d = daysSince(readyAt(t)), last = t.pickupRemindedAt || 0;
+      if (d >= 3 && (now - last) > 3*86400e3) out.push({kind:'pickup', t:t, title: d >= 90 ? 'Abandoned (90+ days)' : d >= 30 ? 'Storage fee notice (30+ days)' : 'Pickup reminder', sub:'Ready for ' + d + ' days', msg:pickupMsg(t), order: d >= 30 ? 0 : 2, warn: d >= 30});
+    }
+  });
+  return out.sort(function(a,b){ return a.order - b.order; });
+}
+function followBox(){
+  var list = followups();
+  var m = modalShell('fu', 'Follow-ups', list.length ? list.map(function(f){
+    var c = f.t.customer || {};
+    return '<div class="tpl"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><b'+(f.warn?' style="color:var(--red)"':'')+'>'+esc(f.title)+'</b><span class="t2">#'+esc(f.t.num)+' · '+esc(f.sub)+'</span></div>' +
+      '<p style="margin:4px 0 8px"><b>'+esc(c.name||'')+'</b> · '+esc(fmtPhone(c.phone))+' · '+esc((f.t.device||{}).model||'')+'</p>' +
+      '<p class="muted" style="font-size:13.5px">'+esc(f.msg)+'</p>' +
+      '<div class="acts" style="margin-top:8px"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(f.msg)+'" data-fu="'+f.kind+'" data-id="'+esc(f.t.id)+'">Text it</a><button class="btn sm ghost" data-fuskip="'+f.kind+'" data-id="'+esc(f.t.id)+'">'+(f.kind==='review'?'Skip':'Done')+'</button><button class="link" data-fuopen="'+esc(f.t.id)+'">Open ticket</button></div></div>';
+  }).join('') + (!(S.pub||{}).reviewUrl && list.some(function(f){ return f.kind === 'review'; }) ? '<p class="hint">Tip: add your Google review link in <b>Settings → Website</b> so it’s included in review texts.</p>' : '')
+  : '<div class="empty" style="padding:30px"><h3>All caught up</h3><p>No reviews to ask for and no devices waiting too long.</p></div>',
+  '<button class="btn ghost" data-mclose>Close</button>', true);
+  m.addEventListener('click', function(e){
+    var a = e.target.closest('[data-fu]'), sk = e.target.closest('[data-fuskip]'), op = e.target.closest('[data-fuopen]');
+    var mark = function(kind, id, skip){
+      var t = byId(id); if (!t) return;
+      if (kind === 'review') patchTicket(t, skip ? {reviewSkip: Date.now()} : {reviewAskedAt: Date.now()}, skip ? [] : [logEntry('asked the customer for a Google review')]);
+      else patchTicket(t, {pickupRemindedAt: Date.now()}, [logEntry(skip ? 'marked the pickup follow-up done' : 'sent a pickup reminder')]);
+      var card = (a || sk).closest('.tpl'); if (card) card.remove();
+    };
+    if (a) mark(a.getAttribute('data-fu'), a.getAttribute('data-id'), false);
+    if (sk) mark(sk.getAttribute('data-fuskip'), sk.getAttribute('data-id'), true);
+    if (op) { m.remove(); openTicket(op.getAttribute('data-fuopen')); }
+  });
+}
+
+/* ---------- warranty check ---------- */
+function warrantyBox(){
+  var m = modalShell('wc', 'Warranty check',
+    '<div class="f"><label for="wc-q">Phone number, IMEI/serial or ticket #</label><input class="in" id="wc-q" autocomplete="off" placeholder="(210) 555-0123"></div><div id="wc-out" style="margin-top:14px"></div>',
+    '<button class="btn ghost" data-mclose>Close</button>', true);
+  var inp = $('#wc-q', m), out = $('#wc-out', m);
+  function run(){
+    var q = inp.value.trim(), d = digits(q);
+    if (q.length < 3) { out.innerHTML = ''; return; }
+    var hits = S.tickets.filter(function(t){
+      var ph = digits(t.customer && t.customer.phone), im = String((t.device||{}).imei||'').toLowerCase();
+      return (d.length >= 7 && ph.slice(-10).indexOf(d.slice(-10)) > -1) || (im && im.indexOf(q.toLowerCase()) > -1) || String(t.num) === q.replace(/^#/,'');
+    }).sort(function(a,b){ return b.createdAt - a.createdAt; });
+    if (!hits.length) { out.innerHTML = '<p class="muted">No repairs found.</p>'; return; }
+    out.innerHTML = hits.map(function(t){
+      var we = warrantyEnd(t), st;
+      if (t.status !== 'done') st = '<span class="tagk gr">'+esc((SMAP[t.status]||{}).label||'')+'</span>';
+      else if (!we) st = '<span class="tagk gr">No warranty</span>';
+      else if (we > Date.now()) st = '<span class="tagk ok">Covered until '+esc(dateOnly(we))+'</span>';
+      else st = '<span class="tagk" style="background:#fbeceb;color:#9b2c27">Ended '+esc(dateOnly(we))+'</span>';
+      return '<button class="row" style="grid-template-columns:70px 1fr auto;display:grid;border-radius:12px;margin-bottom:6px" data-wcopen="'+esc(t.id)+'"><span class="num">#'+esc(t.num)+'</span><span><div class="t1">'+esc((t.device||{}).model||'')+' · '+esc(repairsText(t))+'</div><div class="t2">'+esc((t.customer||{}).name||'')+' · '+esc(dateOnly(t.createdAt))+(t.warranty?' · '+esc(t.warranty):'')+'</div></span>'+st+'</button>';
+    }).join('');
+  }
+  inp.addEventListener('input', run);
+  requestAnimationFrame(function(){ inp.focus(); });
+  m.addEventListener('click', function(e){ var o = e.target.closest('[data-wcopen]'); if (o) { m.remove(); openTicket(o.getAttribute('data-wcopen')); } });
+}
+
+/* ---------- QR ---------- */
+function qrSvg(text, px){
+  try {
+    var q = qrcode(0, 'M'); q.addData(text); q.make();
+    var n = q.getModuleCount(), cell = (px || 96) / (n + 2), r = '';
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (q.isDark(y, x)) r += 'M' + ((x+1)*cell).toFixed(2) + ' ' + ((y+1)*cell).toFixed(2) + 'h' + cell.toFixed(2) + 'v' + cell.toFixed(2) + 'h-' + cell.toFixed(2) + 'z';
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'"><rect width="100%" height="100%" fill="#fff"/><path d="'+r+'" fill="#000"/></svg>';
+  } catch(e) { return ''; }
+}
+
+/* ---------- inventory ---------- */
+var STOCK_CATS = ['Screen','Battery','Charging port','Back glass','Camera','Speaker','Other'];
+function stockLow(i){ return num(i.qty) <= num(i.min || 0); }
+function lowCount(){ return (S.inv||[]).filter(function(i){ return num(i.min) > 0 && stockLow(i); }).length; }
+function stockView(){
+  var q = (S.q||'').toLowerCase();
+  var list = (S.inv||[]).filter(function(i){ return !q || (i.name + ' ' + i.cat + ' ' + (i.supplier||'')).toLowerCase().indexOf(q) > -1; })
+    .sort(function(a,b){ var la = stockLow(a) && num(a.min) > 0, lb = stockLow(b) && num(b.min) > 0; return (lb - la) || String(a.name).localeCompare(b.name); });
+  var worth = (S.inv||[]).reduce(function(a,i){ return a + num(i.qty) * num(i.cost); }, 0);
+  var low = lowCount();
+  var head = '<div class="rgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><b>'+(S.inv||[]).length+'</b><span>Parts tracked</span></div><div class="stat"><b'+(low?' class="low"':'')+'>'+low+'</b><span>Running low</span></div><div class="stat"><b>'+money(worth)+'</b><span>Stock value (at cost)</span></div></div>';
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search stock</label><input id="q" type="search" placeholder="Search stock" value="'+esc(S.q)+'" autocomplete="off"></div><button class="btn" data-act="stockadd">+ Add part</button></div>';
+  var rows = list.map(function(i){
+    var n = num(i.qty), lw = num(i.min) > 0 && stockLow(i);
+    return '<div class="stk"><div><div class="t1">'+esc(i.name)+'</div><div class="t2">'+esc(i.cat||'')+(i.supplier?' · '+esc(i.supplier):'')+(num(i.min)?' · low at '+num(i.min):'')+'</div></div>' +
+      '<div class="qty"><button data-act="stockqty" data-id="'+esc(i.id)+'" data-v="-1" aria-label="One less">−</button><b class="'+(n<=0?'out':lw?'low':'')+'">'+n+'</b><button data-act="stockqty" data-id="'+esc(i.id)+'" data-v="1" aria-label="One more">+</button></div>' +
+      '<div class="hide-s amt">'+(num(i.cost)?money(i.cost):'')+'</div>' +
+      '<div class="hide-s">'+(n<=0?'<span class="out">Out</span>':lw?'<span class="low">Low</span>':'<span class="t2">OK</span>')+'</div>' +
+      '<button class="link" data-act="stockedit" data-id="'+esc(i.id)+'">Edit</button></div>';
+  }).join('');
+  return head + bar + (rows ? '<div>'+rows+'</div>' : '<div class="panel empty"><h3>'+(q?'No parts match':'No stock yet')+'</h3><p>Add the screens, batteries and other parts you keep on hand. When a tech uses one on a ticket, the count goes down automatically.</p></div>');
+}
+function stockBox(item){
+  var i = item || {cat:'Screen', qty:1, min:1};
+  var m = modalShell('sk', item ? 'Edit part' : 'Add part to stock',
+    '<div class="f"><label for="sk-name">Part</label><input class="in" id="sk-name" maxlength="80" placeholder="iPhone 13 screen (OLED)" value="'+esc(i.name||'')+'"></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="sk-cat">Type</label><select class="in" id="sk-cat">'+STOCK_CATS.map(function(c){ return '<option'+(c===i.cat?' selected':'')+'>'+c+'</option>'; }).join('')+'</select></div><div class="f"><label for="sk-sup">Supplier</label><select class="in" id="sk-sup">'+SUPPLIERS.map(function(c){ return '<option'+(c===i.supplier?' selected':'')+'>'+c+'</option>'; }).join('')+'</select></div></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="sk-qty">In stock</label><input class="in" id="sk-qty" inputmode="numeric" value="'+esc(i.qty)+'"></div><div class="f"><label for="sk-min">Warn me when it gets down to</label><input class="in" id="sk-min" inputmode="numeric" value="'+esc(i.min||0)+'"></div></div>' +
+    '<div class="f" style="margin-top:12px;max-width:200px"><label for="sk-cost">Cost each</label><input class="in" id="sk-cost" inputmode="decimal" value="'+esc(i.cost||'')+'"></div>',
+    (item ? '<button class="link red" id="sk-del" style="margin-right:auto">Delete</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="sk-save">Save</button>');
+  requestAnimationFrame(function(){ $('#sk-name', m).focus(); });
+  $('#sk-save', m).addEventListener('click', function(){
+    var name = $('#sk-name', m).value.trim(); if (!name) { $('#sk-err', m).textContent = 'Enter the part name.'; return; }
+    var o = {name:name.slice(0,80), cat:$('#sk-cat', m).value, supplier:$('#sk-sup', m).value, qty:Math.round(num($('#sk-qty', m).value)), min:Math.round(num($('#sk-min', m).value)), cost:num($('#sk-cost', m).value), updatedAt:Date.now()};
+    var ref = item ? S.db.doc('inventory/'+item.id) : S.db.collection('inventory').doc();
+    m.remove();
+    retryOnce(function(){ return item ? ref.update(o) : ref.set(Object.assign({createdAt:Date.now()}, o)); }).then(function(){ toast(item ? 'Saved' : 'Added to stock'); }).catch(writeErr);
+  });
+  var del = $('#sk-del', m);
+  if (del) del.addEventListener('click', function(){ if (!confirm('Delete ' + item.name + ' from stock?')) return; m.remove(); S.db.doc('inventory/'+item.id).delete().then(function(){ toast('Deleted'); }).catch(writeErr); });
+}
+function stockQty(id, delta){
+  var i = (S.inv||[]).filter(function(x){ return x.id === id; })[0]; if (!i) return;
+  if (num(i.qty) + delta < 0) { toast(i.name + ' is already at 0'); return; }
+  i.qty = num(i.qty) + delta; render();
+  S.db.doc('inventory/'+id).update({qty: FV().increment(delta), updatedAt: Date.now()}).then(function(){
+    if (delta < 0 && num(i.min) > 0 && i.qty <= num(i.min)) toast('Running low: ' + i.name + ' (' + i.qty + ' left)');
+  }).catch(writeErr);
+}
+function stockOptions(t){
+  var model = String((t.device||{}).model||'').toLowerCase(), words = model.split(/\s+/).filter(function(w){ return w.length > 1; });
+  var score = function(i){ var n = String(i.name).toLowerCase(); return words.filter(function(w){ return n.indexOf(w) > -1; }).length; };
+  return (S.inv||[]).filter(function(i){ return num(i.qty) > 0; }).sort(function(a,b){ return score(b) - score(a) || String(a.name).localeCompare(b.name); })
+    .map(function(i){ return '<option value="'+esc(i.id)+'">'+esc(i.name)+' ('+num(i.qty)+' left)</option>'; }).join('');
+}
+function useStock(t, id){
+  var i = (S.inv||[]).filter(function(x){ return x.id === id; })[0]; if (!i) return;
+  var part = {id:uid(), name:i.name, supplier:'From stock', cost:num(i.cost), status:'arrived', orderNo:'', addedAt:Date.now(), arrivedAt:Date.now(), stockId:i.id};
+  patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('took “' + i.name + '” from stock')]);
+  stockQty(i.id, -1);
+}
+
+/* ---------- buyback ---------- */
+var BB_ST = [['bought','Bought'],['refurb','Fixing up'],['listed','For sale'],['sold','Sold']];
+var BB_MAP = {}; BB_ST.forEach(function(x){ BB_MAP[x[0]] = x[1]; });
+var BB_COND = ['Like new','Good','Fair','Cracked / broken','Parts only'];
+function bbProfit(b){ return num(b.soldPrice) - num(b.paid) - num(b.fixCost); }
+function buybackView(){
+  var all = S.bb || [], q = (S.q||'').toLowerCase();
+  var list = all.filter(function(b){ return !q || [b.model, b.imei, b.sellerName, b.sellerPhone, b.buyerName].join(' ').toLowerCase().indexOf(q) > -1; });
+  var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
+  var inStock = all.filter(function(b){ return b.status !== 'sold'; });
+  var tied = inStock.reduce(function(a,b){ return a + num(b.paid) + num(b.fixCost); }, 0);
+  var soldM = all.filter(function(b){ return b.status === 'sold' && b.soldAt >= mStart.getTime(); });
+  var profitM = soldM.reduce(function(a,b){ return a + bbProfit(b); }, 0);
+  var head = '<div class="rgrid"><div class="stat"><b>'+inStock.length+'</b><span>Phones on hand</span></div><div class="stat"><b>'+money(tied)+'</b><span>Money in phones on hand</span></div><div class="stat"><b style="color:var(--green)">'+money(profitM)+'</b><span>Profit this month ('+soldM.length+' sold)</span></div></div>';
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search buybacks</label><input id="q" type="search" placeholder="Search model, IMEI, seller" value="'+esc(S.q)+'" autocomplete="off"></div><button class="btn" data-act="bbadd">+ Buy a phone</button></div>';
+  if (!list.length) return head + bar + '<div class="panel empty"><h3>'+(q?'Nothing matches':'No buybacks yet')+'</h3><p>Log phones you buy from customers, fix them up, and track what you make when they sell.</p></div>';
+  return head + bar + BB_ST.map(function(st){
+    var rows = list.filter(function(b){ return (b.status||'bought') === st[0]; }).sort(function(a,b){ return (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt); });
+    if (!rows.length) return '';
+    if (st[0] === 'sold') rows = rows.slice(0, 25);
+    return '<section class="pgroup"><h2>'+st[1]+' <i>'+rows.length+'</i></h2><div>' + rows.map(function(b){
+      var money2 = st[0] === 'sold' ? '<span class="amt" style="color:'+(bbProfit(b)>=0?'var(--green)':'var(--red)')+'">'+(bbProfit(b)>=0?'+':'')+money(bbProfit(b))+'</span>' : (num(b.listPrice) ? 'Asking '+money(b.listPrice) : '');
+      return '<div class="bb"><button class="open" data-act="bbedit" data-id="'+esc(b.id)+'" style="border:0;background:none;text-align:left;padding:0"><div class="t1">'+esc(b.model)+(b.storage?' · '+esc(b.storage):'')+'</div><div class="t2">'+esc(b.cond||'')+(b.imei?' · IMEI '+esc(String(b.imei).slice(-6)):'')+' · '+esc(rel(b.createdAt))+'</div></button>' +
+        '<div class="hide-s t2">From '+esc(b.sellerName||'—')+'</div><div class="hide-s amt">Paid '+money(b.paid)+(num(b.fixCost)?'<div class="t2">+ '+money(b.fixCost)+' fix</div>':'')+'</div><div class="hide-s">'+money2+'</div>' +
+        '<button class="btn sm ghost" data-act="bbedit" data-id="'+esc(b.id)+'">'+(st[0]==='sold'?'View':'Update')+'</button></div>';
+    }).join('') + '</div></section>';
+  }).join('');
+}
+function bbBox(item, pre){
+  var b = item || Object.assign({status:'bought', cond:'Good', payMethod:'Cash'}, pre||{});
+  var opt = function(arr, v){ return arr.map(function(x){ var k = Array.isArray(x) ? x[0] : x, l = Array.isArray(x) ? x[1] : x; return '<option value="'+esc(k)+'"'+(k===v?' selected':'')+'>'+esc(l)+'</option>'; }).join(''); };
+  var m = modalShell('bb', item ? esc(b.model) : 'Buy a phone',
+    '<h3 style="font-size:15px;margin-bottom:8px">Phone</h3>' +
+    '<div class="g2"><div class="f"><label for="bb-model">Model</label><input class="in" id="bb-model" list="bb-models" value="'+esc(b.model||'')+'" placeholder="iPhone 14 Pro"></div><div class="f"><label for="bb-sto">Storage</label><input class="in" id="bb-sto" value="'+esc(b.storage||'')+'" placeholder="128GB"></div></div>' +
+    '<datalist id="bb-models">'+[].concat(CATALOG['Apple iPhone'], CATALOG['Samsung'], CATALOG['Google Pixel']).map(function(x){ return '<option value="'+esc(x)+'">'; }).join('')+'</datalist>' +
+    '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-imei">IMEI / serial</label><input class="in" id="bb-imei" value="'+esc(b.imei||'')+'" inputmode="numeric" placeholder="Dial *#06#"></div><div class="f"><label for="bb-cond">Condition</label><select class="in" id="bb-cond">'+opt(BB_COND, b.cond)+'</select></div></div>' +
+    '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-lock">Carrier / lock</label><input class="in" id="bb-lock" value="'+esc(b.lock||'')+'" placeholder="Unlocked, T-Mobile…"></div><div class="f"><label for="bb-bat">Battery health %</label><input class="in" id="bb-bat" inputmode="numeric" value="'+esc(b.battery||'')+'"></div></div>' +
+    '<p class="hint" style="margin-top:8px">Before paying: make sure iCloud / Google account is signed out (Find My off) and check the IMEI isn’t reported lost or stolen. '+(b.imei?'<a href="https://www.imei.info/?imei='+encodeURIComponent(b.imei)+'" target="_blank" rel="noopener">Check this IMEI</a>':'')+'</p>' +
+    '<label class="check" style="margin-top:6px"><input type="checkbox" id="bb-fmi"'+(b.fmiOff?' checked':'')+'>Find My / Google lock is off</label>' +
+    '<h3 style="font-size:15px;margin:16px 0 8px">Seller</h3>' +
+    '<div class="g2"><div class="f"><label for="bb-sn">Name</label><input class="in" id="bb-sn" value="'+esc(b.sellerName||'')+'"></div><div class="f"><label for="bb-sp">Phone</label><input class="in" id="bb-sp" type="tel" value="'+esc(b.sellerPhone||'')+'"></div></div>' +
+    '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-id">ID checked (type + last 4)</label><input class="in" id="bb-id" value="'+esc(b.idNote||'')+'" placeholder="TX DL ••1234"></div><div class="f"><label for="bb-paid">Paid seller</label><input class="in" id="bb-paid" inputmode="decimal" value="'+esc(b.paid||'')+'"></div></div>' +
+    '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-pm">Paid by</label><select class="in" id="bb-pm">'+opt(PAY, b.payMethod)+'</select></div><div class="f"><label for="bb-fix">Repair cost (parts)</label><input class="in" id="bb-fix" inputmode="decimal" value="'+esc(b.fixCost||'')+'"></div></div>' +
+    '<h3 style="font-size:15px;margin:16px 0 8px">Selling</h3>' +
+    '<div class="g2"><div class="f"><label for="bb-st">Status</label><select class="in" id="bb-st">'+opt(BB_ST, b.status)+'</select></div><div class="f"><label for="bb-list">Asking price</label><input class="in" id="bb-list" inputmode="decimal" value="'+esc(b.listPrice||'')+'"></div></div>' +
+    '<div class="g2" style="margin-top:10px" id="bb-soldw"><div class="f"><label for="bb-sold">Sold for</label><input class="in" id="bb-sold" inputmode="decimal" value="'+esc(b.soldPrice||'')+'"></div><div class="f"><label for="bb-buyer">Buyer (optional)</label><input class="in" id="bb-buyer" value="'+esc(b.buyerName||'')+'"></div></div>' +
+    '<div class="f" style="margin-top:10px"><label for="bb-notes">Notes</label><textarea class="in" id="bb-notes" style="min-height:56px">'+esc(b.notes||'')+'</textarea></div>' +
+    '<div id="bb-prof" class="match" style="margin-top:12px"></div>',
+    (item ? '<button class="link red" id="bb-del" style="margin-right:auto">Delete</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="bb-save">Save</button>', true);
+  function prof(){
+    var sold = $('#bb-st', m).value === 'sold';
+    $('#bb-soldw', m).style.display = sold ? '' : 'none';
+    var paid = num($('#bb-paid', m).value), fix = num($('#bb-fix', m).value), sp = num($('#bb-sold', m).value || $('#bb-list', m).value);
+    $('#bb-prof', m).innerHTML = sp ? (sold ? 'Profit: ' : 'Profit if it sells at asking: ') + '<b>' + money(sp - paid - fix) + '</b>' : 'Total in this phone: <b>' + money(paid + fix) + '</b>';
+  }
+  prof(); m.addEventListener('input', prof); m.addEventListener('change', prof);
+  $('#bb-save', m).addEventListener('click', function(){
+    var model = $('#bb-model', m).value.trim(), err = $('#bb-err', m);
+    if (!model) { err.textContent = 'Enter the model.'; return; }
+    var st = $('#bb-st', m).value;
+    if (st === 'sold' && !num($('#bb-sold', m).value)) { err.textContent = 'Enter what it sold for.'; return; }
+    var o = {model:model.slice(0,60), storage:$('#bb-sto', m).value.trim().slice(0,20), imei:$('#bb-imei', m).value.trim().slice(0,30), cond:$('#bb-cond', m).value, lock:$('#bb-lock', m).value.trim().slice(0,40), battery:$('#bb-bat', m).value.trim().slice(0,5), fmiOff:$('#bb-fmi', m).checked,
+      sellerName:$('#bb-sn', m).value.trim().slice(0,60), sellerPhone:$('#bb-sp', m).value.trim().slice(0,24), idNote:$('#bb-id', m).value.trim().slice(0,40), paid:num($('#bb-paid', m).value), payMethod:$('#bb-pm', m).value, fixCost:num($('#bb-fix', m).value),
+      status:st, listPrice:num($('#bb-list', m).value), soldPrice: st === 'sold' ? num($('#bb-sold', m).value) : 0, buyerName:$('#bb-buyer', m).value.trim().slice(0,60), notes:$('#bb-notes', m).value.trim().slice(0,500), updatedAt:Date.now(), updatedBy:who()};
+    if (st === 'sold' && (!item || item.status !== 'sold')) o.soldAt = Date.now();
+    if (!item && o.paid && !o.fmiOff && !confirm('Find My / Google lock isn’t marked off. Save anyway?')) return;
+    var ref = item ? S.db.doc('buybacks/'+item.id) : S.db.collection('buybacks').doc();
+    if (!item) { o.createdAt = Date.now(); o.createdBy = who(); }
+    m.remove();
+    retryOnce(function(){ return item ? ref.update(o) : ref.set(o); }).then(function(){
+      toast(st === 'sold' ? 'Sold. Profit ' + money(o.soldPrice - o.paid - o.fixCost) : 'Saved');
+      if (pre && pre.reqId) patchReq(pre.reqId, {status:'done'});
+    }).catch(writeErr);
+  });
+  var del = $('#bb-del', m);
+  if (del) del.addEventListener('click', function(){ if (!confirm('Delete this buyback record?')) return; m.remove(); S.db.doc('buybacks/'+item.id).delete().then(function(){ toast('Deleted'); }).catch(writeErr); });
+}
+
+/* ---------- photos ---------- */
+S.photoCache = {};
+function photosCard(t, ro){
+  var ph = t.photos || [];
+  var cells = ph.map(function(p){
+    var key = t.id + '_' + p.k, src = S.photoCache[key];
+    if (!src && S.db && !S.photoCache['l_' + key]) { S.photoCache['l_' + key] = 1; S.db.doc('photos/' + key).get().then(function(snap){ if (snap.exists) { S.photoCache[key] = snap.data().data; renderSheet(); } }).catch(function(){}); }
+    return '<button class="pic" data-act="photo" data-k="'+esc(p.k)+'" style="'+(src?'background-image:url('+src+')':'')+'" aria-label="Photo from '+esc(dt(p.at))+'"></button>';
+  }).join('');
+  return '<div class="card"><h3>Photos</h3><p class="hint" style="margin:-4px 0 10px">Snap the phone’s condition at check-in. It protects you if there’s ever a “you scratched it” dispute.</p><div class="pics">' + cells +
+    (!ro && ph.length < 8 ? '<label class="pic add"><b>+</b>Add photo<input type="file" accept="image/*" capture="environment" multiple data-photoin hidden></label>' : '') + '</div></div>';
+}
+function shrink(file){
+  return new Promise(function(res, rej){
+    var fr = new FileReader();
+    fr.onload = function(){
+      var im = new Image();
+      im.onload = function(){
+        var tries = [[1280,0.72],[1024,0.65],[800,0.6]];
+        for (var i = 0; i < tries.length; i++) {
+          var sc = Math.min(1, tries[i][0] / Math.max(im.width, im.height)), c = document.createElement('canvas');
+          c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          var d = c.toDataURL('image/jpeg', tries[i][1]);
+          if (d.length < 700000 || i === tries.length - 1) return res(d);
+        }
+      };
+      im.onerror = function(){ rej(new Error('img')); };
+      im.src = fr.result;
+    };
+    fr.onerror = function(){ rej(new Error('read')); };
+    fr.readAsDataURL(file);
+  });
+}
+function addPhotos(t, files){
+  files = Array.prototype.slice.call(files||[], 0, 8 - (t.photos||[]).length);
+  if (!files.length) return;
+  toast('Saving ' + files.length + ' photo' + (files.length>1?'s':'') + '…');
+  Promise.all(files.map(shrink)).then(function(datas){
+    var live = byId(t.id) || t, list = (live.photos||[]).slice(), now = Date.now();
+    var b = S.db.batch();
+    datas.forEach(function(d, i){ var k = (now + i).toString(36); list.push({k:k, at:now, by:who()}); S.photoCache[t.id + '_' + k] = d; b.set(S.db.doc('photos/' + t.id + '_' + k), {tid:t.id, data:d, at:now, by:who()}); });
+    return retryOnce(function(){ return b.commit(); }).then(function(){ patchTicket(live, {photos:list}, [logEntry('added ' + datas.length + ' photo' + (datas.length>1?'s':''))]); toast('Photos saved'); });
+  }).catch(function(e){ if (e && e.code) writeErr(e); else toast('Couldn’t read that photo. Try another.'); });
+}
+function photoBox(t, k){
+  var key = t.id + '_' + k, src = S.photoCache[key], p = (t.photos||[]).filter(function(x){ return x.k === k; })[0] || {};
+  var m = modalShell('ph', 'Photo · #' + esc(t.num), '<img src="'+esc(src||'')+'" alt="" style="width:100%;border-radius:12px;display:block;background:var(--mist)"><p class="hint" style="margin-top:8px">Added '+esc(dt(p.at))+(p.by?' by '+esc(p.by):'')+'</p>',
+    (S.canWrite ? '<button class="link red" id="ph-del" style="margin-right:auto">Delete photo</button>' : '') + '<button class="btn ghost" data-mclose>Close</button>', true);
+  var del = $('#ph-del', m);
+  if (del) del.addEventListener('click', function(){
+    if (!confirm('Delete this photo?')) return; m.remove();
+    var live = byId(t.id); if (!live) return;
+    patchTicket(live, {photos:(live.photos||[]).filter(function(x){ return x.k !== k; })}, [logEntry('deleted a photo')]);
+    S.db.doc('photos/' + key).delete().catch(function(){});
+  });
+}
+
+/* ---------- customer approvals ---------- */
+function rtoken(){ var c = 'abcdefghijkmnpqrstuvwxyz23456789', o = '', a = new Uint32Array(14); crypto.getRandomValues(a); for (var i=0;i<14;i++) o += c[a[i] % c.length]; return o; }
+function approvalsCard(t, ro){
+  var list = (t.items||[]).filter(function(i){ return i.apv; });
+  var rows = list.map(function(i){
+    var st = i.apvSt === 'approved' ? '<span class="tagk ok">Approved</span>' : i.apvSt === 'declined' ? '<span class="tagk" style="background:#fbeceb;color:#9b2c27">Declined</span>' : '<span class="tagk" style="background:#fff1e0;color:#a04a00">Waiting</span>';
+    return '<div class="apv"><div class="grow"><b>'+esc((i.desc||i.repair))+'</b> · '+money(i.price)+'<div class="t2">'+(i.apvAt?'Answered '+esc(rel(i.apvAt)):'Sent '+esc(rel(i.apvSent)))+'</div></div>'+st+
+      (i.apvSt === 'pending' && !ro ? '<a class="btn sm ghost" href="sms:'+esc(e164((t.customer||{}).phone))+'?&body='+encodeURIComponent(apvMsg(t, i.apv, i))+'">Resend</a>' : '') + '</div>';
+  }).join('');
+  return '<div class="card"><h3>Customer approval</h3>' + (rows || '<p class="hint" style="margin:-4px 0 0">Found something extra? Send the customer a link to approve the added cost. Their answer is saved here.</p>') +
+    (ro ? '' : '<div class="acts"><button class="btn sm ghost" data-act="apvnew">Ask to approve extra work</button></div>') + '</div>';
+}
+function apvMsg(t, tok, it){
+  var first = String((t.customer||{}).name||'').split(' ')[0] || 'there';
+  return 'Hi ' + first + ', this is iFixPhones. While working on your ' + ((t.device||{}).model||'device') + ' we found it also needs: ' + (it.desc||it.repair) + ' (' + money(it.price) + '). Tap to approve or decline: https://ifixphones.net/approve.html?k=' + tok;
+}
+function apvBox(t){
+  var m = modalShell('av', 'Ask customer to approve',
+    '<div class="f"><label for="av-what">What needs doing</label><input class="in" id="av-what" maxlength="80" placeholder="Battery replacement"></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="av-price">Extra cost</label><input class="in" id="av-price" inputmode="decimal" placeholder="$"></div><div class="f"><label for="av-repair">Type</label><select class="in" id="av-repair">'+REPAIRS.map(function(r){ return '<option>'+esc(r)+'</option>'; }).join('')+'</select></div></div>' +
+    '<div class="f" style="margin-top:12px"><label for="av-note">Why (customer sees this)</label><textarea class="in" id="av-note" maxlength="300" placeholder="Battery health is 71% and it shuts down when cold."></textarea></div>' +
+    '<p class="hint" style="margin-top:8px">The customer gets a text with a link. They tap Approve or Decline, you get an alert, and the ticket updates by itself.</p>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="av-send">Send for approval</button>', true);
+  requestAnimationFrame(function(){ $('#av-what', m).focus(); });
+  $('#av-send', m).addEventListener('click', function(){
+    var what = $('#av-what', m).value.trim(), price = num($('#av-price', m).value), err = $('#av-err', m);
+    if (!what) { err.textContent = 'Describe the extra work.'; return; }
+    if (!price) { err.textContent = 'Enter the extra cost.'; return; }
+    var tok = rtoken(), now = Date.now(), live = byId(t.id) || t;
+    var item = {repair:$('#av-repair', m).value, part:'', price:price, desc:what.slice(0,80), apv:tok, apvSt:'pending', apvSent:now};
+    var doc = {n:live.num, dev:(live.device||{}).model||'', first:String((live.customer||{}).name||'').split(' ')[0], item:what.slice(0,80), price:price, note:$('#av-note', m).value.trim().slice(0,300), status:'pending', createdAt:now, decidedAt:0, tid:live.id};
+    m.remove();
+    retryOnce(function(){ return S.db.doc('approvals/' + tok).set(doc); }).then(function(){
+      patchTicket(live, {items:(live.items||[]).concat([item])}, [logEntry('asked the customer to approve “' + item.desc + '” for ' + money(price))]);
+      openSms('sms:' + e164((live.customer||{}).phone) + '?&body=' + encodeURIComponent(apvMsg(live, tok, item)));
+      toast('Approval link created');
+    }).catch(writeErr);
+  });
+}
+function applyApproval(id, a){
+  var t = byId(a.tid); if (!t || a.status === 'pending') return;
+  var items = clone(t.items||[]), changed = false;
+  items.forEach(function(i){ if (i.apv === id && i.apvSt !== a.status) { i.apvSt = a.status; i.apvAt = a.decidedAt || Date.now(); changed = true; } });
+  if (!changed) return;
+  if (a.status === 'declined') items = items.map(function(i){ if (i.apv === id) i.price = i.price; return i; });
+  patchTicket(t, {items:items}, [logEntry('Customer ' + (a.status === 'approved' ? 'APPROVED' : 'declined') + ' “' + a.item + '” (' + money(a.price) + ')')]);
+}
+
+/* ---------- end of day ---------- */
+function closeoutData(){
+  var sod = new Date(); sod.setHours(0,0,0,0); var a = sod.getTime(), b = a + 86400e3;
+  var inD = function(ts){ return ts >= a && ts < b; };
+  var paid = S.tickets.filter(function(t){ return t.paid && inD(t.paidAt); });
+  var by = {}; paid.forEach(function(t){ var k = t.payMethod || 'Not recorded'; by[k] = (by[k]||0) + total(t); });
+  var deps = S.tickets.filter(function(t){ return inD(t.createdAt) && num(t.deposit); });
+  var bbOut = (S.bb||[]).filter(function(x){ return inD(x.createdAt) && num(x.paid); });
+  var bbIn = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inD(x.soldAt); });
+  var cashBuy = bbOut.filter(function(x){ return x.payMethod === 'Cash'; }).reduce(function(s2,x){ return s2 + num(x.paid); }, 0);
+  return {day:sod, paid:paid, by:by, total:paid.reduce(function(s2,t){ return s2 + total(t); }, 0), deps:deps, depTotal:deps.reduce(function(s2,t){ return s2 + num(t.deposit); }, 0),
+    checkedIn:S.tickets.filter(function(t){ return inD(t.createdAt); }).length, pickedUp:S.tickets.filter(function(t){ return t.status === 'done' && inD(t.pickedUpAt); }).length,
+    bbOut:bbOut, bbOutTotal:bbOut.reduce(function(s2,x){ return s2 + num(x.paid); }, 0), bbIn:bbIn, bbInTotal:bbIn.reduce(function(s2,x){ return s2 + num(x.soldPrice); }, 0), cashBuy:cashBuy,
+    ready:S.tickets.filter(function(t){ return t.status === 'ready'; }).length, open:S.tickets.filter(function(t){ return ['in','part','repair'].indexOf(t.status) > -1; }).length};
+}
+function closeoutPanel(){
+  var d = closeoutData();
+  var rows = Object.keys(d.by).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(d.by[k])+'</td></tr>'; }).join('');
+  return '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Close out today</h2><button class="btn sm ghost" data-act="closeout">Print close-out</button></div>' +
+    '<div class="g2" style="margin-top:12px"><div><table class="rtable"><tbody>' + (rows || '<tr><td class="muted">No repair payments yet today</td><td></td></tr>') + '<tr><td><b>Repairs total</b></td><td class="right amt"><b>'+money(d.total)+'</b></td></tr></tbody></table></div>' +
+    '<div><table class="rtable"><tbody><tr><td>Checked in</td><td class="right">'+d.checkedIn+'</td></tr><tr><td>Picked up</td><td class="right">'+d.pickedUp+'</td></tr><tr><td>Deposits taken</td><td class="right amt">'+money(d.depTotal)+'</td></tr>' +
+    (d.bbOut.length || d.bbIn.length ? '<tr><td>Phones bought</td><td class="right amt">−'+money(d.bbOutTotal)+'</td></tr><tr><td>Phones sold</td><td class="right amt">'+money(d.bbInTotal)+'</td></tr>' : '') +
+    '<tr><td>Still open / ready</td><td class="right">'+d.open+' / '+d.ready+'</td></tr></tbody></table></div></div>' +
+    '<p class="hint" style="margin-top:8px">Cash in drawer should be about: repairs paid in cash'+(d.cashBuy?' minus '+money(d.cashBuy)+' paid out for phones':'')+'. Card payments should match Square.</p></div>';
+}
+function closeoutDoc(){
+  var d = closeoutData();
+  var tr = function(a, b){ return '<tr><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Close-out '+esc(dateOnly(d.day))+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:640px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:20px;margin:0}h2{font-size:14px;margin:18px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid #eee}.sig{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:24px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}</style></head><body>' +
+    '<h1>iFixPhones · Close-out</h1><div>'+esc(d.day.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}))+' · printed by '+esc(who())+'</div>' +
+    '<h2>Repair payments</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total</b>', '<b>'+money(d.total)+'</b>') + '</table>' +
+    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(total(t))+' '+esc(t.payMethod||'')); }).join('') || tr('None','')) + '</table>' +
+    '<h2>Other</h2><table>' + tr('Deposits taken', money(d.depTotal)) + tr('Checked in', d.checkedIn) + tr('Picked up', d.pickedUp) + tr('Phones bought (paid out)', money(d.bbOutTotal)) + tr('Phones sold', money(d.bbInTotal)) + tr('Still open / ready for pickup', d.open + ' / ' + d.ready) + '</table>' +
+    '<h2>Drawer count</h2><table>' + tr('Cash counted', '$__________') + tr('Card total in Square', '$__________') + tr('Difference', '$__________') + '</table>' +
+    '<div class="sig"><div>Counted by</div><div>Checked by</div></div></body></html>';
 }
 
 /* ---------- bookings ---------- */
@@ -1020,15 +1494,15 @@ function isBooking(r){ return r.kind !== 'quote' && r.day && r.time; }
 function holdsSlot(r){ return isBooking(r) && r.status !== 'cancel'; }
 
 function reqBox(r){
-  var isQ = r.kind === 'quote';
-  var tag = isQ ? '<span class="tagk q">Quote</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
+  var isQ = r.kind !== 'booking';
+  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
   var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
   var first = String(r.name||'').split(' ')[0];
   var place = r.where === 'mobile' ? '' : ' at 9055 Marbach Rd, Suite 105';
-  var msg = isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
+  var msg = r.kind === 'sell' ? 'Hi ' + (first||'there') + ', this is iFixPhones about the ' + (r.device||'phone') + ' you want to sell. We can offer $' : r.kind === 'business' ? 'Hi ' + (first||'there') + ', this is iFixPhones following up on your repair request' + (r.org ? ' for ' + r.org : '') + '. ' : isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
     : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + place + '.' + (r.where==='mobile' ? ' We’ll text you when we’re on the way.' : '') + ' Reply here if anything changes.';
   var rem = 'Hi ' + (first||'there') + ', reminder from iFixPhones: your ' + (r.repair||'repair') + ' appointment is ' + (sameDay(r.apptAt, Date.now()) ? 'today' : 'tomorrow') + ' at ' + (r.time||'') + place + '. Reply here if you need to change it.';
-  var when = isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
+  var when = r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
   var open = r.status === 'new' || r.status === 'confirmed';
   var late = !isQ && r.apptAt && r.apptAt < Date.now() - 3600e3 && open;
   var soon = !isQ && open && r.apptAt && r.apptAt > Date.now() && r.apptAt - Date.now() < 36*3600e3;
@@ -1043,13 +1517,14 @@ function reqBox(r){
     '<div class="side">'+tag+st+'<span class="t2">'+esc(rel(r.createdAt))+'</span></div>' +
     '<div class="acts">' +
       '<a class="btn sm ghost" href="tel:'+esc(e164(r.phone))+'">Call</a>' +
-      (open ? '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(msg)+'" data-rqconfirm="'+esc(r.id)+'">'+(isQ?'Text quote':'Text to confirm')+'</a>' : '') +
+      (open ? '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(msg)+'" data-rqconfirm="'+esc(r.id)+'">'+(r.kind==='sell'?'Text an offer':r.kind==='business'?'Text them':isQ?'Text quote':'Text to confirm')+'</a>' : '') +
+      (r.email ? '<a class="btn sm ghost" href="mailto:'+esc(r.email)+'">Email</a>' : '') +
       (soon && r.status === 'confirmed' ? '<a class="btn sm ghost" href="sms:'+esc(e164(r.phone))+'?&body='+encodeURIComponent(rem)+'" data-rqremind="'+esc(r.id)+'">Text reminder</a>' : '') +
       (r.status === 'new' && !isQ ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="confirmed">Mark confirmed</button>' : '') +
       (open && !isQ ? '<button class="btn sm ghost" data-act="rqmove" data-id="'+esc(r.id)+'">Reschedule</button>' : '') +
-      (open ? '<button class="btn sm" data-act="rqticket" data-id="'+esc(r.id)+'">Make ticket</button>' : '') +
+      (open && r.kind === 'sell' ? '<button class="btn sm" data-act="rqbuy" data-id="'+esc(r.id)+'">Buy it</button>' : open && r.kind !== 'business' ? '<button class="btn sm" data-act="rqticket" data-id="'+esc(r.id)+'">Make ticket</button>' : '') +
       (r.ticketId ? '<button class="btn sm ghost" data-act="open" data-id="'+esc(r.ticketId)+'">Open ticket #'+esc(r.ticketNum)+'</button>' : '') +
-      (open ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="done">'+(isQ?'Quote sent':'Done')+'</button><button class="link red" data-act="rq" data-id="'+esc(r.id)+'" data-v="cancel">Cancel</button>' : '<button class="link" data-act="rq" data-id="'+esc(r.id)+'" data-v="'+(isQ?'new':'confirmed')+'">Reopen</button><button class="link red" data-act="rqdel" data-id="'+esc(r.id)+'">Delete</button>') +
+      (open ? '<button class="btn sm ghost" data-act="rq" data-id="'+esc(r.id)+'" data-v="done">'+(r.kind==='quote'?'Quote sent':'Done')+'</button><button class="link red" data-act="rq" data-id="'+esc(r.id)+'" data-v="cancel">Cancel</button>' : '<button class="link" data-act="rq" data-id="'+esc(r.id)+'" data-v="'+(isQ?'new':'confirmed')+'">Reopen</button><button class="link red" data-act="rqdel" data-id="'+esc(r.id)+'">Delete</button>') +
     '</div></div>';
 }
 
@@ -1176,7 +1651,7 @@ function moveBox(r){
       slotOp(b, oldDay, r.where, oldT, false);
       slotOp(b, day, r.where, t, true);
     }, 'Moved to ' + f.whenText);
-    if (txt) { var first = String(r.name||'').split(' ')[0]; location.href = 'sms:' + e164(r.phone) + '?&body=' + encodeURIComponent('Hi ' + (first||'there') + ', this is iFixPhones. Your appointment is now ' + f.whenText + '. Reply here if that doesn’t work.'); }
+    if (txt) { var first = String(r.name||'').split(' ')[0]; openSms('sms:' + e164(r.phone) + '?&body=' + encodeURIComponent('Hi ' + (first||'there') + ', this is iFixPhones. Your appointment is now ' + f.whenText + '. Reply here if that doesn’t work.')); }
   });
 }
 function addApptBox(day){
@@ -1368,6 +1843,8 @@ function renderSheet(){
         (num(partsCost(t)) && tot ? '<p class="hint">Part costs '+money(partsCost(t))+' · after parts '+money(tot - partsCost(t))+'</p>' : '') +
       '</div>' +
       partsCard(t, ro) +
+      approvalsCard(t, ro) +
+      photosCard(t, ro) +
 
       '<div class="card"><h3>Customer signature</h3>' + (t.sig ? '<img class="sigimg" alt="Customer signature" src="'+esc(t.sig)+'"><p class="hint">Signed '+esc(dt(t.sigAt))+'</p>' : '<p class="hint">Not signed yet.</p>') + (ro ? '' : '<div class="acts"><button class="btn sm ghost" data-act="sign">'+(t.sig?'Sign again':'Get signature')+'</button></div>') + '</div>' +
       '<div class="card"><h3>Before repair</h3>'+checklist('pre')+'</div>' +
@@ -1401,7 +1878,8 @@ function partsCard(t, ro){
     (ro ? '' : '<form class="addp" data-form="addpart"><label class="sr" for="pn">Part</label><input class="in" id="pn" data-keep placeholder="Part, e.g. iPhone 14 Pro OLED" maxlength="80" autocomplete="off">' +
       '<label class="sr" for="ps">Supplier</label><select class="in" id="ps">'+SUPPLIERS.map(function(x){ return '<option'+(x===(S.lastSupplier||SUPPLIERS[0])?' selected':'')+'>'+x+'</option>'; }).join('')+'</select>' +
       '<label class="sr" for="pc2">Cost</label><input class="in" id="pc2" data-keep inputmode="decimal" placeholder="Cost" autocomplete="off">' +
-      '<button class="btn sm dark" type="submit">Add part</button></form>') +
+      '<button class="btn sm dark" type="submit">Add part</button></form>' +
+      (stockOptions(t) ? '<div class="stockpick"><label class="sr" for="stk-pick">Use from stock</label><select class="in" id="stk-pick"><option value="">Use a part from stock…</option>'+stockOptions(t)+'</select><button class="btn sm ghost" data-act="usestock">Use</button></div>' : '')) +
   '</div>';
 }
 
@@ -1440,11 +1918,11 @@ function templates(t){
   var dev = d.model || 'device';
   var bal = balance(t);
   return [
-    ['Checked in', 'Hi ' + first + ', this is iFixPhones. We’ve got your ' + dev + ' (ticket #' + t.num + ')' + (t.dueAt ? ' and expect it ready ' + dueText(t.dueAt) : '') + '. We’ll text you when it’s done.'],
+    ['Checked in', 'Hi ' + first + ', this is iFixPhones. We’ve got your ' + dev + ' (ticket #' + t.num + ')' + (t.dueAt ? ' and expect it ready ' + dueText(t.dueAt) : '') + '. We’ll text you when it’s done. Track it here: ' + statusUrl(t)],
     ['Part ordered', 'Hi ' + first + ', the part for your ' + dev + ' has been ordered. We’ll let you know as soon as it arrives. – iFixPhones'],
     ['Ready for pickup', 'Hi ' + first + ', your ' + dev + ' is ready for pickup at iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Balance due: ' + money(bal) + '.' : '') + ' Open Mon–Sat 10–8, Sun 12–6.'],
     ['Pickup reminder', 'Hi ' + first + ', a reminder that your ' + dev + ' is still waiting for you at iFixPhones, 9055 Marbach Rd, Suite 105. Open Mon–Sat 10–8, Sun 12–6.'],
-    ['Thank you', 'Thanks for choosing iFixPhones, ' + first + '! If you’re happy with your repair, a quick Google review would mean a lot to us.'],
+    ['Review request', reviewMsg(t)],
     ['Mobile visit', 'Hi ' + first + ', this is iFixPhones. Your technician is on the way for your ' + dev + ' repair' + (t.address ? ' at ' + t.address : '') + '.']
   ];
 }
@@ -1739,7 +2217,9 @@ function submitForm(t, m, closeForm){
 
   if (t) {
     var live = byId(t.id); if (!live) { closeForm(); return; }
+    var oldK = pubKey(live);
     patchTicket(live, data, [logEntry('edited the ticket details')]);
+    syncStatusSoon(live, oldK);
     closeForm(); toast('Saved');
     return;
   }
@@ -1753,6 +2233,7 @@ function submitForm(t, m, closeForm){
   var reqId = NT.reqId;
   var ref = S.db.collection('tickets').doc();
   retryOnce(function(){ return ref.set(body); }).then(function(){
+    var sb = clone(body); sb.id = ref.id; syncStatus(sb);
     if (!byId(ref.id)) { var loc = clone(body); loc.id = ref.id; S.tickets.unshift(loc); }
     closeForm(); toast('Ticket #' + body.num + ' created');
     S.filter = 'active'; S.q = ''; render();
@@ -1795,6 +2276,7 @@ function ticketDoc(t){
     '<h2>Condition at check-in</h2><div class="cl">'+pre+'</div>' +
     '<p><b>Existing damage:</b> '+esc(t.damage||'None noted')+(t.liquid?' · <b>Signs of liquid damage</b>':'')+'</p>' +
     '<div class="box"><b>Please read.</b> Back up your data; we aren’t responsible for data loss. Opening a phone carries risks even when done correctly, including damage to the original screen, loss of water resistance and parts notices in Settings. We warranty a part only when our supplier does; Incell parts have no warranty. Any new cracks, pressure marks, frame damage or liquid voids the warranty. Payment is due when the repair is done. Full policy: ifixphones.net/policy.html</div>' +
+    '<div style="display:flex;gap:14px;align-items:center;margin-top:14px;border:1px solid #ddd;border-radius:8px;padding:8px 12px">' + qrSvg(statusUrl(t), 84) + '<div><b>Check your repair anytime</b><br>Scan the code or visit <b>ifixphones.net/status.html</b><br>Ticket #'+esc(t.num)+' · last 4 of your phone number</div></div>' +
     '<p style="margin-top:12px">I agree to the iFixPhones Warranty and Repair Policy and approve the repairs listed above.</p>' +
     (t.sig ? '<div class="sig"><div class="sv"><img src="'+esc(t.sig)+'" alt=""><span>Customer signature</span></div><div class="sv"><b>'+esc(dateOnly(t.sigAt))+'</b><span>Date</span></div></div>' : '<div class="sig"><div>Customer signature</div><div>Date</div></div>') +
     '</body></html>';
@@ -1955,7 +2437,7 @@ document.addEventListener('click', async function(e){
       if (!t) break;
       var pid2 = a.getAttribute('data-pid'); var pr = (t.parts||[]).filter(function(x){ return x.id === pid2; })[0]; if (!pr) break;
       var okp = await confirmBox('Remove this part?', pr.name, 'Remove', true);
-      if (okp) { var live2 = byId(t.id); if (live2) patchTicket(live2, {parts:(live2.parts||[]).filter(function(x){ return x.id !== pid2; })}, [logEntry('removed part “' + pr.name + '”')]); }
+      if (okp) { var live2 = byId(t.id); if (live2) { patchTicket(live2, {parts:(live2.parts||[]).filter(function(x){ return x.id !== pid2; })}, [logEntry('removed part “' + pr.name + '”' + (pr.stockId && pr.status !== 'used' ? ' and put it back in stock' : ''))]); if (pr.stockId && pr.status !== 'used') stockQty(pr.stockId, 1); } }
       break;
     }
     case 'status': if (t && !a.disabled) setStatus(t, a.getAttribute('data-v')); break;
@@ -1994,6 +2476,21 @@ document.addEventListener('click', async function(e){
     case 'edit': if (t) ticketForm(t); break;
     case 'print': if (t) printTicket(t); break;
     case 'label': if (t) printLabel(t); break;
+    case 'followups': followBox(); break;
+    case 'closeout': printHtml(closeoutDoc()); break;
+    case 'pmode': S.pMode = a.getAttribute('data-v'); S.q = ''; render(); break;
+    case 'stockadd': stockBox(null); break;
+    case 'stockedit': { var si = (S.inv||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (si) stockBox(si); break; }
+    case 'stockqty': stockQty(a.getAttribute('data-id'), +a.getAttribute('data-v')); break;
+    case 'usestock': { var sp = $('#stk-pick'); if (t && sp && sp.value) useStock(t, sp.value); break; }
+    case 'bbadd': bbBox(null); break;
+    case 'bbedit': { var bi = (S.bb||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (bi) bbBox(bi); break; }
+    case 'photo': if (t) photoBox(t, a.getAttribute('data-k')); break;
+    case 'apvnew': if (t) apvBox(t); break;
+    case 'rqbuy': { var rb = reqById(a.getAttribute('data-id')); if (rb) bbBox(null, {model:rb.device||'', cond: BB_COND.indexOf(rb.repair) > -1 ? rb.repair : 'Good', lock:rb.screen||'', sellerName:rb.name||'', sellerPhone:rb.phone||'', notes:rb.notes||'', reqId:rb.id}); break; }
+    case 'warranty': warrantyBox(); break;
+    case 'saverev': { var u = ($('#revurl')||{}).value || ''; u = u.trim(); if (u && !/^https:\/\//i.test(u)) { toast('Paste the full link starting with https://'); break; } savePublic({reviewUrl: u}); break; }
+    case 'rmprice': { var pr2 = ((S.pub||{}).prices||[]).slice(); pr2.splice(+a.getAttribute('data-i'), 1); savePublic({prices: pr2}); break; }
     case 'rq': { var rq = reqById(a.getAttribute('data-id')), rv = a.getAttribute('data-v'); if (!rq) break; if (rv === 'cancel' && !confirm('Cancel this booking?' + (isBooking(rq) ? ' ' + rq.time + ' opens up again on the website.' : ''))) break; setReqStatus(rq, rv); break; }
     case 'rqdel': { var rd = reqById(a.getAttribute('data-id')); if (!rd || !confirm('Delete this booking for good?')) break; deleteReq(rd); break; }
     case 'rqmove': { var rm = reqById(a.getAttribute('data-id')); if (rm) moveBox(rm); break; }
@@ -2009,7 +2506,7 @@ document.addEventListener('click', async function(e){
       if (!t) break;
       var ok3 = await confirmBox('Delete ticket #' + t.num + '?', 'This removes the ticket and its history for everyone. It can’t be undone. To keep a record, cancel it instead.', 'Delete ticket', true);
       if (!ok3) break;
-      var id = t.id; closeSheet();
+      var id = t.id; dropStatus(t); closeSheet();
       S.tickets = S.tickets.filter(function(x){ return x.id !== id; }); render();
       enqueue('tickets/'+id, function(){ return retryOnce(function(){ return S.db.doc('tickets/'+id).delete(); }); }).then(function(){ toast('Ticket deleted'); }).catch(writeErr);
       break;
@@ -2020,6 +2517,7 @@ document.addEventListener('click', async function(e){
 document.addEventListener('change', function(e){
   if (e.target.closest('.modal')) return;
   var el = e.target;
+  if (el.hasAttribute && el.hasAttribute('data-photoin')) { var pt = S.openId ? byId(S.openId) : null; if (pt) addPhotos(pt, el.files); el.value = ''; return; }
   var sk = el.getAttribute('data-setting');
   if (sk) { var o = {}; o[sk] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(o); toast('Saved'); return; }
   var t = S.openId ? byId(S.openId) : null;
@@ -2058,6 +2556,12 @@ document.addEventListener('submit', function(e){
     $('#pn').value = ''; $('#pc2').value = '';
     patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('added part “' + part.name + '” from ' + sup)]);
     return;
+  }
+  if (f.getAttribute('data-form') === 'addprice') {
+    var pm = $('#pg-model').value.trim(), pf = num($('#pg-from').value);
+    if (!pm || !pf) { toast('Enter a model and a starting price'); return; }
+    var pl = ((S.pub||{}).prices||[]).concat([{model: pm.slice(0,40), repair: $('#pg-rep').value, from: pf}]);
+    savePublic({prices: pl}); return;
   }
   if (f.getAttribute('data-form') === 'addtech') {
     e.preventDefault();
