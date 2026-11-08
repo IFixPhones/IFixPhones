@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iFixPhones Tickets</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<script src="fb-app.js"></script>
+<script src="fb-auth.js"></script>
+<script src="fb-firestore.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white:#fff;--mist:#f5f5f7;--mist2:#ececf0;--ink:#1d1d1f;--graphite:#6e6e73;--line:#d2d2d7;--line2:#e5e5ea;
+  --blue:#0071e3;--blue-h:#0077ed;--link:#0066cc;--green:#1a7f37;--red:#c9302c;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--mist);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.45;letter-spacing:-.01em;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+a{color:var(--link);text-decoration:none}
+:focus-visible{outline:3px solid rgba(0,113,227,.45);outline-offset:2px;border-radius:8px}
+.hidden{display:none!important}
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.gate .card{background:#fff;border-radius:22px;box-shadow:0 10px 40px rgba(0,0,0,.08);padding:44px 36px;max-width:380px;width:100%;text-align:center}
+.gate h1{font-size:28px;letter-spacing:-.02em;margin-bottom:6px}
+.gate p{color:var(--graphite);margin-bottom:26px}
+.gbtn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:12px 22px;font-weight:600;font-size:15px}
+.gbtn:hover{background:var(--mist)}
+.gate .err{color:var(--red);margin-top:16px;font-size:14px;min-height:20px}
+.muted{color:var(--graphite)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
+.top .tin{max-width:1200px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:16px}
+.brand{font-weight:700;font-size:19px;letter-spacing:-.035em;white-space:nowrap}
+.brand span{color:var(--graphite);font-weight:500;margin-left:6px}
+.tabs{display:flex;background:var(--mist);border-radius:10px;padding:3px;gap:2px}
+.tabs button{border:0;background:transparent;padding:6px 14px;border-radius:8px;font-size:14px;color:var(--ink)}
+.tabs button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.grow{flex:1}
+.me{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px 5px 5px;font-size:14px;white-space:nowrap}
+.av{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:9px 18px;font-size:15px;font-weight:500;white-space:nowrap}
+.btn:hover{background:var(--blue-h)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{background:var(--mist)}
+.btn.dark{background:var(--ink)}
+.btn.dark:hover{background:#000}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.danger{background:#fff;color:var(--red);box-shadow:inset 0 0 0 1px #f0c9c7}
+.btn[disabled]{opacity:.5;cursor:default}
+.link{border:0;background:none;color:var(--link);padding:0;font-size:inherit}
+.link.red{color:var(--red)}
+@media (max-width:820px){.tabs{display:none}.top .tin{gap:10px}.me .nm{display:none}.me{padding:4px}.newtxt{display:none}}
+
+.wrap{max-width:1200px;margin:0 auto;padding:22px 20px 120px}
+.mtabs{display:none;margin-bottom:14px}
+@media (max-width:820px){.mtabs{display:flex}.mtabs.tabs button{flex:1;padding:6px 4px;font-size:13px}}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat{background:#fff;border-radius:var(--r);padding:16px 18px;border:0;text-align:left;width:100%}
+button.stat:hover{box-shadow:inset 0 0 0 1px var(--line)}
+.stat b{display:block;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.stat span{font-size:13px;color:var(--graphite)}
+@media (max-width:820px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat b{font-size:24px}}
+
+/* toolbar */
+.bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.search{position:relative;flex:1 1 280px}
+.search input{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 14px 11px 40px;font-size:15px;outline:none}
+.search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.18)}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.chip i{font-style:normal;color:var(--graphite);font-size:12px}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip[aria-pressed="true"] i{color:#c7c7cc}
+
+/* list */
+.list{background:#fff;border-radius:var(--r);overflow:hidden}
+.lhead,.row{display:grid;grid-template-columns:76px minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,1fr) 150px 90px 90px;gap:14px;align-items:center;padding:0 18px}
+.lhead{font-size:12px;color:var(--graphite);font-weight:600;height:40px;border-bottom:1px solid var(--line2)}
+.row{width:100%;border:0;background:#fff;text-align:left;min-height:64px;border-bottom:1px solid var(--line2);padding-top:10px;padding-bottom:10px}
+.row:last-child{border-bottom:0}
+.row:hover{background:#fafafc}
+.num{font-weight:600;font-variant-numeric:tabular-nums}
+.t1{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t2{font-size:13px;color:var(--graphite);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.right{text-align:right}
+.amt{font-weight:600;font-variant-numeric:tabular-nums}
+.paid{font-size:12px;color:var(--green);font-weight:600}
+.due{font-size:12px;color:#b25000;font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px 4px 8px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.pill i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.mobtag{display:inline-block;font-size:11px;font-weight:600;color:var(--blue);background:#e8f2ff;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.empty{padding:56px 20px;text-align:center}
+.empty h3{font-size:20px;letter-spacing:-.02em}
+.empty p{color:var(--graphite);margin:6px 0 18px}
+.notice{background:#fff;border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:14px;display:flex;gap:10px;align-items:center}
+.notice.warn{background:#fff8ec}
+@media (max-width:820px){
+  .lhead{display:none}
+  .list{background:transparent;display:grid;gap:10px}
+  .row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"a b" "c c" "d e";border-radius:var(--r);border:0;padding:14px 16px;gap:4px 12px}
+  .row .c-num{grid-area:a}.row .c-st{grid-area:b;justify-self:end}.row .c-cust{grid-area:c}.row .c-dev{grid-area:d;align-self:end}.row .c-tech{display:none}.row .c-age{display:none}.row .c-amt{grid-area:e;align-self:end}
+  .row .c-cust .t2{display:none}
+}
+
+/* parts */
+.pgroup{margin-bottom:18px}
+.pgroup h2{font-size:15px;font-weight:600;margin:0 0 8px 2px;display:flex;gap:8px;align-items:center}
+.pgroup h2 i{font-style:normal;color:var(--graphite);font-weight:500}
+.prow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.2fr) 90px auto;gap:12px;align-items:center;background:#fff;padding:12px 16px;border-bottom:1px solid var(--line2)}
+.plist{border-radius:var(--r);overflow:hidden}
+.prow:last-child{border-bottom:0}
+.prow .open{border:0;background:none;text-align:left;padding:0;color:inherit;min-width:0}
+.prow .open:hover .t1{color:var(--link)}
+@media (max-width:820px){.prow{grid-template-columns:minmax(0,1fr) auto;gap:4px 10px}.prow .hide-s{display:none}}
+.pitem{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14px;flex-wrap:wrap}
+.pitem:last-child{border-bottom:0}
+.pst{display:inline-flex;background:var(--mist);border-radius:8px;padding:2px;gap:2px}
+.pst button{border:0;background:transparent;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:600;color:var(--graphite)}
+.pst button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.addp{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 90px auto;gap:8px;margin-top:10px}
+@media (max-width:620px){.addp{grid-template-columns:1fr 1fr}}
+.duel{font-size:12px;font-weight:600;margin-top:3px}
+.duel.late{color:var(--red)}
+.duel.soon{color:#a04a00}
+.duel.wait{color:var(--graphite)}
+.wbadge{display:inline-block;font-size:11px;font-weight:600;color:#7a3e00;background:#fff1e0;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+
+/* reports */
+.rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+@media (max-width:820px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rtable{width:100%;border-collapse:collapse;font-size:14px}
+.rtable th{text-align:left;font-size:12px;color:var(--graphite);font-weight:600;padding:8px 0;border-bottom:1px solid var(--line2)}
+.rtable td{padding:10px 0;border-bottom:1px solid var(--line2)}
+.rtable tr:last-child td{border-bottom:0}
+.barw{height:8px;background:var(--mist);border-radius:4px;overflow:hidden;min-width:60px}
+.barw i{display:block;height:100%;background:var(--ink);border-radius:4px}
+.tpl{border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.tpl b{font-size:14px}
+.tpl p{font-size:14px;color:var(--graphite);margin:4px 0 8px;white-space:pre-wrap}
+
+/* item description row */
+.irow .desc{grid-column:1/-1}
+/* profile */
+.hist{border:1px solid var(--line2);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.hist .hh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.hist ul{list-style:none;margin-top:8px;font-size:14px}
+.hist li{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.hist .pu{font-size:13px;color:var(--graphite);margin-top:6px}
+.devs{display:flex;flex-wrap:wrap;gap:8px}
+.dev{background:var(--mist);border-radius:10px;padding:8px 12px;font-size:14px}
+.dev b{display:block}
+.dev span{font-size:12px;color:var(--graphite)}
+.nameb{border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit}
+.nameb:hover{color:var(--link)}
+
+/* customers */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ccard{background:#fff;border:0;border-radius:var(--r);padding:16px 18px;text-align:left;width:100%}
+.ccard:hover{box-shadow:inset 0 0 0 1px var(--line)}
+.ccard b{font-size:16px;display:block}
+.ccard .meta{display:flex;gap:14px;margin-top:10px;font-size:13px;color:var(--graphite)}
+.ccard .meta strong{color:var(--ink);font-weight:600}
+
+/* settings */
+.panel{background:#fff;border-radius:var(--r);padding:22px 24px;margin-bottom:14px}
+.panel h2{font-size:19px;letter-spacing:-.02em}
+.panel p.d{color:var(--graphite);font-size:14px;margin:4px 0 14px}
+.techs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tchip{display:inline-flex;align-items:center;gap:8px;background:var(--mist);border-radius:999px;padding:5px 6px 5px 5px;font-size:14px}
+.tchip button{border:0;background:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:var(--graphite)}
+.inline{display:flex;gap:8px;max-width:420px}
+.inline input{flex:1}
+
+/* form controls */
+.f{display:flex;flex-direction:column;gap:5px}
+.f label,.lab{font-size:12.5px;font-weight:600;color:var(--graphite)}
+.in{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;font-size:15px;outline:none;min-height:42px}
+textarea.in{min-height:76px;resize:vertical}
+select.in{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.in:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.18)}
+.in.bad{border-color:var(--red);background:#fff6f6}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:620px){.g2,.g3{grid-template-columns:1fr}}
+.seg{display:inline-flex;background:var(--mist);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:14px}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{width:18px;height:18px;margin-top:1px;accent-color:var(--blue);flex:none}
+
+/* checklist */
+.cl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px}
+@media (max-width:620px){.cl{grid-template-columns:1fr}}
+.cli{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.tri{display:inline-flex;background:var(--mist);border-radius:8px;padding:2px;flex:none}
+.tri button{border:0;background:transparent;width:34px;height:28px;border-radius:6px;font-size:13px;font-weight:700;color:#aeaeb2}
+.tri button[aria-pressed="true"][data-v="ok"]{background:#fff;color:var(--green);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tri button[aria-pressed="true"][data-v="bad"]{background:#fff;color:var(--red);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tri button[aria-pressed="true"][data-v="na"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.cllegend{font-size:12px;color:var(--graphite);margin-top:8px}
+
+/* overlay / sheet / modal */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:40;opacity:0;transition:opacity .2s ease}
+.scrim.on{opacity:1}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(620px,100%);background:var(--mist);z-index:41;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 60px rgba(0,0,0,.12)}
+.sheet.on{transform:none}
+.shead{background:#fff;padding:16px 20px 14px;border-bottom:1px solid var(--line2);display:flex;align-items:flex-start;gap:12px}
+.shead h2{font-size:24px;letter-spacing:-.03em;line-height:1.1}
+.shead .sub{font-size:13px;color:var(--graphite);margin-top:3px}
+.x{border:0;background:var(--mist);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.x:hover{background:var(--mist2)}
+.sbody{flex:1;overflow-y:auto;padding:16px 16px 30px;-webkit-overflow-scrolling:touch}
+.card{background:#fff;border-radius:var(--r);padding:16px 18px;margin-bottom:12px}
+.card h3{font-size:13px;font-weight:600;color:var(--graphite);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:7px 12px;font-size:14px}
+.kv dt{color:var(--graphite)}
+.kv dd{word-break:break-word}
+.big{font-size:18px;font-weight:600;letter-spacing:-.02em}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.step{border:0;background:var(--mist);border-radius:10px;padding:10px 6px 9px;font-size:12px;font-weight:600;color:var(--graphite);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;line-height:1.2}
+.step i{width:10px;height:10px;border-radius:50%;background:#d2d2d7}
+.step.past{color:var(--ink)}
+.step.past i{background:var(--ink)}
+.step.cur{background:var(--ink);color:#fff}
+.step.cur i{background:#fff}
+@media (max-width:520px){.steps{gap:4px}.step{font-size:11px;padding:9px 2px 8px}}
+.items{width:100%;border-collapse:collapse;font-size:14px}
+.items td{padding:7px 0;border-bottom:1px solid var(--line2)}
+.items tr:last-child td{border-bottom:0}
+.items .p{color:var(--graphite);font-size:13px}
+.tot{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+.tot.b{font-weight:700;font-size:16px;border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+.feed{list-style:none;margin-top:12px}
+.feed li{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line2);font-size:14px}
+.feed li:first-child{border-top:0}
+.feed .av{width:24px;height:24px;font-size:11px}
+.feed .w{font-weight:600}
+.feed .when{color:var(--graphite);font-size:12px;white-space:nowrap}
+.feed .note{background:var(--mist);border-radius:10px;padding:8px 10px;margin-top:4px;white-space:pre-wrap}
+.sfoot{background:#fff;border-top:1px solid var(--line2);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+.modal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+.mbox{background:#fff;border-radius:20px;width:min(760px,100%);box-shadow:0 30px 80px rgba(0,0,0,.25);transform:translateY(12px);opacity:0;transition:transform .2s ease,opacity .2s ease}
+.modal.on .mbox{transform:none;opacity:1}
+.mbox.sm{width:min(440px,100%)}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line2)}
+.mhead h2{font-size:21px;letter-spacing:-.025em}
+.mbody{padding:18px 22px}
+.msec{padding:6px 0 18px}
+.msec+.msec{border-top:1px solid var(--line2);padding-top:18px}
+.msec h3{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.msec h3 .n{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;display:grid;place-items:center}
+.mfoot{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:14px 22px;border-top:1px solid var(--line2);background:#fff;border-radius:0 0 20px 20px;flex:none}
+.mbox.tall{display:flex;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px)}
+.mbox.tall .mhead{flex:none}
+.mbox.tall .mbody{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
+@media (max-width:620px){.modal.formm{padding:0}.modal.formm .mbox.tall{max-height:100vh;max-height:100dvh;height:100dvh;border-radius:0}.modal.formm .mfoot{border-radius:0;padding-bottom:calc(14px + env(safe-area-inset-bottom))}}
+.irow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 110px 36px;gap:8px;margin-bottom:8px}
+.irow .del{border:0;background:var(--mist);border-radius:10px;color:var(--graphite)}
+@media (max-width:620px){.irow{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.irow .pr{grid-column:1}.irow .del{grid-column:2;height:42px}}
+.hint{font-size:12.5px;color:var(--graphite);margin-top:6px}
+.match{background:#e8f2ff;border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+.err{color:var(--red);font-size:13.5px;margin-right:auto}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.pick button{border:1px solid var(--line);background:#fff;border-radius:14px;padding:18px 10px;font-size:16px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pick button:hover{border-color:var(--ink)}
+.pick .av{width:44px;height:44px;font-size:17px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-size:14px;z-index:60;opacity:0;transition:all .2s ease;pointer-events:none;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.fab{display:none}
+@media (max-width:820px){.fab{display:inline-flex;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:25;box-shadow:0 8px 24px rgba(0,113,227,.35);padding:14px 20px;font-size:16px}}
+.skel{height:64px;border-bottom:1px solid var(--line2);background:linear-gradient(90deg,#fff 0,#f5f5f7 50%,#fff 100%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- constants ---------- */
+var STATUSES = [
+  {k:'in',     label:'Checked in',       short:'Checked in', c:'#515154', bg:'#ececf0'},
+  {k:'part',   label:'Waiting on part',  short:'Part',       c:'#a04a00', bg:'#fff1e0'},
+  {k:'repair', label:'Repairing',        short:'Repairing',  c:'#0058b0', bg:'#e6f0fc'},
+  {k:'ready',  label:'Ready for pickup', short:'Ready',      c:'#14692c', bg:'#e5f5ea'},
+  {k:'done',   label:'Picked up',        short:'Picked up',  c:'#1d1d1f', bg:'#f2f2f4'},
+  {k:'cancel', label:'Cancelled',        short:'Cancelled',  c:'#9b2c27', bg:'#fbeceb'}
+];
+var SMAP = {}; STATUSES.forEach(function(s){ SMAP[s.k] = s; });
+var FLOW = ['in','part','repair','ready','done'];
+var ACTIVE = ['in','part','repair','ready'];
+var REPAIRS = ['Screen','Battery','Charging port','Back glass','Rear camera','Front camera','Camera lens','Earpiece speaker','Loudspeaker','Microphone','Face ID / Touch ID','Buttons','Water damage','Board / soldering','Unlock','Software / update','Data recovery','Diagnostic','Other repair'];
+var CATALOG = {
+  'Apple iPhone': ['iPhone 18 Pro Max','iPhone 18 Pro','iPhone Duo','iPhone 17 Pro Max','iPhone 17 Pro','iPhone Air','iPhone 17','iPhone 17e','iPhone 16 Pro Max','iPhone 16 Pro','iPhone 16 Plus','iPhone 16','iPhone 16e','iPhone 15 Pro Max','iPhone 15 Pro','iPhone 15 Plus','iPhone 15','iPhone 14 Pro Max','iPhone 14 Pro','iPhone 14 Plus','iPhone 14','iPhone 13 Pro Max','iPhone 13 Pro','iPhone 13','iPhone 13 mini','iPhone 12 Pro Max','iPhone 12 Pro','iPhone 12','iPhone 12 mini','iPhone 11 Pro Max','iPhone 11 Pro','iPhone 11','iPhone SE (3rd gen)','iPhone SE (2nd gen)','iPhone XS Max','iPhone XS','iPhone XR','iPhone X','iPhone 8 Plus','iPhone 8','iPhone 7 Plus','iPhone 7'],
+  'Apple iPad': ['iPad Pro 13" (M5)','iPad Pro 11" (M5)','iPad Pro 13" (M4)','iPad Pro 11" (M4)','iPad Pro 12.9" (6th gen)','iPad Pro 11" (4th gen)','iPad Air 13" (M3)','iPad Air 11" (M3)','iPad Air 13" (M2)','iPad Air 11" (M2)','iPad Air (5th gen)','iPad Air (4th gen)','iPad (A16)','iPad (10th gen)','iPad (9th gen)','iPad (8th gen)','iPad (7th gen)','iPad mini (A17 Pro)','iPad mini (6th gen)','iPad mini (5th gen)'],
+  'Samsung': ['Galaxy S26 Ultra','Galaxy S26+','Galaxy S26','Galaxy S25 Ultra','Galaxy S25+','Galaxy S25','Galaxy S25 Edge','Galaxy S25 FE','Galaxy S24 Ultra','Galaxy S24+','Galaxy S24','Galaxy S24 FE','Galaxy S23 Ultra','Galaxy S23+','Galaxy S23','Galaxy S23 FE','Galaxy S22 Ultra','Galaxy S22+','Galaxy S22','Galaxy S21 Ultra','Galaxy S21','Galaxy Z Fold 8 Ultra','Galaxy Z Fold 8','Galaxy Z Flip 8','Galaxy Z Fold 7','Galaxy Z Flip 7','Galaxy Z Flip 7 FE','Galaxy Z Fold 6','Galaxy Z Flip 6','Galaxy Z Fold 5','Galaxy Z Flip 5','Galaxy A57','Galaxy A37','Galaxy A27','Galaxy A17','Galaxy A56','Galaxy A36','Galaxy A26','Galaxy A16','Galaxy A55','Galaxy A35','Galaxy A25','Galaxy A15','Galaxy A54','Galaxy A14','Galaxy Tab S10','Galaxy Tab S9','Galaxy Tab A9'],
+  'Google Pixel': ['Pixel 11 Pro XL','Pixel 11 Pro','Pixel 11','Pixel 11 Pro Fold','Pixel 10a','Pixel 10 Pro XL','Pixel 10 Pro','Pixel 10','Pixel 10 Pro Fold','Pixel 9a','Pixel 9 Pro XL','Pixel 9 Pro','Pixel 9','Pixel 9 Pro Fold','Pixel 8a','Pixel 8 Pro','Pixel 8','Pixel 7a','Pixel 7 Pro','Pixel 7','Pixel 6a','Pixel 6 Pro','Pixel 6'],
+  'Motorola': ['Moto G Stylus','Moto G Power','Moto G','Moto G Play','Edge','Razr','Razr+'],
+  'OnePlus': ['OnePlus 13','OnePlus 13R','OnePlus 12','OnePlus 12R','OnePlus 11','OnePlus Nord N30'],
+  'Other': []
+};
+var BRANDS = Object.keys(CATALOG);
+function guessBrand(model){
+  model = String(model||'').toLowerCase(); if (!model) return '';
+  for (var i = 0; i < BRANDS.length; i++) { var b = BRANDS[i]; if (CATALOG[b].some(function(m){ return m.toLowerCase() === model; })) return b; }
+  if (/ipad/.test(model)) return 'Apple iPad'; if (/iphone/.test(model)) return 'Apple iPhone'; if (/galaxy|samsung/.test(model)) return 'Samsung'; if (/pixel/.test(model)) return 'Google Pixel'; if (/moto|razr/.test(model)) return 'Motorola'; if (/oneplus/.test(model)) return 'OnePlus';
+  return 'Other';
+}
+var PARTS = ['','Incell','OLED','Refurbished original','Genuine Apple','Aftermarket'];
+var WARR = ['None','30 days','90 days','6 months','1 year'];
+var CHECKS = [['power','Powers on'],['display','Display'],['touch','Touch'],['bio','Face ID / Touch ID'],['fcam','Front camera'],['rcam','Rear camera'],['ear','Earpiece'],['spk','Loudspeaker'],['mic','Microphone'],['charge','Charging'],['btn','Buttons'],['net','Wi-Fi / cellular']];
+var PAY = ['Cash','Card','Zelle / Cash App','Other'];
+var DEFAULT_TECHS = ['Mark','Ray','David'];
+var SUPPLIERS = ['MobileSentrix','Injured Gadgets','Phone LCD Parts','Wholesale Gadget Parts','Amazon','Other'];
+var PSTAT = [['needed','Needs order'],['ordered','Ordered'],['arrived','Arrived'],['used','Installed']];
+var PSMAP = {}; PSTAT.forEach(function(p){ PSMAP[p[0]] = p[1]; });
+var VIEWS = [['tickets','Tickets'],['parts','Parts'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
+var SHOP = {name:'iFixPhones', addr:'9055 Marbach Rd, Suite 105, San Antonio, TX', shop:'(210) 773-3548', mobile:'(210) 724-2800', web:'ifixphones.net'};
+
+/* ---------- state ---------- */
+var S = {
+  db:null, user:null, dl:null, canWrite:true,
+  status:'loading', slow:false,
+  tickets:[], settings:{techs:DEFAULT_TECHS.slice()}, settingsLoaded:false,
+  view:'tickets', filter:'active', q:'',
+  openId:null, me:null
+};
+try { S.me = localStorage.getItem('ifx_tech') || null; } catch(e) {}
+
+/* ---------- helpers ---------- */
+function $(s, r){ return (r||document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function digits(s){ return String(s||'').replace(/\D/g,''); }
+function fmtPhone(s){ var d = digits(s); if (d.length === 11 && d[0] === '1') d = d.slice(1); if (d.length === 10) return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); return s || ''; }
+function e164(s){ var d = digits(s); if (d.length === 10) return '+1' + d; if (d.length === 11 && d[0]==='1') return '+' + d; return d; }
+function money(n){ n = Number(n)||0; return '$' + (Math.round(n*100) % 100 ? n.toFixed(2) : String(Math.round(n))); }
+function num(n){ var v = parseFloat(String(n).replace(/[^0-9.]/g,'')); return isFinite(v) ? Math.round(v*100)/100 : 0; }
+function initials(n){ n = String(n||'?').trim(); var p = n.split(/\s+/); return ((p[0]||'?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+function dt(t){ if (!t) return ''; var d = new Date(t); return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+function dateOnly(t){ return new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function rel(t){
+  if (!t) return '';
+  var s = (Date.now() - t)/1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  var d = Math.floor(s/86400);
+  if (d === 1) return 'yesterday';
+  if (d < 7) return d + 'd ago';
+  return new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function sameDay(a, b){ var x = new Date(a), y = new Date(b); return x.getFullYear()===y.getFullYear() && x.getMonth()===y.getMonth() && x.getDate()===y.getDate(); }
+function pill(k){ var s = SMAP[k] || SMAP['in']; return '<span class="pill" style="color:'+s.c+';background:'+s.bg+'"><i></i>'+esc(s.label)+'</span>'; }
+function total(t){ return (t.items||[]).reduce(function(a,i){ return a + num(i.price); }, 0); }
+function balance(t){ return Math.max(0, total(t) - num(t.deposit)); }
+function itemName(i){ return (i.repair === 'Other repair' || i.repair === 'Other') && i.desc ? i.desc : i.repair; }
+function repairsText(t){ return (t.items||[]).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
+function who(){ return S.me || 'Staff'; }
+function byId(id){ for (var i=0;i<S.tickets.length;i++) if (S.tickets[i].id === id) return S.tickets[i]; return null; }
+function clone(o){ return JSON.parse(JSON.stringify(o||{})); }
+function uid(){ return Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4); }
+function partsCost(t){ return (t.parts||[]).reduce(function(a,p){ return a + num(p.cost); }, 0); }
+function openParts(t){ return (t.parts||[]).filter(function(p){ return p.status === 'needed' || p.status === 'ordered'; }); }
+function isOverdue(t){ return !!t.dueAt && t.dueAt < Date.now() && ['in','part','repair'].indexOf(t.status) > -1; }
+function daysSince(ts){ return ts ? Math.floor((Date.now() - ts)/86400000) : 0; }
+function readyAt(t){
+  var l = (t.log||[]); for (var i = l.length-1; i >= 0; i--) if (/changed status to Ready/.test(l[i].what||'')) return l[i].t;
+  return t.updatedAt || t.createdAt;
+}
+function dueText(ts){
+  var d = new Date(ts), now = new Date();
+  var time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if (sameDay(ts, now)) return 'today ' + time;
+  var tm = new Date(now); tm.setDate(tm.getDate()+1);
+  if (sameDay(ts, tm)) return 'tomorrow ' + time;
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ' ' + time;
+}
+function toLocalInput(ts){ if (!ts) return ''; var d = new Date(ts); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,16); }
+function fromLocalInput(v){ if (!v) return 0; var d = new Date(v); return isNaN(d) ? 0 : d.getTime(); }
+function warrantyEnd(t){
+  if (!t.pickedUpAt) return 0;
+  var m = String(t.warranty||'').match(/(\d+)\s*(day|month|year)/i); if (!m) return 0;
+  var d = new Date(t.pickedUpAt), n = +m[1], u = m[2].toLowerCase();
+  if (u === 'day') d.setDate(d.getDate() + n); else if (u === 'month') d.setMonth(d.getMonth() + n); else d.setFullYear(d.getFullYear() + n);
+  return d.getTime();
+}
+function lastPrice(model, repair, part, exceptId){
+  model = String(model||'').trim().toLowerCase(); if (!model || !repair) return null;
+  for (var i = 0; i < S.tickets.length; i++) {
+    var t = S.tickets[i]; if (t.id === exceptId) continue;
+    if (String(t.device && t.device.model || '').trim().toLowerCase() !== model) continue;
+    var it = (t.items||[]).filter(function(x){ return x.repair === repair && (x.part||'') === (part||'') && num(x.price); })[0];
+    if (it) return num(it.price);
+  }
+  return null;
+}
+
+var toastT;
+function toast(msg){ var el = $('#toast'); el.textContent = msg; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ el.classList.remove('on'); }, 2600); }
+
+/* one write at a time per document */
+var queues = {};
+function enqueue(key, fn){
+  var p = (queues[key] || Promise.resolve()).then(fn, fn);
+  queues[key] = p.catch(function(){});
+  return p;
+}
+function retryOnce(fn){
+  return fn().catch(function(e){
+    if (e && e.code === 'unavailable') return new Promise(function(r){ setTimeout(r, 600 + Math.random()*600); }).then(fn);
+    throw e;
+  });
+}
+function writeErr(e){
+  var c = e && e.code;
+  if (c === 'permission-denied') { toast('No permission. Sign out and sign in with the shop account.'); return; }
+  if (c === 'resource-exhausted') { toast('Storage is full. Export and delete old tickets in Settings.'); return; }
+    toast('Couldn’t save. Check your connection and try again.');
+}
+
+/* ---------- data writes ---------- */
+function logEntry(what, kind){ return {t:Date.now(), who:who(), what:what, kind:kind||'event'}; }
+
+function patchTicket(t, fields, logs){
+  var log = (t.log || []).slice();
+  (logs||[]).forEach(function(l){ log.push(l); });
+  if (log.length > 400) log = log.slice(-400);
+  var body = Object.assign({}, fields, {updatedAt:Date.now(), log:log});
+  // optimistic local apply
+  Object.keys(fields).forEach(function(k){
+    if (fields[k] && typeof fields[k] === 'object' && !Array.isArray(fields[k]) && t[k] && typeof t[k] === 'object') t[k] = Object.assign({}, t[k], fields[k]);
+    else t[k] = fields[k];
+  });
+  t.log = log; t.updatedAt = body.updatedAt;
+  renderSoon();
+  return enqueue('tickets/'+t.id, function(){
+    return retryOnce(function(){ return S.db.doc('tickets/'+t.id).update(body); });
+  }).catch(writeErr);
+}
+
+function nextNum(){
+  var m = 1000;
+  S.tickets.forEach(function(t){ if (t.num > m) m = t.num; });
+  return m + 1;
+}
+
+function saveSettings(patch){
+  var s = Object.assign({}, S.settings, patch);
+  S.settings = s; render();
+  return enqueue('settings/main', function(){
+    return retryOnce(function(){ return S.db.doc('settings/main').set(s); });
+  }).catch(writeErr);
+}
+
+/* ---------- boot ---------- */
+render();
+var loadTimer = setTimeout(function(){ if (S.status === 'loading' || S.cacheOnly) { S.slow = true; render(); } }, 10000);
+
+var FB_CONFIG = {
+  apiKey: "AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI",
+  authDomain: "ifixphones-ca10e.firebaseapp.com",
+  projectId: "ifixphones-ca10e",
+  storageBucket: "ifixphones-ca10e.firebasestorage.app",
+  messagingSenderId: "230387153893",
+  appId: "1:230387153893:web:ddbdac71ff0b1c56284d0c"
+};
+var ALLOWED = ['ubringifix24@gmail.com'];
+
+/* downloads: save a file to the computer */
+S.dl = { save: function(o){
+  return new Promise(function(res){
+    var type = /\.csv$/.test(o.filename) ? 'text/csv' : 'text/html';
+    var url = URL.createObjectURL(new Blob([o.data], {type:type+';charset=utf-8'}));
+    var a = document.createElement('a'); a.href = url; a.download = o.filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000); res();
+  });
+}};
+
+var unsubs = [];
+function stopListening(){ unsubs.forEach(function(u){ try{u();}catch(e){} }); unsubs = []; }
+
+function gate(msg){
+  S.status = 'signin'; clearTimeout(loadTimer);
+  $('#layer').innerHTML = '';
+  $('#app').innerHTML = '<div class="gate"><div class="card"><h1>iFixPhones</h1><p>Tickets · staff only</p>' +
+    '<button class="gbtn" id="gsign"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Sign in with Google</button>' +
+    '<div class="err" role="alert">'+esc(msg||'')+'</div></div></div>';
+  $('#gsign').onclick = function(){
+    var b = this; b.disabled = true;
+    var prov = new firebase.auth.GoogleAuthProvider(); prov.setCustomParameters({prompt:'select_account'});
+    firebase.auth().signInWithPopup(prov).catch(function(e){
+      b.disabled = false;
+      var c = e && e.code;
+      if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return;
+      if (c === 'auth/popup-blocked') return firebase.auth().signInWithRedirect(prov);
+      if (c === 'auth/unauthorized-domain') { $('.gate .err').textContent = 'This address isn’t approved in Firebase yet (Authentication → Settings → Authorized domains).'; return; }
+      $('.gate .err').textContent = 'Couldn’t sign in. Check your connection and try again.';
+    });
+  };
+}
+
+function startData(){
+  var db = firebase.firestore();
+  S.db = db; S.status = 'loading'; render();
+  unsubs.push(db.collection('tickets').orderBy('createdAt','desc').limit(2000).onSnapshot({includeMetadataChanges:true}, function(snap){
+    S.tickets = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    S.status = 'ready';
+    S.cacheOnly = !!snap.metadata.fromCache;
+    if (!snap.metadata.fromCache) { clearTimeout(loadTimer); S.slow = false; }
+    render();
+  }, function(err){
+    clearTimeout(loadTimer);
+    S.status = (err && err.code === 'permission-denied') ? 'revoked' : 'error';
+    render();
+  }));
+  unsubs.push(db.doc('settings/main').onSnapshot(function(snap){
+    S.settingsLoaded = true;
+    if (snap.exists) {
+      var d = snap.data() || {};
+      S.settings = Object.assign({techs:DEFAULT_TECHS.slice()}, clone(d));
+      if (!Array.isArray(S.settings.techs)) S.settings.techs = DEFAULT_TECHS.slice();
+    }
+    render();
+  }, function(){}));
+}
+
+(function(){
+  if (!window.firebase) { S.status = 'nodb'; clearTimeout(loadTimer); render(); return; }
+  firebase.initializeApp(FB_CONFIG);
+  var fs = firebase.firestore();
+  try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch(e) {}
+  try { fs.enablePersistence({synchronizeTabs:true}).catch(function(){}); } catch(e) {}
+  firebase.auth().getRedirectResult().catch(function(){});
+  firebase.auth().onAuthStateChanged(function(u){
+    stopListening();
+    if (!u) { S.authUser = null; gate(); return; }
+    var em = String(u.email||'').toLowerCase();
+    if (ALLOWED.indexOf(em) < 0) {
+      firebase.auth().signOut().then(function(){ gate(em + ' doesn’t have access. Sign in with the shop account.'); });
+      return;
+    }
+    S.authUser = u;
+    startData();
+  });
+})();
+
+function signOut(){
+  if (!confirm('Sign out of iFixPhones Tickets on this computer?')) return;
+  stopListening(); S.tickets = []; S.status = 'loading';
+  firebase.auth().signOut();
+}
+
+/* ---------- rendering ---------- */
+var raf = 0;
+function renderSoon(){ if (raf) return; raf = requestAnimationFrame(function(){ raf = 0; render(); }); }
+
+function render(){
+  if (S.status === 'signin') return;
+  var app = $('#app');
+  app.innerHTML = topbar() + '<div class="wrap">' + mobileTabs() + body() + '</div>' +
+    (S.view === 'tickets' && S.status === 'ready' && S.canWrite ? '<button class="btn fab" data-act="new">+ New ticket</button>' : '');
+  restoreSearchFocus();
+  if (S.openId) renderSheet(); else if (S.profile) renderProfile();
+  maybeAskWho();
+}
+
+function topbar(){
+  var tabs = VIEWS.map(function(t){
+    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+'</button>';
+  }).join('');
+  return '<header class="top"><div class="tin">' +
+    '<div class="brand">iFixPhones<span>Tickets</span></div>' +
+    '<nav class="tabs" aria-label="Sections">' + tabs + '</nav>' +
+    '<div class="grow"></div>' +
+    '<button class="me" data-act="who" aria-label="Working as '+esc(who())+'. Change"><span class="av">'+esc(S.me ? initials(S.me) : '?')+'</span><span class="nm">'+esc(S.me ? S.me : 'Who’s working?')+'</span></button>' +
+    (S.status==='ready' && S.canWrite ? '<button class="btn" data-act="new">+ <span class="newtxt">New ticket</span></button>' : '') +
+  '</div></header>';
+}
+function mobileTabs(){
+  return '<nav class="tabs mtabs" aria-label="Sections">' + VIEWS.map(function(t){
+    return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+'</button>';
+  }).join('') + '</nav>';
+}
+
+function body(){
+  if (S.status === 'nodb') return '<div class="panel empty"><h3>Couldn’t start</h3><p>Check the internet connection, then reload.</p></div>';
+  if (S.status === 'revoked') return '<div class="panel empty"><h3>No access</h3><p>This account can’t open tickets.</p><button class="btn ghost" data-act="signout">Sign out</button></div>';
+  if (S.status === 'error') return '<div class="panel empty"><h3>Tickets couldn’t load</h3><p>Check your connection, then reopen this page.</p></div>';
+  var note = '';
+  if (S.slow) note = '<div class="notice warn">Offline or slow connection. You’re seeing saved tickets; changes will sync when the internet is back.</div>';
+    if (S.status === 'loading') return note + '<div class="list">' + '<div class="skel"></div>'.repeat(6) + '</div>';
+  if (S.view === 'customers') return note + customersView();
+  if (S.view === 'parts') return note + partsView();
+  if (S.view === 'reports') return note + reportsView();
+  if (S.view === 'settings') return note + settingsView();
+  return note + ticketsView();
+}
+
+function counts(){
+  var c = {active:0, all:S.tickets.length};
+  STATUSES.forEach(function(s){ c[s.k] = 0; });
+  c.overdue = 0;
+  S.tickets.forEach(function(t){ c[t.status] = (c[t.status]||0) + 1; if (ACTIVE.indexOf(t.status) > -1) c.active++; if (isOverdue(t)) c.overdue++; });
+  return c;
+}
+
+function matches(t, q){
+  if (!q) return true;
+  var hay = [t.num, t.customer && t.customer.name, t.customer && digits(t.customer.phone), t.device && t.device.model, t.device && t.device.imei, repairsText(t), t.assigned].join(' ').toLowerCase();
+  return q.toLowerCase().split(/\s+/).every(function(w){
+    if (!w) return true;
+    var d = digits(w);
+    return hay.indexOf(w.replace(/^#/,'')) > -1 || (d.length >= 3 && hay.indexOf(d) > -1);
+  });
+}
+
+function ticketsView(){
+  var c = counts();
+  var paidToday = S.tickets.filter(function(t){ return t.paid && t.paidAt && sameDay(t.paidAt, Date.now()); }).reduce(function(a,t){ return a + total(t); }, 0);
+  var stats = '<div class="stats">' +
+    '<button class="stat" data-act="filter" data-v="active"><b>'+c.active+'</b><span>Open tickets</span></button>' +
+    '<button class="stat" data-act="filter" data-v="ready"><b>'+c.ready+'</b><span>Ready for pickup</span></button>' +
+    '<button class="stat" data-act="filter" data-v="overdue"><b'+(c.overdue?' style="color:var(--red)"':'')+'>'+c.overdue+'</b><span>Past promised time</span></button>' +
+    '<div class="stat"><b>'+money(paidToday)+'</b><span>Paid today</span></div>' +
+  '</div>';
+
+  var chipDefs = [['active','Open']].concat(c.overdue || S.filter==='overdue' ? [['overdue','Overdue']] : []).concat(STATUSES.map(function(s){ return [s.k, s.short]; })).concat([['all','All']]);
+  var chips = chipDefs.map(function(d){
+    return '<button class="chip" data-act="filter" data-v="'+d[0]+'" aria-pressed="'+(S.filter===d[0])+'">'+esc(d[1])+' <i>'+(c[d[0]]||0)+'</i></button>';
+  }).join('');
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg>' +
+    '<label class="sr" for="q">Search tickets</label><input id="q" type="search" placeholder="Search name, phone, device, ticket #" value="'+esc(S.q)+'" autocomplete="off"></div></div>' +
+    '<div class="chips" role="group" aria-label="Filter by status" style="margin-bottom:14px">' + chips + '</div>';
+
+  var list = S.tickets.filter(function(t){
+    if (S.filter === 'active' && ACTIVE.indexOf(t.status) < 0) return false;
+    if (S.filter === 'overdue' && !isOverdue(t)) return false;
+    if (['active','all','overdue'].indexOf(S.filter) < 0 && t.status !== S.filter) return false;
+    return matches(t, S.q);
+  });
+
+  var rows;
+  if (!S.tickets.length) {
+    rows = '<div class="empty"><h3>No tickets yet</h3><p>Check in your first repair to get started.</p>' + (S.canWrite ? '<button class="btn" data-act="new">+ New ticket</button>' : '') + '</div>';
+  } else if (!list.length) {
+    rows = '<div class="empty"><h3>Nothing here</h3><p>No tickets match' + (S.q ? ' “'+esc(S.q)+'”' : ' this filter') + '.</p>' + (S.q || S.filter!=='all' ? '<button class="btn ghost" data-act="clearq">Show all tickets</button>' : '') + '</div>';
+  } else {
+    rows = '<div class="lhead"><div>Ticket</div><div>Customer</div><div>Device and repair</div><div>Tech</div><div>Status</div><div class="right">Total</div><div class="right">Updated</div></div>' +
+      list.map(rowHtml).join('');
+  }
+  return stats + bar + '<div class="list">' + rows + '</div>';
+}
+
+function rowHtml(t){
+  var tot = total(t), bal = balance(t);
+  var amt = tot ? '<div class="amt">'+money(tot)+'</div>' + (t.paid ? '<div class="paid">Paid</div>' : (num(t.deposit) ? '<div class="due">'+money(bal)+' due</div>' : '')) : '<div class="t2">No price</div>';
+  return '<button class="row" data-act="open" data-id="'+esc(t.id)+'">' +
+    '<div class="c-num"><span class="num">#'+esc(t.num)+'</span></div>' +
+    '<div class="c-cust"><div class="t1">'+esc(t.customer && t.customer.name)+'</div><div class="t2">'+esc(fmtPhone(t.customer && t.customer.phone))+'</div></div>' +
+    '<div class="c-dev"><div class="t1">'+esc(t.device && t.device.model)+(t.type==='mobile'?'<span class="mobtag">Mobile</span>':'')+(t.warrantyReturn?'<span class="wbadge">Warranty</span>':'')+'</div><div class="t2">'+esc(repairsText(t))+'</div></div>' +
+    '<div class="c-tech t2">'+esc(t.assigned || '—')+'</div>' +
+    '<div class="c-st">'+pill(t.status)+rowSub(t)+'</div>' +
+    '<div class="c-amt right">'+amt+'</div>' +
+    '<div class="c-age right t2" title="'+esc(dt(t.updatedAt))+'">'+esc(rel(t.updatedAt||t.createdAt))+'</div>' +
+  '</button>';
+}
+
+function rowSub(t){
+  if (t.status === 'ready') { var d = daysSince(readyAt(t)); return d >= 2 ? '<div class="duel wait">Waiting '+d+' days</div>' : ''; }
+  if (['in','part','repair'].indexOf(t.status) < 0) return '';
+  var op = openParts(t).length;
+  if (t.dueAt) {
+    var late = t.dueAt < Date.now(), soon = !late && t.dueAt - Date.now() < 2*3600e3;
+    return '<div class="duel '+(late?'late':soon?'soon':'wait')+'">'+(late?'Was due ':'Due ')+esc(dueText(t.dueAt))+'</div>';
+  }
+  return op ? '<div class="duel wait">'+op+' part'+(op===1?'':'s')+' pending</div>' : '';
+}
+
+function partsView(){
+  var all = [];
+  S.tickets.forEach(function(t){ (t.parts||[]).forEach(function(p){ if (p.status !== 'used' && t.status !== 'cancel' && t.status !== 'done') all.push({t:t, p:p}); }); });
+  if (S.q) all = all.filter(function(x){ return (x.p.name + ' ' + x.p.supplier + ' ' + x.p.orderNo + ' ' + x.t.num + ' ' + (x.t.customer&&x.t.customer.name) + ' ' + (x.t.device&&x.t.device.model)).toLowerCase().indexOf(S.q.toLowerCase()) > -1; });
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search parts</label><input id="q" type="search" placeholder="Search part, supplier, order #, customer" value="'+esc(S.q)+'" autocomplete="off"></div></div>';
+  if (!all.length) return bar + '<div class="panel empty"><h3>'+(S.q?'No parts match':'No parts to track')+'</h3><p>Add parts inside a ticket. Anything that needs ordering or is on the way shows up here.</p></div>';
+  var groups = [['needed','Needs ordering'],['ordered','Ordered, on the way'],['arrived','Arrived, ready to install']];
+  return bar + groups.map(function(g){
+    var rows = all.filter(function(x){ return x.p.status === g[0]; });
+    if (!rows.length) return '';
+    rows.sort(function(a,b){ return (a.p.orderedAt||a.t.createdAt) - (b.p.orderedAt||b.t.createdAt); });
+    return '<section class="pgroup"><h2>'+g[1]+' <i>'+rows.length+'</i></h2><div class="plist">' + rows.map(function(x){
+      var p = x.p, t = x.t;
+      var when = p.status === 'ordered' ? 'Ordered ' + rel(p.orderedAt) : p.status === 'arrived' ? 'Arrived ' + rel(p.arrivedAt) : 'Added ' + rel(p.addedAt || t.createdAt);
+      var next = p.status === 'needed' ? ['ordered','Mark ordered'] : p.status === 'ordered' ? ['arrived','Mark arrived'] : ['used','Mark installed'];
+      return '<div class="prow"><button class="open" data-act="open" data-id="'+esc(t.id)+'"><div class="t1">'+esc(p.name)+'</div><div class="t2">#'+esc(t.num)+' · '+esc(t.customer&&t.customer.name)+' · '+esc(t.device&&t.device.model)+'</div></button>' +
+        '<div class="hide-s"><div class="t1" style="font-weight:500">'+esc(p.supplier||'—')+'</div><div class="t2">'+(p.orderNo?'Order '+esc(p.orderNo):'No order #')+'</div></div>' +
+        '<div class="t2 hide-s">'+esc(when)+'</div>' +
+        '<div class="amt right hide-s">'+(num(p.cost)?money(p.cost):'')+'</div>' +
+        (S.canWrite ? '<button class="btn sm '+(p.status==='needed'?'':'ghost')+'" data-act="pstat" data-tid="'+esc(t.id)+'" data-pid="'+esc(p.id)+'" data-v="'+next[0]+'">'+next[1]+'</button>' : '<span></span>') +
+      '</div>';
+    }).join('') + '</div></section>';
+  }).join('');
+}
+
+var RP = 'today';
+function reportsView(){
+  var now = new Date(), start;
+  if (RP === 'today') { start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); }
+  else if (RP === 'week') { start = Date.now() - 7*86400000; }
+  else if (RP === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); }
+  else { start = Date.now() - 30*86400000; }
+  var inR = function(ts){ return ts && ts >= start; };
+  var paid = S.tickets.filter(function(t){ return t.paid && inR(t.paidAt); });
+  var revenue = paid.reduce(function(a,t){ return a + total(t); }, 0);
+  var pcost = paid.reduce(function(a,t){ return a + partsCost(t); }, 0);
+  var created = S.tickets.filter(function(t){ return inR(t.createdAt); }).length;
+  var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
+  var turn = done.length ? done.reduce(function(a,t){ return a + (t.pickedUpAt - t.createdAt); }, 0) / done.length : 0;
+  var turnTxt = !done.length ? '—' : turn < 3600e3 ? Math.max(1, Math.round(turn/60000)) + ' min' : turn < 86400e3 ? (Math.round(turn/360000)/10) + ' hrs' : (Math.round(turn/8640000)/10) + ' days';
+  var seg = '<div class="seg" role="group" aria-label="Period" style="margin-bottom:16px">' + [['today','Today'],['week','7 days'],['month','This month'],['30','30 days']].map(function(o){ return '<button data-act="rp" data-v="'+o[0]+'" aria-pressed="'+(RP===o[0])+'">'+o[1]+'</button>'; }).join('') + '</div>';
+  var tiles = '<div class="rgrid">' +
+    '<div class="stat"><b>'+money(revenue)+'</b><span>Paid</span></div>' +
+    '<div class="stat"><b>'+money(revenue - pcost)+'</b><span>After part costs</span></div>' +
+    '<div class="stat"><b>'+paid.length+'</b><span>Paid tickets</span></div>' +
+    '<div class="stat"><b>'+created+'</b><span>New tickets</span></div>' +
+    '<div class="stat"><b>'+done.length+'</b><span>Picked up</span></div>' +
+    '<div class="stat"><b>'+turnTxt+'</b><span>Average check-in to pickup</span></div>' +
+  '</div>';
+  var byTech = {};
+  done.forEach(function(t){ var k = t.assigned || 'Unassigned'; var o = byTech[k] || (byTech[k] = {n:0, rev:0}); o.n++; if (t.paid) o.rev += total(t); });
+  var techRows = Object.keys(byTech).sort(function(a,b){ return byTech[b].n - byTech[a].n; });
+  var maxN = techRows.reduce(function(m,k){ return Math.max(m, byTech[k].n); }, 1);
+  var techTbl = techRows.length ? '<table class="rtable"><thead><tr><th>Technician</th><th>Picked up</th><th></th><th class="right">Paid</th></tr></thead><tbody>' + techRows.map(function(k){
+    return '<tr><td>'+esc(k)+'</td><td style="width:90px">'+byTech[k].n+'</td><td><div class="barw"><i style="width:'+Math.round(byTech[k].n/maxN*100)+'%"></i></div></td><td class="right amt">'+money(byTech[k].rev)+'</td></tr>';
+  }).join('') + '</tbody></table>' : '<p class="muted">No repairs picked up in this period.</p>';
+  var rep = {};
+  S.tickets.filter(function(t){ return inR(t.createdAt); }).forEach(function(t){ (t.items||[]).forEach(function(i){ var k = ((i.repair === 'Other repair' || i.repair === 'Other') ? 'Other repair' : i.repair) + (i.part ? ' · ' + i.part : ''); rep[k] = (rep[k]||0) + 1; }); });
+  var repRows = Object.keys(rep).sort(function(a,b){ return rep[b]-rep[a]; }).slice(0,8);
+  var maxR = repRows.reduce(function(m,k){ return Math.max(m, rep[k]); }, 1);
+  var repTbl = repRows.length ? '<table class="rtable"><tbody>' + repRows.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:45%"><div class="barw"><i style="width:'+Math.round(rep[k]/maxR*100)+'%"></i></div></td><td class="right" style="width:40px">'+rep[k]+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No tickets in this period.</p>';
+  var pm = {};
+  paid.forEach(function(t){ var k = t.payMethod || 'Not recorded'; pm[k] = (pm[k]||0) + total(t); });
+  var pmTbl = Object.keys(pm).length ? '<table class="rtable"><tbody>' + Object.keys(pm).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(pm[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No payments in this period.</p>';
+  return seg + tiles +
+    '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period, by who was assigned.</p>'+techTbl+'</div>' +
+    '<div class="g2"><div class="panel"><h2>Most common repairs</h2><p class="d">From tickets checked in this period.</p>'+repTbl+'</div>' +
+    '<div class="panel"><h2>Payments</h2><p class="d">By payment method.</p>'+pmTbl+'</div></div>' +
+    '<p class="muted" style="font-size:13px">“After part costs” uses the part costs entered on tickets.</p>';
+}
+
+function custKey(c){ c = c || {}; var d = digits(c.phone).slice(-10); return d ? d : 'n:' + String(c.name||'').trim().toLowerCase(); }
+function custTickets(key){ return S.tickets.filter(function(t){ return custKey(t.customer) === key; }).sort(function(a,b){ return b.createdAt - a.createdAt; }); }
+
+function openProfile(key){
+  S.profile = key; S.openId = null;
+  var layer = $('#layer');
+  layer.innerHTML = '<div class="scrim" data-act="close"></div><aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="pf-title"></aside>';
+  renderProfile();
+  requestAnimationFrame(function(){ $('.scrim', layer).classList.add('on'); $('.sheet', layer).classList.add('on'); var x = $('.sheet .x'); if (x) x.focus(); });
+}
+function renderProfile(){
+  var sheet = $('#layer .sheet'); if (!sheet || !S.profile) return;
+  var list = custTickets(S.profile);
+  if (!list.length) { sheet.innerHTML = '<div class="shead"><div class="grow"><h2 id="pf-title">Customer not found</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>'; return; }
+  var latest = list[0].customer || {};
+  var addr = ''; var email = '';
+  list.forEach(function(t){ if (!addr) addr = (t.customer && t.customer.address) || (t.type === 'mobile' ? t.address : ''); if (!email) email = t.customer && t.customer.email || ''; });
+  var paid = list.filter(function(t){ return t.paid; }).reduce(function(a,t){ return a + total(t); }, 0);
+  var first = list[list.length-1].createdAt;
+  var devs = {};
+  list.forEach(function(t){ var m = (t.device && t.device.model) || 'Unknown device'; var o = devs[m] || (devs[m] = {n:0, last:0}); o.n++; o.last = Math.max(o.last, t.createdAt||0); });
+  var devHtml = Object.keys(devs).sort(function(a,b){ return devs[b].last - devs[a].last; }).map(function(m){ return '<div class="dev"><b>'+esc(m)+'</b><span>'+devs[m].n+' '+(devs[m].n===1?'repair':'repairs')+' · last '+esc(rel(devs[m].last))+'</span></div>'; }).join('');
+  var hist = list.map(function(t){
+    var items = (t.items||[]).map(function(i){ return '<li><span>'+esc(itemName(i))+(i.part?' <span class="muted">· '+esc(i.part)+'</span>':'')+'</span><span class="amt">'+(num(i.price)?money(i.price):'')+'</span></li>'; }).join('');
+    var used = (t.parts||[]).map(function(p){ return esc(p.name) + (p.supplier ? ' (' + esc(p.supplier) + ')' : ''); }).join(', ');
+    var we = warrantyEnd(t);
+    return '<div class="hist"><div class="hh"><div><b>'+esc(t.device && t.device.model)+'</b><div class="t2">#'+esc(t.num)+' · '+esc(dateOnly(t.createdAt))+(t.assigned?' · '+esc(t.assigned):'')+'</div></div>'+pill(t.status)+'</div>' +
+      '<ul>'+items+'</ul>' +
+      (used ? '<div class="pu"><b>Parts used:</b> '+used+'</div>' : '') +
+      (we ? '<div class="pu">'+(we > Date.now() ? '<b style="color:var(--green)">Under warranty</b> until '+esc(dateOnly(we)) : 'Warranty ended '+esc(dateOnly(we)))+'</div>' : (t.status==='done' && t.warranty && t.warranty !== 'None' ? '' : '')) +
+      '<div class="acts" style="margin-top:8px"><button class="link" data-act="open" data-id="'+esc(t.id)+'">Open ticket</button></div></div>';
+  }).join('');
+  sheet.innerHTML =
+    '<div class="shead"><div class="grow"><h2 id="pf-title">'+esc(latest.name||'Customer')+'</h2><div class="sub">Customer since '+esc(dateOnly(first))+'</div></div><button class="x" data-act="close" aria-label="Close">✕</button></div>' +
+    '<div class="sbody">' +
+      '<div class="card"><div class="big">'+esc(fmtPhone(latest.phone))+'</div>' +
+        '<div class="acts"><a class="btn sm ghost" href="tel:'+esc(e164(latest.phone))+'">Call</a><a class="btn sm ghost" href="sms:'+esc(e164(latest.phone))+'">Text</a>'+(S.canWrite?'<button class="btn sm" data-act="newfor">+ New ticket</button>':'')+'</div>' +
+        '<dl class="kv" style="margin-top:14px"><dt>Address</dt><dd>'+(addr?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr)+'">'+esc(addr)+'</a>':'<span class="muted">Not on file</span>')+'</dd>' +
+        '<dt>Email</dt><dd>'+(email?esc(email):'<span class="muted">Not on file</span>')+'</dd>' +
+        '<dt>Repairs</dt><dd>'+list.length+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Last visit</dt><dd>'+esc(dateOnly(list[0].createdAt))+'</dd></dl></div>' +
+      '<div class="card"><h3>Devices</h3><div class="devs">'+devHtml+'</div></div>' +
+      '<div class="card"><h3>Repair history</h3>'+hist+'</div>' +
+    '</div>';
+}
+
+function customersView(){
+  var map = {};
+  S.tickets.forEach(function(t){
+    var k = custKey(t.customer);
+    var c = map[k] || (map[k] = {name:'', phone:'', n:0, spent:0, last:0});
+    c.n++;
+    if ((t.createdAt||0) >= c.last) { c.last = t.createdAt||0; c.name = t.customer && t.customer.name || c.name; c.phone = t.customer && t.customer.phone || c.phone; }
+    if (t.paid) c.spent += total(t);
+  });
+  var arr = Object.keys(map).map(function(k){ return map[k]; }).sort(function(a,b){ return b.last - a.last; });
+  var q = S.q;
+  if (q) arr = arr.filter(function(c){ var h = (c.name + ' ' + digits(c.phone)).toLowerCase(); var d = digits(q); return h.indexOf(q.toLowerCase()) > -1 || (d.length>=3 && h.indexOf(d) > -1); });
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search customers</label><input id="q" type="search" placeholder="Search name or phone" value="'+esc(q)+'" autocomplete="off"></div></div>';
+  if (!arr.length) return bar + '<div class="panel empty"><h3>'+(S.tickets.length ? 'No customers match' : 'No customers yet')+'</h3><p>Customers appear here after their first ticket.</p></div>';
+  return bar + '<div class="cgrid">' + arr.map(function(c){
+    return '<button class="ccard" data-act="profile" data-key="'+esc(custKey(c))+'"><b>'+esc(c.name || 'No name')+'</b><span class="muted">'+esc(fmtPhone(c.phone))+'</span>' +
+      '<div class="meta"><span><strong>'+c.n+'</strong> '+(c.n===1?'repair':'repairs')+'</span><span><strong>'+money(c.spent)+'</strong> paid</span><span>Last '+esc(rel(c.last))+'</span></div></button>';
+  }).join('') + '</div>';
+}
+
+function settingsView(){
+  var techs = (S.settings.techs||[]).map(function(n, i){
+    return '<span class="tchip"><span class="av">'+esc(initials(n))+'</span>'+esc(n)+(S.canWrite?'<button data-act="rmtech" data-i="'+i+'" aria-label="Remove '+esc(n)+'">×</button>':'')+'</span>';
+  }).join('');
+  return '<div class="panel"><h2>Team</h2><p class="d">Everyone who works on repairs. Each action on a ticket is saved with the name of whoever is working.</p>' +
+    '<div class="techs">' + (techs || '<span class="muted">No one added yet.</span>') + '</div>' +
+    (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
+  '</div>' +
+  '<div class="panel"><h2>Back up your tickets</h2><p class="d">Download every ticket as a spreadsheet file (CSV). Good to do once a month.</p>' +
+    (S.dl ? '<button class="btn ghost" data-act="csv">Download CSV</button>' : '<span class="muted">Downloads aren’t available in this view.</span>') +
+  '</div>' +
+  '<div class="panel"><h2>Privacy</h2><p class="d">Passcodes are deleted automatically when a ticket is marked Picked up or Cancelled, as your repair policy promises. Only the shop Google account can open tickets.</p></div>' +
+  '<div class="panel"><h2>Account</h2><p class="d">Signed in as '+esc(S.authUser ? S.authUser.email : '')+'</p><button class="btn ghost" data-act="signout">Sign out</button></div>';
+}
+
+/* keep search focus across re-renders */
+var searchState = null;
+function restoreSearchFocus(){
+  if (!searchState) return;
+  var el = $('#q'); if (!el) return;
+  el.focus();
+  try { el.setSelectionRange(searchState.s, searchState.e); } catch(e) {}
+  searchState = null;
+}
+
+/* ---------- ticket sheet ---------- */
+function openTicket(id){
+  S.openId = id; S.profile = null;
+  var layer = $('#layer');
+  layer.innerHTML = '<div class="scrim" data-act="close"></div><aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title"></aside>';
+  renderSheet();
+  requestAnimationFrame(function(){ $('.scrim', layer).classList.add('on'); $('.sheet', layer).classList.add('on'); var x = $('.sheet .x'); if (x) x.focus(); });
+}
+function closeSheet(){
+  S.profile = null;
+  var layer = $('#layer');
+  var sh = $('.sheet', layer), sc = $('.scrim', layer);
+  S.openId = null;
+  if (sh) { sh.classList.remove('on'); sc.classList.remove('on'); setTimeout(function(){ if (!S.openId) layer.innerHTML = ''; }, 260); }
+}
+
+function renderSheet(){
+  var sheet = $('#layer .sheet'); if (!sheet) return;
+  var t = byId(S.openId);
+  if (!t) { sheet.innerHTML = '<div class="shead"><div class="grow"><h2 id="sh-title">Ticket not found</h2><div class="sub">It may have been deleted.</div></div><button class="x" data-act="close" aria-label="Close">✕</button></div>'; return; }
+
+  // preserve typed text
+  var keep = {}, focusId = null, sel = null;
+  $$('#layer .sheet [data-keep]').forEach(function(el){ keep[el.id] = el.value; });
+  var ae = document.activeElement;
+  if (ae && sheet.contains(ae) && ae.id) { focusId = ae.id; try { sel = [ae.selectionStart, ae.selectionEnd]; } catch(e) {} }
+  var scrollTop = $('.sbody', sheet) ? $('.sbody', sheet).scrollTop : 0;
+
+  var ro = !S.canWrite;
+  var c = t.customer || {}, d = t.device || {};
+  var idx = FLOW.indexOf(t.status);
+  var steps = FLOW.map(function(k, i){
+    var cls = t.status === 'cancel' ? '' : (i < idx ? 'past' : (i === idx ? 'cur' : ''));
+    return '<button class="step '+cls+'" data-act="status" data-v="'+k+'" '+(ro?'disabled':'')+' aria-pressed="'+(t.status===k)+'"><i></i>'+esc(SMAP[k].short)+'</button>';
+  }).join('');
+
+  var past = S.tickets.filter(function(x){ return x.id !== t.id && digits(x.customer && x.customer.phone) && digits(x.customer && x.customer.phone) === digits(c.phone); }).length;
+
+  var items = (t.items||[]).map(function(i){
+    return '<tr><td><div>'+esc(itemName(i))+'</div>'+(i.part?'<div class="p">'+esc(i.part)+'</div>':'')+'</td><td class="right amt">'+(num(i.price)?money(i.price):'<span class="muted">—</span>')+'</td></tr>';
+  }).join('');
+  var tot = total(t), dep = num(t.deposit), bal = balance(t);
+  var payBlock = t.paid
+    ? '<div class="tot" style="color:var(--green);font-weight:600"><span>Paid'+(t.payMethod?' by '+esc(t.payMethod):'')+'</span><span>'+esc(dt(t.paidAt))+'</span></div>' + (ro?'':'<div class="acts"><button class="link" data-act="unpay">Undo payment</button></div>')
+    : (ro ? '' : '<div class="acts" style="align-items:center"><label class="sr" for="paym">Payment method</label><select class="in" id="paym" style="width:auto;min-height:36px;padding:6px 32px 6px 10px">'+PAY.map(function(p){return '<option>'+p+'</option>';}).join('')+'</select><button class="btn sm" data-act="pay">Mark '+money(bal)+' paid</button></div>');
+
+  var checklist = function(which){
+    var m = t[which] || {};
+    return '<div class="cl">' + CHECKS.map(function(ch){
+      var v = m[ch[0]] || '';
+      var b = function(val, sym, lab){ return '<button type="button" data-act="chk" data-w="'+which+'" data-k="'+ch[0]+'" data-v="'+val+'" aria-pressed="'+(v===val)+'" aria-label="'+esc(ch[1])+': '+lab+'" '+(ro?'disabled':'')+'>'+sym+'</button>'; };
+      return '<div class="cli"><span>'+esc(ch[1])+'</span><span class="tri">'+b('ok','✓','Works')+b('bad','✕','Not working')+b('na','–','Can’t test')+'</span></div>';
+    }).join('') + '</div><div class="cllegend">✓ works · ✕ not working · – can’t test</div>';
+  };
+
+  var feed = (t.log||[]).slice().reverse().map(function(l){
+    return '<li><span class="av">'+esc(initials(l.who))+'</span><div class="grow"><div><span class="w">'+esc(l.who)+'</span> ' + (l.kind==='note' ? '<span class="muted">added a note</span>' : esc(l.what)) + '</div>' +
+      (l.kind==='note' ? '<div class="note">'+esc(l.what)+'</div>' : '') + '</div><span class="when" title="'+esc(dt(l.t))+'">'+esc(rel(l.t))+'</span></li>';
+  }).join('');
+
+  var techOpts = '<option value="">Unassigned</option>' + (S.settings.techs||[]).concat(t.assigned && (S.settings.techs||[]).indexOf(t.assigned) < 0 ? [t.assigned] : []).map(function(n){ return '<option'+(n===t.assigned?' selected':'')+'>'+esc(n)+'</option>'; }).join('');
+  var warrOpts = WARR.concat(t.warranty && WARR.indexOf(t.warranty) < 0 ? [t.warranty] : []).map(function(w){ return '<option'+(w===(t.warranty||'None')?' selected':'')+'>'+esc(w)+'</option>'; }).join('');
+  var readyMsg = 'Hi ' + (c.name||'').split(' ')[0] + ', your ' + (d.model||'device') + ' is ready for pickup at iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Balance due: ' + money(bal) + '.' : '') + ' Thank you!';
+
+  sheet.innerHTML =
+    '<div class="shead"><div class="grow"><h2 id="sh-title">#'+esc(t.num)+' · '+esc(c.name)+'</h2><div class="sub">Checked in '+esc(dt(t.createdAt))+' by '+esc(t.createdBy||'Staff')+(t.type==='mobile'?' · Mobile repair':'')+(t.warrantyReturn?' · Warranty return':'')+'</div></div>' +
+      '<button class="x" data-act="close" aria-label="Close ticket">✕</button></div>' +
+    '<div class="sbody">' +
+      '<div class="card"><h3>Status '+pill(t.status)+'</h3><div class="steps" role="group" aria-label="Set status">'+steps+'</div>' +
+        (['in','part','repair'].indexOf(t.status) > -1 ? '<div class="f" style="margin-top:14px;max-width:280px"><label for="due">Promised by'+(isOverdue(t)?' <span style="color:var(--red)">(past due)</span>':'')+'</label><input class="in" id="due" type="datetime-local" value="'+esc(toLocalInput(t.dueAt))+'" data-act="due" '+(ro?'disabled':'')+'></div>' : '') +
+        (t.status==='cancel' ? '' : (ro?'':'<div class="acts"><button class="link red" data-act="status" data-v="cancel">Cancel ticket</button></div>')) +
+        (t.status==='ready' && daysSince(readyAt(t)) >= 30 ? '<div class="notice warn" style="margin:12px 0 0">Waiting '+daysSince(readyAt(t))+' days. Your policy allows a storage fee after 30 days and treats devices as abandoned after 90 days with notice.</div>' : '') +
+        (t.status==='ready' ? '<div class="match" style="margin-top:12px"><b>Let the customer know.</b> <a href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(readyMsg)+'">Text '+esc(fmtPhone(c.phone))+'</a> or <button class="link" data-act="copymsg" data-msg="'+esc(readyMsg)+'">copy the message</button>.</div>' : '') +
+      '</div>' +
+
+      '<div class="card"><h3>Customer'+(ro?'':'<button class="link" data-act="edit">Edit details</button>')+'</h3>' +
+        '<div class="big"><button class="nameb" data-act="profile" data-key="'+esc(custKey(c))+'">'+esc(c.name)+'</button></div><div class="muted">'+esc(fmtPhone(c.phone))+'</div>' +
+        '<div class="acts"><a class="btn sm ghost" href="tel:'+esc(e164(c.phone))+'">Call</a><a class="btn sm ghost" href="sms:'+esc(e164(c.phone))+'">Text</a><button class="btn sm ghost" data-act="msgs">Message templates</button>' +
+        '<button class="btn sm ghost" data-act="profile" data-key="'+esc(custKey(c))+'">Customer profile'+(past?' · '+past+' past':'')+'</button></div>' +
+        (!(t.type==='mobile' && t.address) && c.address ? '<dl class="kv" style="margin-top:12px"><dt>Address</dt><dd>'+esc(c.address)+'</dd></dl>' : '') +
+        (t.type==='mobile' && t.address ? '<dl class="kv" style="margin-top:12px"><dt>Address</dt><dd><a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t.address)+'">'+esc(t.address)+'</a></dd></dl>' : '') +
+      '</div>' +
+
+      '<div class="card"><h3>Device</h3><dl class="kv">' +
+        '<dt>Model</dt><dd>'+esc(d.model||'—')+(d.brand && d.brand !== 'Other' ? ' <span class="muted">· '+esc(d.brand)+'</span>' : '')+'</dd>' +
+        (d.color?'<dt>Color</dt><dd>'+esc(d.color)+'</dd>':'') +
+        '<dt>IMEI / serial</dt><dd>'+esc(d.imei||'—')+'</dd>' +
+        '<dt>Passcode</dt><dd>' + (d.passcode ? '<span id="pc" data-pc="'+esc(d.passcode)+'">••••</span> <button class="link" data-act="showpc">Show</button>' : '<span class="muted">'+(t.status==='done'||t.status==='cancel'?'Deleted after pickup':'Not given')+'</span>') + '</dd>' +
+        '<dt>Liquid signs</dt><dd>'+(t.liquid?'<b style="color:var(--red)">Yes</b>':'No')+'</dd>' +
+        '<dt>Existing damage</dt><dd>'+esc(t.damage||'None noted')+'</dd>' +
+      '</dl></div>' +
+
+      '<div class="card"><h3>Repairs and payment</h3><table class="items">'+(items||'<tr><td class="muted">No repairs listed</td></tr>')+'</table>' +
+        '<div class="tot b"><span>Total</span><span>'+money(tot)+'</span></div>' +
+        (dep ? '<div class="tot"><span>Deposit</span><span>−'+money(dep)+'</span></div><div class="tot"><span>Balance</span><span>'+money(bal)+'</span></div>' : '') +
+        payBlock +
+        '<div class="g2" style="margin-top:14px"><div class="f"><label for="asg">Technician</label><select class="in" id="asg" data-act="assign" '+(ro?'disabled':'')+'>'+techOpts+'</select></div>' +
+        '<div class="f"><label for="war">Warranty</label><select class="in" id="war" data-act="warranty" '+(ro?'disabled':'')+'>'+warrOpts+'</select></div></div>' +
+        (/incell/i.test(repairsText(t)) ? '<p class="hint">Incell parts have no warranty under your policy.</p>' : '') +
+        (t.status==='done' && warrantyEnd(t) ? (warrantyEnd(t) > Date.now() ? '<div class="match" style="margin-top:12px">Warranty active until <b>'+esc(dateOnly(warrantyEnd(t)))+'</b>.</div>' : '<p class="hint">Warranty ended '+esc(dateOnly(warrantyEnd(t)))+'.</p>') : '') +
+        (num(partsCost(t)) && tot ? '<p class="hint">Part costs '+money(partsCost(t))+' · after parts '+money(tot - partsCost(t))+'</p>' : '') +
+      '</div>' +
+      partsCard(t, ro) +
+
+      '<div class="card"><h3>Before repair</h3>'+checklist('pre')+'</div>' +
+      '<div class="card"><h3>After repair</h3>'+checklist('post')+'</div>' +
+
+      '<div class="card"><h3>Notes and history</h3>' +
+        (ro ? '' : '<div class="f"><label for="note">Add a note</label><textarea class="in" id="note" data-keep placeholder="Part ordered from MobileSentrix, customer approved $40 extra…"></textarea></div><div class="acts"><button class="btn sm dark" data-act="note">Add note</button></div>') +
+        '<ul class="feed">'+feed+'</ul>' +
+      '</div>' +
+    '</div>' +
+    '<div class="sfoot">' +
+      (S.dl ? '<button class="btn ghost sm" data-act="print">Print ticket</button>' : '') +
+      '<span class="grow"></span>' +
+      (ro ? '' : '<button class="link red" data-act="delete">Delete</button>') +
+    '</div>';
+
+  Object.keys(keep).forEach(function(id){ var el = document.getElementById(id); if (el) el.value = keep[id]; });
+  if (focusId) { var f = document.getElementById(focusId); if (f) { f.focus(); if (sel) try { f.setSelectionRange(sel[0], sel[1]); } catch(e) {} } }
+  var sb = $('.sbody', sheet); if (sb) sb.scrollTop = scrollTop;
+}
+
+function partsCard(t, ro){
+  var list = (t.parts||[]).map(function(p){
+    var st = '<span class="pst" role="group" aria-label="Status of '+esc(p.name)+'">' + PSTAT.map(function(s){ return '<button data-act="pstat" data-tid="'+esc(t.id)+'" data-pid="'+esc(p.id)+'" data-v="'+s[0]+'" aria-pressed="'+(p.status===s[0])+'" '+(ro?'disabled':'')+'>'+s[1]+'</button>'; }).join('') + '</span>';
+    return '<div class="pitem"><div class="grow" style="min-width:150px"><div style="font-weight:600">'+esc(p.name)+'</div><div class="t2">'+esc(p.supplier||'')+(p.orderNo?' · Order '+esc(p.orderNo):'')+(num(p.cost)?' · '+money(p.cost):'')+'</div></div>'+st+(ro?'':'<button class="link red" data-act="rmpart" data-pid="'+esc(p.id)+'" aria-label="Remove '+esc(p.name)+'" style="font-size:13px">Remove</button>')+'</div>';
+  }).join('');
+  var arrivedAll = (t.parts||[]).length && !openParts(t).length && t.status === 'part';
+  return '<div class="card"><h3>Parts</h3>' + (list || '<p class="muted" style="font-size:14px">No parts added. Add one if it needs to be ordered.</p>') +
+    (arrivedAll && !ro ? '<div class="match" style="margin-top:10px">All parts are in. <button class="link" data-act="status" data-v="repair">Move to Repairing</button></div>' : '') +
+    (ro ? '' : '<form class="addp" data-form="addpart"><label class="sr" for="pn">Part</label><input class="in" id="pn" data-keep placeholder="Part, e.g. iPhone 14 Pro OLED" maxlength="80" autocomplete="off">' +
+      '<label class="sr" for="ps">Supplier</label><select class="in" id="ps">'+SUPPLIERS.map(function(x){ return '<option'+(x===(S.lastSupplier||SUPPLIERS[0])?' selected':'')+'>'+x+'</option>'; }).join('')+'</select>' +
+      '<label class="sr" for="pc2">Cost</label><input class="in" id="pc2" data-keep inputmode="decimal" placeholder="Cost" autocomplete="off">' +
+      '<button class="btn sm dark" type="submit">Add part</button></form>') +
+  '</div>';
+}
+
+function setPartStatus(t, pid, v, orderNo){
+  var parts = clone(t.parts||[]); var p = parts.filter(function(x){ return x.id === pid; })[0]; if (!p || p.status === v) return;
+  p.status = v;
+  if (v === 'ordered') { p.orderedAt = Date.now(); if (orderNo) p.orderNo = orderNo; }
+  if (v === 'arrived') p.arrivedAt = Date.now();
+  if (v === 'used') p.usedAt = Date.now();
+  var fields = {parts:parts};
+  var logs = [logEntry('marked part “' + p.name + '” ' + PSMAP[v].toLowerCase() + (v==='ordered' && orderNo ? ' (order ' + orderNo + ')' : ''))];
+  if (v === 'ordered' && t.status === 'in') { fields.status = 'part'; logs.push(logEntry('changed status to Waiting on part')); }
+  patchTicket(t, fields, logs);
+  if (v === 'arrived' && t.status === 'part' && !openParts({parts:parts}).length) toast('All parts are in for #' + t.num);
+}
+
+function orderBox(t, pid){
+  var p = (t.parts||[]).filter(function(x){ return x.id === pid; })[0]; if (!p) return;
+  var m = document.createElement('div');
+  m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','ob-t');
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-ob-close></div><form class="mbox sm" style="position:relative;z-index:1;margin-top:12vh"><div class="mhead"><h2 id="ob-t">Mark as ordered</h2><button type="button" class="x" data-ob-close aria-label="Close">✕</button></div>' +
+    '<div class="mbody"><p class="muted" style="margin-bottom:12px">'+esc(p.name)+' from '+esc(p.supplier||'supplier')+'</p><div class="f"><label for="ob-n">Order or tracking number (optional)</label><input class="in" id="ob-n" autocomplete="off" maxlength="60"></div></div>' +
+    '<div class="mfoot"><button type="button" class="btn ghost" data-ob-close>Cancel</button><button type="submit" class="btn">Mark ordered</button></div></form>';
+  document.body.appendChild(m);
+  requestAnimationFrame(function(){ m.classList.add('on'); var i = $('#ob-n', m); if (i) i.focus(); });
+  function close(){ m.remove(); document.removeEventListener('keydown', k, true); }
+  function k(e){ if (e.key === 'Escape') { e.stopPropagation(); close(); } }
+  document.addEventListener('keydown', k, true);
+  m.addEventListener('click', function(e){ if (e.target.closest('[data-ob-close]')) close(); });
+  $('form', m).addEventListener('submit', function(e){ e.preventDefault(); var live = byId(t.id); if (live) setPartStatus(live, pid, 'ordered', $('#ob-n', m).value.trim()); close(); });
+}
+
+function templates(t){
+  var c = t.customer||{}, d = t.device||{};
+  var first = (c.name||'').split(' ')[0] || 'there';
+  var dev = d.model || 'device';
+  var bal = balance(t);
+  return [
+    ['Checked in', 'Hi ' + first + ', this is iFixPhones. We’ve got your ' + dev + ' (ticket #' + t.num + ')' + (t.dueAt ? ' and expect it ready ' + dueText(t.dueAt) : '') + '. We’ll text you when it’s done.'],
+    ['Part ordered', 'Hi ' + first + ', the part for your ' + dev + ' has been ordered. We’ll let you know as soon as it arrives. – iFixPhones'],
+    ['Ready for pickup', 'Hi ' + first + ', your ' + dev + ' is ready for pickup at iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Balance due: ' + money(bal) + '.' : '') + ' Open Mon–Sat 10–8, Sun 12–6.'],
+    ['Pickup reminder', 'Hi ' + first + ', a reminder that your ' + dev + ' is still waiting for you at iFixPhones, 9055 Marbach Rd, Suite 105. Open Mon–Sat 10–8, Sun 12–6.'],
+    ['Thank you', 'Thanks for choosing iFixPhones, ' + first + '! If you’re happy with your repair, a quick Google review would mean a lot to us.'],
+    ['Mobile visit', 'Hi ' + first + ', this is iFixPhones. Your technician is on the way for your ' + dev + ' repair' + (t.address ? ' at ' + t.address : '') + '.']
+  ];
+}
+function msgBox(t){
+  var c = t.customer||{};
+  var m = document.createElement('div');
+  m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','mb-t');
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-mb-close></div><div class="mbox" style="position:relative;z-index:1;width:min(560px,100%)"><div class="mhead"><h2 id="mb-t">Message '+esc((c.name||'').split(' ')[0])+'</h2><button class="x" data-mb-close aria-label="Close">✕</button></div><div class="mbody">' +
+    templates(t).map(function(x, i){ return '<div class="tpl"><b>'+esc(x[0])+'</b><p id="tpl'+i+'">'+esc(x[1])+'</p><div class="acts" style="margin-top:0"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text it</a><button class="btn sm ghost" data-copy="'+i+'">Copy</button></div></div>'; }).join('') +
+    '<p class="hint">“Text it” opens your messages app with the text filled in. If nothing opens on this computer, use Copy.</p></div></div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(function(){ m.classList.add('on'); var x = $('.x', m); if (x) x.focus(); });
+  function close(){ m.remove(); document.removeEventListener('keydown', k, true); }
+  function k(e){ if (e.key === 'Escape') { e.stopPropagation(); close(); } }
+  document.addEventListener('keydown', k, true);
+  m.addEventListener('click', async function(e){
+    if (e.target.closest('[data-mb-close]')) { close(); return; }
+    var cp = e.target.closest('[data-copy]');
+    if (cp) { var txt = $('#tpl' + cp.getAttribute('data-copy'), m).textContent; try { await navigator.clipboard.writeText(txt); toast('Copied'); } catch(err) { toast('Copy didn’t work here. Select the text instead.'); } return; }
+    var sent = e.target.closest('[data-sent]');
+    if (sent) { var live = byId(t.id); if (live) patchTicket(live, {}, [logEntry('texted the customer: ' + sent.getAttribute('data-sent'))]); }
+  });
+}
+
+/* ---------- status / actions ---------- */
+async function setStatus(t, k){
+  if (t.status === k) return;
+  if (k === 'done' && !t.paid && balance(t) > 0) {
+    var ok = await confirmBox('Mark as picked up?', 'This ticket still shows ' + money(balance(t)) + ' unpaid. Mark it picked up anyway?', 'Picked up, unpaid');
+    if (!ok) return;
+  }
+  if (k === 'cancel') {
+    var ok2 = await confirmBox('Cancel this ticket?', 'The ticket stays in your history as Cancelled. The passcode will be deleted.', 'Cancel ticket', true);
+    if (!ok2) return;
+  }
+  var fields = {status:k};
+  var logs = [logEntry('changed status to ' + SMAP[k].label)];
+  if (k === 'done') fields.pickedUpAt = Date.now();
+  if ((k === 'done' || k === 'cancel') && t.device && t.device.passcode) {
+    fields.device = Object.assign({}, t.device, {passcode:''});
+    logs.push(logEntry('deleted the passcode'));
+  }
+  patchTicket(t, fields, logs);
+  toast(SMAP[k].label);
+}
+
+function confirmBox(title, text, okLabel, danger){
+  return new Promise(function(resolve){
+    var m = document.createElement('div');
+    m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true');
+    m.innerHTML = '<div class="scrim on" style="position:fixed"></div><div class="mbox sm" style="position:relative;z-index:1;margin-top:12vh"><div class="mbody"><h2 style="font-size:20px;letter-spacing:-.02em;margin-bottom:6px">'+esc(title)+'</h2><p class="muted">'+esc(text)+'</p></div>' +
+      '<div class="mfoot"><button class="btn ghost" data-r="0">Go back</button><button class="btn '+(danger?'danger':'')+'" data-r="1">'+esc(okLabel)+'</button></div></div>';
+    document.body.appendChild(m);
+    requestAnimationFrame(function(){ m.classList.add('on'); var b0 = $('[data-r="1"]', m); if (b0) b0.focus(); });
+    function done(v){ m.remove(); document.removeEventListener('keydown', key, true); resolve(v); }
+    function key(e){ if (e.key === 'Escape') { e.stopPropagation(); done(false); } }
+    document.addEventListener('keydown', key, true);
+    m.addEventListener('click', function(e){
+      var b = e.target.closest('[data-r]'); if (b) done(b.getAttribute('data-r') === '1');
+      else if (e.target.classList.contains('scrim')) done(false);
+    });
+  });
+}
+
+/* ---------- who's working ---------- */
+var askedWho = false;
+function maybeAskWho(){
+  if (askedWho || S.me || S.status !== 'ready' || !S.settingsLoaded || !S.canWrite) return;
+  askedWho = true; whoBox();
+}
+function whoBox(){
+  var m = document.createElement('div');
+  m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','who-t');
+  var techs = S.settings.techs || [];
+  m.innerHTML = '<div class="scrim on" style="position:fixed"></div><div class="mbox sm" style="position:relative;z-index:1;margin-top:10vh"><div class="mhead"><h2 id="who-t">Who’s working?</h2>' + (S.me ? '<button class="x" data-who-close aria-label="Close">✕</button>' : '') + '</div><div class="mbody">' +
+    '<p class="muted" style="margin-bottom:14px">Everything you do on tickets is saved under this name. You can switch any time from the top bar.</p>' +
+    '<div class="pick">' + techs.map(function(n){ return '<button data-pick="'+esc(n)+'"><span class="av">'+esc(initials(n))+'</span>'+esc(n)+'</button>'; }).join('') + '</div>' +
+    '<form data-whoform style="margin-top:16px" class="inline"><label class="sr" for="whoname">Someone else</label><input class="in" id="whoname" placeholder="Someone else? Type a name" maxlength="30"><button class="btn dark" type="submit">Go</button></form>' +
+    '</div></div>';
+  document.body.appendChild(m);
+  requestAnimationFrame(function(){ m.classList.add('on'); var b = $('[data-pick]', m) || $('#whoname', m); if (b) b.focus(); });
+  function set(n){
+    n = String(n||'').trim().slice(0,30); if (!n) return;
+    S.me = n; try { localStorage.setItem('ifx_tech', n); } catch(e) {}
+    m.remove(); render(); toast('Working as ' + n);
+  }
+  m.addEventListener('click', function(e){
+    var b = e.target.closest('[data-pick]'); if (b) set(b.getAttribute('data-pick'));
+    if (e.target.closest('[data-who-close]') || (e.target.classList.contains('scrim') && S.me)) m.remove();
+  });
+  m.addEventListener('submit', function(e){ e.preventDefault(); set($('#whoname', m).value); });
+}
+
+/* ---------- new / edit ticket form ---------- */
+var NT = null;
+function ticketForm(existing, prefill){
+  var t = existing ? clone(existing) : null;
+  NT = {
+    editId: t ? t.id : null,
+    type: t ? (t.type||'shop') : 'shop',
+    items: t && t.items && t.items.length ? clone(t.items) : [{repair:'Screen', part:'', price:''}]
+  };
+  var c = t && t.customer || (prefill ? clone(prefill) : {}), d = t && t.device || {};
+  var pre = t && t.pre || {};
+  var techOpts = '<option value="">Unassigned</option>' + (S.settings.techs||[]).map(function(n){ var s = t ? n === t.assigned : n === S.me; return '<option'+(s?' selected':'')+'>'+esc(n)+'</option>'; }).join('');
+  var warrOpts = WARR.map(function(w){ return '<option'+((t ? w===(t.warranty||'None') : w==='None')?' selected':'')+'>'+w+'</option>'; }).join('');
+
+  var m = document.createElement('div');
+  m.className = 'modal formm'; m.id = 'tform'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','tf-t');
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-tf-close></div><form class="mbox tall" style="position:relative;z-index:1" novalidate>' +
+    '<div class="mhead"><h2 id="tf-t">'+(t?'Edit ticket #'+esc(t.num):'New ticket')+'</h2><button type="button" class="x" data-tf-close aria-label="Close">✕</button></div>' +
+    '<div class="mbody">' +
+      '<div class="msec"><h3><span class="n">1</span>Customer</h3>' +
+        '<div class="g2"><div class="f"><label for="tf-phone">Phone</label><input class="in" id="tf-phone" type="tel" inputmode="tel" autocomplete="off" value="'+esc(fmtPhone(c.phone))+'" placeholder="(210) 555-0123"></div>' +
+        '<div class="f"><label for="tf-name">Name</label><input class="in" id="tf-name" autocomplete="off" value="'+esc(c.name)+'" placeholder="First and last name"></div></div>' +
+        '<div id="tf-match"></div>' +
+        '<div style="margin-top:12px" class="seg" role="group" aria-label="Where"><button type="button" data-tftype="shop" aria-pressed="'+(NT.type==='shop')+'">At the shop</button><button type="button" data-tftype="mobile" aria-pressed="'+(NT.type==='mobile')+'">Mobile</button></div>' +
+        '<div class="g2" style="margin-top:12px"><div class="f" id="tf-addrw"><label for="tf-addr" id="tf-addrl">'+(NT.type==='mobile'?'Address (where we’re going)':'Address (optional)')+'</label><input class="in" id="tf-addr" autocomplete="off" value="'+esc((t&&t.address)||c.address||'')+'"></div>' +
+        '<div class="f"><label for="tf-email">Email (optional)</label><input class="in" id="tf-email" type="email" autocomplete="off" value="'+esc(c.email||'')+'"></div></div>' +
+      '</div>' +
+      '<div class="msec"><h3><span class="n">2</span>Device</h3>' +
+        '<div class="g2"><div class="f"><label for="tf-brand">Brand</label><select class="in" id="tf-brand"><option value="">Choose brand</option>'+BRANDS.map(function(b){ return '<option'+(b===(d.brand||guessBrand(d.model))?' selected':'')+'>'+esc(b)+'</option>'; }).join('')+'</select></div>' +
+        '<div class="f"><label for="tf-model">Model</label><input class="in" id="tf-model" list="tf-models" autocomplete="off" value="'+esc(d.model)+'" placeholder="Start typing, e.g. 15 Pro Max"><datalist id="tf-models"></datalist></div>' +
+        '<div class="f"><label for="tf-color">Color (optional)</label><input class="in" id="tf-color" autocomplete="off" value="'+esc(d.color)+'"></div>' +
+        '<div class="f"><label for="tf-imei">IMEI or serial (optional)</label><input class="in" id="tf-imei" autocomplete="off" value="'+esc(d.imei)+'"></div>' +
+        '<div class="f"><label for="tf-pc">Passcode (optional)</label><input class="in" id="tf-pc" autocomplete="off" value="'+esc(d.passcode)+'"></div></div>' +
+        '<p class="hint">Passcodes are deleted automatically when the ticket is picked up.</p>' +
+      '</div>' +
+      '<div class="msec"><h3><span class="n">3</span>Repairs</h3><div id="tf-items"></div>' +
+        '<button type="button" class="link" data-additem>+ Add another repair</button>' +
+        '<div class="g3" style="margin-top:14px"><div class="f"><label for="tf-dep">Deposit</label><input class="in" id="tf-dep" inputmode="decimal" value="'+esc(t && num(t.deposit) ? t.deposit : '')+'" placeholder="$0"></div>' +
+        '<div class="f"><label for="tf-tech">Technician</label><select class="in" id="tf-tech">'+techOpts+'</select></div>' +
+        '<div class="f"><label for="tf-war">Warranty</label><select class="in" id="tf-war">'+warrOpts+'</select></div></div>' +
+        '<div class="g2" style="margin-top:12px"><div class="f"><label for="tf-due">Promised by (optional)</label><input class="in" id="tf-due" type="datetime-local" value="'+esc(toLocalInput(t && t.dueAt))+'"></div>' +
+        '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-wret" '+(t&&t.warrantyReturn?'checked':'')+'>Warranty return</label></div></div>' +
+        '<div class="acts" style="margin-top:8px"><button type="button" class="chip" data-due="1">In 1 hour</button><button type="button" class="chip" data-due="eod">Today by close</button><button type="button" class="chip" data-due="tmr">Tomorrow 2 PM</button></div>' +
+        '<div class="tot b" style="margin-top:14px"><span>Total</span><span id="tf-total">$0</span></div>' +
+      '</div>' +
+      '<div class="msec"><h3><span class="n">4</span>Condition at check-in</h3>' +
+        '<div class="cl">' + CHECKS.map(function(ch){
+          var v = pre[ch[0]] || '';
+          var b = function(val, sym, lab){ return '<button type="button" data-tfchk="'+ch[0]+'" data-v="'+val+'" aria-pressed="'+(v===val)+'" aria-label="'+esc(ch[1])+': '+lab+'">'+sym+'</button>'; };
+          return '<div class="cli"><span>'+esc(ch[1])+'</span><span class="tri">'+b('ok','✓','Works')+b('bad','✕','Not working')+b('na','–','Can’t test')+'</span></div>';
+        }).join('') + '</div><div class="cllegend">✓ works · ✕ not working · – can’t test. <button type="button" class="link" data-allok>Mark all as works</button></div>' +
+        '<div class="f" style="margin-top:14px"><label for="tf-dmg">Existing damage</label><textarea class="in" id="tf-dmg" placeholder="Cracked back glass, dent on bottom left corner, scratches on screen…">'+esc(t&&t.damage)+'</textarea></div>' +
+        '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
+      '</div>' +
+      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms and Incell no-warranty were explained.</span></label></div>') +
+    '</div>' +
+    '<div class="mfoot"><span class="err" id="tf-err" role="alert"></span><button type="button" class="btn ghost" data-tf-close>Cancel</button><button type="submit" class="btn" id="tf-save">'+(t?'Save changes':'Check in')+'</button></div>' +
+  '</form>';
+  document.body.appendChild(m);
+  m._pre = clone(pre);
+  renderItems();
+  fillModels();
+  requestAnimationFrame(function(){ m.classList.add('on'); var p0 = prefill ? $('#tf-brand', m) : $('#tf-phone', m); if (p0) p0.focus(); if (prefill) lookupCustomer(); });
+
+  function closeForm(){ m.remove(); NT = null; document.removeEventListener('keydown', esc1, true); }
+  function esc1(e){ if (e.key === 'Escape' && !document.querySelector('.modal:not(#tform)')) { e.stopPropagation(); closeForm(); } }
+  document.addEventListener('keydown', esc1, true);
+
+  m.addEventListener('click', function(e){
+    var el = e.target;
+    if (el.closest('[data-tf-close]')) { closeForm(); return; }
+    var ty = el.closest('[data-tftype]');
+    if (ty) { NT.type = ty.getAttribute('data-tftype'); $$('[data-tftype]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b === ty)); }); $('#tf-addrl').textContent = NT.type === 'mobile' ? 'Address (where we’re going)' : 'Address (optional)'; if (NT.type==='mobile') $('#tf-addr').focus(); return; }
+    if (el.closest('[data-additem]')) { syncItems(); NT.items.push({repair:'Battery', part:'', price:''}); renderItems(); var r = $$('.irow select', m); if (r.length) r[r.length-2].focus(); return; }
+    var del = el.closest('[data-delitem]');
+    if (del) { syncItems(); NT.items.splice(+del.getAttribute('data-delitem'), 1); if (!NT.items.length) NT.items.push({repair:'Screen', part:'', price:''}); renderItems(); return; }
+    var ck = el.closest('[data-tfchk]');
+    if (ck) { var k = ck.getAttribute('data-tfchk'), v = ck.getAttribute('data-v'); var cur = m._pre[k]; m._pre[k] = cur === v ? '' : v; $$('[data-tfchk="'+k+'"]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(m._pre[k] === b.getAttribute('data-v'))); }); return; }
+    if (el.closest('[data-allok]')) { CHECKS.forEach(function(ch){ m._pre[ch[0]] = 'ok'; }); $$('[data-tfchk]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-v') === 'ok')); }); return; }
+    var dq = el.closest('[data-due]');
+    if (dq) {
+      var v = dq.getAttribute('data-due'), d = new Date();
+      if (v === '1') { d = new Date(Date.now() + 3600e3); d.setMinutes(Math.ceil(d.getMinutes()/15)*15, 0, 0); }
+      else if (v === 'eod') { d.setHours(d.getDay() === 0 ? 17 : 19, 30, 0, 0); }
+      else { d.setDate(d.getDate()+1); d.setHours(14, 0, 0, 0); }
+      $('#tf-due').value = toLocalInput(d.getTime()); return;
+    }
+    var use = el.closest('[data-usecust]');
+    if (use) { $('#tf-name').value = use.getAttribute('data-usecust'); $('#tf-model').focus(); return; }
+  });
+  m.addEventListener('input', function(e){
+    if (e.target.id === 'tf-phone') lookupCustomer();
+    if (e.target.closest('.irow') || e.target.id === 'tf-dep') { syncItems(); updateTotal(); }
+    if (e.target.classList.contains('bad')) e.target.classList.remove('bad');
+  });
+  m.addEventListener('change', function(e){
+    if (e.target.closest('.irow')) {
+      syncItems();
+      if (e.target.getAttribute('data-f') === 'part' && NT.items.every(function(x){ return x.part === 'Incell'; })) { var wsel = $('#tf-war'); if (wsel && wsel.value !== 'None') { wsel.value = 'None'; toast('Warranty set to None. Incell parts have no warranty.'); } }
+      if (e.target.getAttribute('data-f') === 'repair') { var ri = +e.target.closest('.irow').getAttribute('data-i'); renderItems(); var dd = $('#it-d' + ri); if (dd) dd.focus(); }
+      updateTotal(); hintPrices();
+    }
+    if (e.target.id === 'tf-brand') { fillModels(); $('#tf-model').focus(); }
+  });
+  $('#tf-model', m).addEventListener('input', hintPrices);
+  $('#tf-model', m).addEventListener('change', function(){ var br = $('#tf-brand', m); if (br && !br.value) { var g = guessBrand(this.value); if (g && g !== 'Other') { br.value = g; fillModels(); } } });
+  $('form', m).addEventListener('submit', function(e){ e.preventDefault(); submitForm(t, m, closeForm); });
+
+  function lookupCustomer(){
+    var dg = digits($('#tf-phone').value); var box = $('#tf-match');
+    if (dg.length < 10) { box.innerHTML = ''; return; }
+    var prev = S.tickets.filter(function(x){ return digits(x.customer && x.customer.phone).slice(-10) === dg.slice(-10) && (!t || x.id !== t.id); });
+    if (!prev.length) { box.innerHTML = ''; return; }
+    var name = prev[0].customer.name;
+    var activeW = prev.filter(function(x){ return warrantyEnd(x) > Date.now(); })[0];
+    box.innerHTML = '<div class="match"><b>Returning customer:</b> '+esc(name)+', '+prev.length+' past '+(prev.length===1?'ticket':'tickets')+' (last: '+esc(prev[0].device && prev[0].device.model)+', '+esc(rel(prev[0].createdAt))+'). ' + (activeW ? '<br><b>Under warranty:</b> #'+esc(activeW.num)+' '+esc(repairsText(activeW))+' until '+esc(dateOnly(warrantyEnd(activeW)))+'. ' : '') + ($('#tf-name').value.trim() ? '' : '<button type="button" class="link" data-usecust="'+esc(name)+'">Use this name</button>') + '</div>';
+  }
+}
+
+function renderItems(){
+  var box = $('#tf-items'); if (!box) return;
+  box.innerHTML = NT.items.map(function(it, i){
+    var rOpts = REPAIRS.concat(it.repair && REPAIRS.indexOf(it.repair) < 0 ? [it.repair] : []).map(function(r){ return '<option'+(r===it.repair?' selected':'')+'>'+esc(r)+'</option>'; }).join('');
+    var pOpts = PARTS.map(function(p){ return '<option value="'+esc(p)+'"'+(p===it.part?' selected':'')+'>'+(p?esc(p):'Part (if any)')+'</option>'; }).join('');
+    return '<div class="irow" data-i="'+i+'"><label class="sr" for="it-r'+i+'">Repair</label><select class="in" id="it-r'+i+'" data-f="repair">'+rOpts+'</select>' +
+      '<label class="sr" for="it-p'+i+'">Part</label><select class="in" id="it-p'+i+'" data-f="part">'+pOpts+'</select>' +
+      '<label class="sr" for="it-pr'+i+'">Price</label><input class="in pr" id="it-pr'+i+'" data-f="price" inputmode="decimal" placeholder="Price" value="'+esc(it.price)+'">' +
+      '<button type="button" class="del" data-delitem="'+i+'" aria-label="Remove this repair">✕</button>' +
+      ((it.repair === 'Other repair' || it.repair === 'Other') ? '<label class="sr" for="it-d'+i+'">Describe the repair</label><input class="in desc" id="it-d'+i+'" data-f="desc" placeholder="Describe the repair, e.g. replace vibration motor" value="'+esc(it.desc||'')+'" maxlength="120">' : '') +
+      '</div>';
+  }).join('');
+  updateTotal();
+  hintPrices();
+}
+function fillModels(){
+  var b = $('#tf-brand') ? $('#tf-brand').value : '';
+  var list = b ? (CATALOG[b] || []) : BRANDS.reduce(function(a,k){ return a.concat(CATALOG[k]); }, []);
+  var dl = $('#tf-models'); if (dl) dl.innerHTML = list.map(function(m){ return '<option value="'+esc(m)+'"></option>'; }).join('');
+}
+function hintPrices(){
+  var model = $('#tf-model') ? $('#tf-model').value : '';
+  $$('#tf-items .irow').forEach(function(r){
+    var i = +r.getAttribute('data-i'); if (!NT || !NT.items[i]) return;
+    var lp = lastPrice(model, $('[data-f="repair"]', r).value, $('[data-f="part"]', r).value, NT.editId);
+    $('[data-f="price"]', r).placeholder = lp != null ? 'Last ' + money(lp) : 'Price';
+  });
+}
+function syncItems(){
+  $$('#tf-items .irow').forEach(function(r){
+    var i = +r.getAttribute('data-i'); if (!NT.items[i]) return;
+    NT.items[i].repair = $('[data-f="repair"]', r).value;
+    NT.items[i].part = $('[data-f="part"]', r).value;
+    NT.items[i].price = $('[data-f="price"]', r).value;
+    var de = $('[data-f="desc"]', r); NT.items[i].desc = de ? de.value : (NT.items[i].desc || '');
+  });
+}
+function updateTotal(){
+  var tot = NT.items.reduce(function(a,i){ return a + num(i.price); }, 0);
+  var el = $('#tf-total'); if (el) el.textContent = money(tot);
+}
+
+function submitForm(t, m, closeForm){
+  syncItems();
+  var err = $('#tf-err'); err.textContent = '';
+  var phone = $('#tf-phone').value.trim(), name = $('#tf-name').value.trim(), model = $('#tf-model').value.trim();
+  var bad = [];
+  if (digits(phone).length < 10) bad.push('tf-phone');
+  if (!name) bad.push('tf-name');
+  if (!model) bad.push('tf-model');
+  if (NT.type === 'mobile' && !$('#tf-addr').value.trim()) bad.push('tf-addr');
+  bad.forEach(function(id){ $('#'+id).classList.add('bad'); });
+  if (bad.length) { err.textContent = digits(phone).length && digits(phone).length < 10 ? 'Enter a 10-digit phone number.' : 'Fill in the highlighted fields.'; $('#'+bad[0]).focus(); return; }
+  if (!t && !$('#tf-agree').checked) { err.textContent = 'Confirm the customer agreed to the repair policy.'; $('#tf-agree').focus(); return; }
+
+  var needDesc = NT.items.filter(function(i){ return (i.repair === 'Other repair' || i.repair === 'Other') && !String(i.desc||'').trim(); });
+  if (needDesc.length) { var di = NT.items.indexOf(needDesc[0]); var de = $('#it-d' + di); if (de) { de.classList.add('bad'); de.focus(); } err.textContent = 'Describe the “Other repair”.'; return; }
+  var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other') && i.desc) o.desc = String(i.desc).trim().slice(0,120); return o; });
+  var data = {
+    type: NT.type,
+    address: NT.type === 'mobile' ? $('#tf-addr').value.trim() : '',
+    customer: {name:name, phone:fmtPhone(phone), address:$('#tf-addr').value.trim(), email:$('#tf-email').value.trim()},
+    device: {brand:$('#tf-brand').value || guessBrand(model), model:model, color:$('#tf-color').value.trim(), imei:$('#tf-imei').value.trim(), passcode:$('#tf-pc').value.trim()},
+    items: items,
+    deposit: num($('#tf-dep').value),
+    assigned: $('#tf-tech').value,
+    warranty: $('#tf-war').value,
+    pre: m._pre,
+    damage: $('#tf-dmg').value.trim(),
+    liquid: $('#tf-liq').checked,
+    dueAt: fromLocalInput($('#tf-due').value),
+    warrantyReturn: $('#tf-wret').checked
+  };
+  var btn = $('#tf-save'); btn.disabled = true; btn.textContent = 'Saving…';
+
+  if (t) {
+    var live = byId(t.id); if (!live) { closeForm(); return; }
+    patchTicket(live, data, [logEntry('edited the ticket details')]);
+    closeForm(); toast('Saved');
+    return;
+  }
+  var now = Date.now();
+  var body = Object.assign(data, {
+    num: nextNum(), status:'in', createdAt:now, updatedAt:now, createdBy:who(),
+    paid:false, payMethod:'', paidAt:0, agreed:true, post:{}, parts:[],
+    log:[logEntry('checked in the device')].concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
+  });
+  var ref = S.db.collection('tickets').doc();
+  retryOnce(function(){ return ref.set(body); }).then(function(){
+    if (!byId(ref.id)) { var loc = clone(body); loc.id = ref.id; S.tickets.unshift(loc); }
+    closeForm(); toast('Ticket #' + body.num + ' created');
+    S.filter = 'active'; S.q = ''; render();
+    openTicket(ref.id);
+  }).catch(function(e){
+    btn.disabled = false; btn.textContent = 'Check in';
+    if (e && e.code === 'resource-exhausted') err.textContent = 'Storage is full. Export and delete old tickets in Settings.';
+    else if (e && e.code === 'permission-denied') { err.textContent = 'No permission. Sign in with the shop account.'; }
+    else err.textContent = 'Couldn’t save. Check your connection and try again.';
+  });
+}
+
+/* ---------- print + export ---------- */
+function ticketDoc(t){
+  var c = t.customer||{}, d = t.device||{};
+  var rows = (t.items||[]).map(function(i){ return '<tr><td>'+esc(itemName(i))+(i.part?'<br><small>'+esc(i.part)+'</small>':'')+'</td><td style="text-align:right">'+(num(i.price)?money(i.price):'')+'</td></tr>'; }).join('');
+  var pre = CHECKS.map(function(ch){ var v = (t.pre||{})[ch[0]]; return '<span>'+esc(ch[1])+': <b>'+(v==='ok'?'Works':v==='bad'?'Not working':v==='na'?'Can’t test':'—')+'</b></span>'; }).join('');
+  var tot = total(t), dep = num(t.deposit);
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>iFixPhones ticket #'+esc(t.num)+'</title><style>' +
+    'body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;max-width:720px;margin:24px auto;padding:0 20px;font-size:13px;line-height:1.45}' +
+    'h1{font-size:22px;margin:0}h2{font-size:14px;margin:18px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}' +
+    '.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1d1d1f;padding-bottom:10px}' +
+    'table{width:100%;border-collapse:collapse}td{padding:5px 0;border-bottom:1px solid #eee;vertical-align:top}small{color:#666}' +
+    '.g{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}.cl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 14px;font-size:12px}' +
+    '.box{border:1.5px solid #1d1d1f;border-radius:8px;padding:10px 12px;margin-top:14px;font-size:12px}' +
+    '.sig{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:26px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}' +
+    '@media print{body{margin:0}}</style></head><body>' +
+    '<div class="hd"><div><h1>iFixPhones</h1><div>'+esc(SHOP.addr)+'</div><div>Shop '+esc(SHOP.shop)+' · Mobile '+esc(SHOP.mobile)+' · '+esc(SHOP.web)+'</div></div>' +
+    '<div style="text-align:right"><div style="font-size:20px;font-weight:700">Ticket #'+esc(t.num)+'</div><div>'+esc(dt(t.createdAt))+'</div><div>'+esc(t.type==='mobile'?'Mobile repair':'In-store repair')+'</div></div></div>' +
+    '<h2>Customer and device</h2><div class="g"><div><b>'+esc(c.name)+'</b><br>'+esc(fmtPhone(c.phone))+(t.address?'<br>'+esc(t.address):'')+'</div>' +
+    '<div><b>'+esc(d.model)+'</b>'+(d.color?'<br>'+esc(d.color):'')+(d.imei?'<br>IMEI/serial: '+esc(d.imei):'')+'</div></div>' +
+    '<h2>Repairs</h2><table>'+rows+'<tr><td><b>Total</b></td><td style="text-align:right"><b>'+money(tot)+'</b></td></tr>' +
+    (dep?'<tr><td>Deposit</td><td style="text-align:right">−'+money(dep)+'</td></tr><tr><td>Balance</td><td style="text-align:right">'+money(Math.max(0,tot-dep))+'</td></tr>':'') +
+    (t.paid?'<tr><td>Paid'+(t.payMethod?' ('+esc(t.payMethod)+')':'')+'</td><td style="text-align:right">'+esc(dt(t.paidAt))+'</td></tr>':'') + '</table>' +
+    (t.dueAt?'<p><b>Promised by:</b> '+esc(dt(t.dueAt))+'</p>':'')+'<p><b>Warranty:</b> '+esc(t.warranty||'None')+(/incell/i.test(repairsText(t))?' (Incell parts have no warranty)':'')+' · <b>Technician:</b> '+esc(t.assigned||'—')+'</p>' +
+    '<h2>Condition at check-in</h2><div class="cl">'+pre+'</div>' +
+    '<p><b>Existing damage:</b> '+esc(t.damage||'None noted')+(t.liquid?' · <b>Signs of liquid damage</b>':'')+'</p>' +
+    '<div class="box"><b>Please read.</b> Back up your data; we aren’t responsible for data loss. Opening a phone carries risks even when done correctly, including damage to the original screen, loss of water resistance and parts notices in Settings. We warranty a part only when our supplier does; Incell parts have no warranty. Any new cracks, pressure marks, frame damage or liquid voids the warranty. Payment is due when the repair is done. Full policy: ifixphones.net/policy.html</div>' +
+    '<p style="margin-top:12px">I agree to the iFixPhones Warranty and Repair Policy and approve the repairs listed above.</p>' +
+    '<div class="sig"><div>Customer signature</div><div>Date</div></div>' +
+    '</body></html>';
+}
+
+async function printTicket(t){
+  if (!S.dl) return;
+  try { await S.dl.save({filename:'iFixPhones-ticket-'+t.num+'.html', data:ticketDoc(t)}); toast('Saved. Open the file and print it.'); }
+  catch(e){ if (e && e.code === 'declined') return; if (e && e.code === 'rate_limited') toast('One moment, then try again.'); else toast('Couldn’t save the file here.'); }
+}
+
+function csvCell(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; }
+async function exportCsv(){
+  if (!S.dl) return;
+  var head = ['Ticket','Status','Checked in','Checked in by','Type','Customer','Phone','Address','Device','Color','IMEI/serial','Repairs','Total','Deposit','Paid','Payment method','Paid at','Technician','Warranty','Existing damage','Liquid','Picked up','Promised by','Parts','Part costs','Warranty return'];
+  var lines = [head.join(',')].concat(S.tickets.map(function(t){
+    var c = t.customer||{}, d = t.device||{};
+    return [t.num, (SMAP[t.status]||{}).label, dt(t.createdAt), t.createdBy, t.type, c.name, fmtPhone(c.phone), t.address, d.model, d.color, d.imei,
+      (t.items||[]).map(function(i){ return itemName(i) + (i.part?' ('+i.part+')':'') + (num(i.price)?' '+money(i.price):''); }).join('; '),
+      total(t), num(t.deposit), t.paid?'Yes':'No', t.payMethod, t.paidAt?dt(t.paidAt):'', t.assigned, t.warranty, t.damage, t.liquid?'Yes':'No', t.pickedUpAt?dt(t.pickedUpAt):'', t.dueAt?dt(t.dueAt):'',
+      (t.parts||[]).map(function(p){ return p.name + ' (' + (p.supplier||'') + ', ' + PSMAP[p.status] + (p.orderNo?', order '+p.orderNo:'') + ')'; }).join('; '), partsCost(t), t.warrantyReturn?'Yes':'No'].map(csvCell).join(',');
+  }));
+  try { await S.dl.save({filename:'iFixPhones-tickets-'+new Date().toISOString().slice(0,10)+'.csv', data:lines.join('\n')}); toast('Backup saved'); }
+  catch(e){ if (e && e.code !== 'declined') toast('Couldn’t save the file here.'); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async function(e){
+  if (e.target.closest('.modal')) return; // modals handle their own clicks
+  var a = e.target.closest('[data-act]'); if (!a) return;
+  var act = a.getAttribute('data-act');
+  var t = S.openId ? byId(S.openId) : null;
+  switch (act) {
+    case 'view': S.view = a.getAttribute('data-v'); S.q = ''; render(); window.scrollTo(0,0); break;
+    case 'filter': S.filter = a.getAttribute('data-v'); S.view = 'tickets'; render(); break;
+    case 'clearq': S.q = ''; S.filter = 'all'; render(); break;
+    case 'new': if (!S.me) { whoBox(); return; } ticketForm(null); break;
+    case 'who': whoBox(); break;
+    case 'open': openTicket(a.getAttribute('data-id')); break;
+    case 'close': closeSheet(); break;
+    case 'profile': openProfile(a.getAttribute('data-key')); break;
+    case 'newfor': {
+      var pl = custTickets(S.profile); if (!pl.length) break;
+      var pc = pl[0].customer || {};
+      var pAddr = ''; pl.forEach(function(x){ if (!pAddr) pAddr = (x.customer && x.customer.address) || ''; });
+      if (!S.me) { whoBox(); break; }
+      ticketForm(null, {name:pc.name, phone:pc.phone, address:pAddr, email:pc.email||''});
+      break;
+    }
+    case 'history': S.view = 'tickets'; S.filter = 'all'; S.q = a.getAttribute('data-phone'); closeSheet(); render(); break;
+    case 'rmtech': {
+      var i = +a.getAttribute('data-i'); var n = (S.settings.techs||[])[i];
+      var ok = await confirmBox('Remove ' + n + '?', 'Their name stays on tickets they already worked on.', 'Remove', true);
+      if (ok) { var arr = S.settings.techs.slice(); arr.splice(i,1); saveSettings({techs:arr}); }
+      break;
+    }
+    case 'csv': exportCsv(); break;
+    case 'signout': signOut(); break;
+    case 'rp': RP = a.getAttribute('data-v'); render(); break;
+    case 'msgs': if (t) msgBox(t); break;
+    case 'pstat': {
+      var tt = byId(a.getAttribute('data-tid')) || t; if (!tt || a.disabled) break;
+      var v2 = a.getAttribute('data-v'), pid = a.getAttribute('data-pid');
+      if (v2 === 'ordered') { var pp = (tt.parts||[]).filter(function(x){ return x.id === pid; })[0]; if (pp && pp.status !== 'ordered') { orderBox(tt, pid); break; } }
+      setPartStatus(tt, pid, v2);
+      break;
+    }
+    case 'rmpart': {
+      if (!t) break;
+      var pid2 = a.getAttribute('data-pid'); var pr = (t.parts||[]).filter(function(x){ return x.id === pid2; })[0]; if (!pr) break;
+      var okp = await confirmBox('Remove this part?', pr.name, 'Remove', true);
+      if (okp) { var live2 = byId(t.id); if (live2) patchTicket(live2, {parts:(live2.parts||[]).filter(function(x){ return x.id !== pid2; })}, [logEntry('removed part “' + pr.name + '”')]); }
+      break;
+    }
+    case 'status': if (t && !a.disabled) setStatus(t, a.getAttribute('data-v')); break;
+    case 'chk': {
+      if (!t) break;
+      var w = a.getAttribute('data-w'), k = a.getAttribute('data-k'), v = a.getAttribute('data-v');
+      var m = Object.assign({}, t[w]||{}); var label = (CHECKS.filter(function(c){ return c[0]===k; })[0]||[,''])[1];
+      m[k] = m[k] === v ? '' : v;
+      var o = {}; o[w] = m;
+      var vtxt = m[k]==='ok'?'works':m[k]==='bad'?'not working':m[k]==='na'?'can’t test':'cleared';
+      patchTicket(t, o, [logEntry((w==='pre'?'before repair':'after repair') + ': ' + label + ' ' + vtxt)]);
+      break;
+    }
+    case 'pay': {
+      if (!t) break;
+      var meth = $('#paym') ? $('#paym').value : '';
+      patchTicket(t, {paid:true, payMethod:meth, paidAt:Date.now()}, [logEntry('marked ' + money(balance(t)) + ' paid' + (meth ? ' by ' + meth : ''))]);
+      toast('Marked paid');
+      break;
+    }
+    case 'unpay': if (t) patchTicket(t, {paid:false, payMethod:'', paidAt:0}, [logEntry('undid the payment')]); break;
+    case 'note': {
+      if (!t) break;
+      var ta = $('#note'); var txt = ta ? ta.value.trim() : '';
+      if (!txt) { if (ta) ta.focus(); break; }
+      ta.value = '';
+      patchTicket(t, {}, [logEntry(txt.slice(0,2000), 'note')]);
+      break;
+    }
+    case 'showpc': { var pc = $('#pc'); if (pc) { var shown = pc.textContent !== '••••'; pc.textContent = shown ? '••••' : pc.getAttribute('data-pc'); a.textContent = shown ? 'Show' : 'Hide'; } break; }
+    case 'copymsg': {
+      var msg = a.getAttribute('data-msg');
+      try { await navigator.clipboard.writeText(msg); toast('Message copied'); } catch(err){ toast('Copy didn’t work here. Select the text in your messages app instead.'); }
+      break;
+    }
+    case 'edit': if (t) ticketForm(t); break;
+    case 'print': if (t) printTicket(t); break;
+    case 'delete': {
+      if (!t) break;
+      var ok3 = await confirmBox('Delete ticket #' + t.num + '?', 'This removes the ticket and its history for everyone. It can’t be undone. To keep a record, cancel it instead.', 'Delete ticket', true);
+      if (!ok3) break;
+      var id = t.id; closeSheet();
+      S.tickets = S.tickets.filter(function(x){ return x.id !== id; }); render();
+      enqueue('tickets/'+id, function(){ return retryOnce(function(){ return S.db.doc('tickets/'+id).delete(); }); }).then(function(){ toast('Ticket deleted'); }).catch(writeErr);
+      break;
+    }
+  }
+});
+
+document.addEventListener('change', function(e){
+  if (e.target.closest('.modal')) return;
+  var el = e.target; var t = S.openId ? byId(S.openId) : null;
+  if (!t) return;
+  if (el.getAttribute('data-act') === 'assign') {
+    var v = el.value;
+    patchTicket(t, {assigned:v}, [logEntry(v ? 'assigned the ticket to ' + v : 'unassigned the ticket')]);
+  }
+  if (el.getAttribute('data-act') === 'due') {
+    var ts = fromLocalInput(el.value);
+    patchTicket(t, {dueAt:ts}, [logEntry(ts ? 'set promised time to ' + dueText(ts) : 'cleared the promised time')]);
+  }
+  if (el.getAttribute('data-act') === 'warranty') {
+    patchTicket(t, {warranty:el.value}, [logEntry('set warranty to ' + el.value)]);
+  }
+});
+
+var qT;
+document.addEventListener('input', function(e){
+  if (e.target.id === 'q') {
+    var el = e.target;
+    S.q = el.value;
+    clearTimeout(qT);
+    qT = setTimeout(function(){ searchState = {s:el.selectionStart, e:el.selectionEnd}; render(); }, 120);
+  }
+});
+
+document.addEventListener('submit', function(e){
+  var f = e.target;
+  if (f.getAttribute('data-form') === 'addpart') {
+    e.preventDefault();
+    var t = S.openId ? byId(S.openId) : null; if (!t) return;
+    var n = $('#pn').value.trim(); if (!n) { $('#pn').focus(); return; }
+    var sup = $('#ps').value; S.lastSupplier = sup;
+    var part = {id:uid(), name:n.slice(0,80), supplier:sup, cost:num($('#pc2').value), status:'needed', orderNo:'', addedAt:Date.now()};
+    $('#pn').value = ''; $('#pc2').value = '';
+    patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('added part “' + part.name + '” from ' + sup)]);
+    return;
+  }
+  if (f.getAttribute('data-form') === 'addtech') {
+    e.preventDefault();
+    var inp = $('#newtech'); var n = inp.value.trim().slice(0,30);
+    if (!n) { inp.focus(); return; }
+    var arr = (S.settings.techs||[]).slice();
+    if (arr.some(function(x){ return x.toLowerCase() === n.toLowerCase(); })) { toast(n + ' is already on the team'); return; }
+    arr.push(n); saveSettings({techs:arr}); toast(n + ' added');
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && S.openId && !document.querySelector('.modal')) closeSheet();
+  if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey && !/input|textarea|select/i.test((document.activeElement||{}).tagName||'') && !document.querySelector('.modal') && !S.openId && S.status === 'ready' && S.canWrite) {
+    e.preventDefault(); if (!S.me) whoBox(); else ticketForm(null);
+  }
+});
+
+// keep "updated 5m ago" fresh
+setInterval(function(){ if (S.status === 'ready' && !document.querySelector('.modal') && !(document.activeElement && document.activeElement.id === 'q')) render(); }, 60000);
+
+})();
+</script>
+</body>
+</html>

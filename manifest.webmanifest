@@ -1,8 +1,8 @@
 {
   "name": "iFixPhones Tickets",
   "short_name": "Tickets",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/tickets.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f5f5f7",
   "theme_color": "#ffffff",
