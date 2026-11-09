@@ -194,11 +194,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
       '<div class="g2"><div class="field"><label for="ap-name">Your name</label><input id="ap-name" maxlength="60" autocomplete="name"></div>' +
       '<div class="field"><label for="ap-phone">Cell phone</label><input id="ap-phone" type="tel" maxlength="20" autocomplete="tel"></div></div>' +
       '<div class="g2"><div class="field"><label for="ap-city">City</label><input id="ap-city" maxlength="60" value="San Antonio"></div>' +
-      '<div class="field"><label for="ap-tax">TX sales tax permit # (optional)</label><input id="ap-tax" maxlength="30" inputmode="numeric"></div></div>' +
+      '<div class="field"><label for="ap-tax">TX sales tax permit # (11 digits, optional)</label><input id="ap-tax" maxlength="30" inputmode="numeric"></div></div>' +
       (existing ? '' :
       '<div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email"></div>' +
       '<div class="field"><label for="pw">Create a password (8+ characters)</label><input id="pw" type="password" autocomplete="new-password"></div>') +
-      '</div><p class="hint">With a Texas sales tax permit and a resale certificate on file, your orders are tax-free. Without one, 8.25% sales tax is added.</p>' +
+      '</div><p class="hint"><b>Buying tax-free:</b> enter your Texas sales tax permit number, then give us a signed Texas Resale Certificate (Form 01-339) at your first pickup. Until we have it, 8.25% sales tax is added. A permit number alone isn’t enough under Texas rules.</p>' +
       '<button class="btn full" data-a="' + (existing ? 'finish' : 'apply') + '">Apply for wholesale</button><div class="err" id="err" role="alert"></div>';
   }
 
@@ -206,7 +206,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
     var me = S.me || {};
     var tabs = ['Screens', 'Batteries', 'My orders'];
     var openN = S.orders.filter(function(o){ return o.status !== 'done' && o.status !== 'cancelled'; }).length;
-    var h = '<div class="w"><div class="top"><div><h2>' + esc(me.shop || 'Wholesale') + '</h2><div class="who">Wholesale prices · ' + (exempt() ? 'tax-free (resale certificate on file)' : '8.25% sales tax added') + '</div></div></div>' +
+    var h = '<div class="w"><div class="top"><div><h2>' + esc(me.shop || 'Wholesale') + '</h2><div class="who">Wholesale prices · ' + (exempt() ? 'tax-free (resale certificate on file)' : '8.25% sales tax added · bring a signed Form 01-339 to buy tax-free') + '</div></div></div>' +
       '<div class="tools"><div class="seg" role="group" aria-label="Section">' + tabs.map(function(t){ return '<button data-a="tab" data-v="' + t + '" aria-pressed="' + (S.tab === t) + '">' + t + (t === 'My orders' && openN ? ' (' + openN + ')' : '') + '</button>'; }).join('') + '</div>' +
       (S.tab !== 'My orders' ? '<label class="search"><span class="sr">Search models</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><input id="q" type="search" placeholder="Search, e.g. 14 Pro Max" value="' + esc(S.q) + '" autocomplete="off"></label>' : '') + '</div>';
     if (S.tab === 'My orders') return h + ordersView() + '</div>';
@@ -293,6 +293,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
     if (o.shop.length < 2) return 'Enter your shop or business name.';
     if (o.name.length < 2) return 'Enter your name.';
     if (digits(o.phone).length < 10) return 'Enter a 10-digit phone number.';
+    if (o.taxId && digits(o.taxId).length !== 11) return 'A Texas sales tax permit number is 11 digits. Check it, or leave it blank.';
     return o;
   }
   function writeApp(u, o){

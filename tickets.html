@@ -1509,17 +1509,17 @@ function wsShopsView(){
   var shops = (S.wsShops || []).slice().sort(function(a, b){ return (b.createdAt||0) - (a.createdAt||0); });
   var pend = shops.filter(function(x){ return x.status === 'pending'; }), ok = shops.filter(function(x){ return x.status === 'approved'; }), off = shops.filter(function(x){ return x.status === 'declined' || x.status === 'off'; });
   var spent = function(uid){ return (S.wsOrders||[]).filter(function(o){ return o.uid === uid && o.status === 'done'; }).reduce(function(a, o){ return a + num(o.subtotal); }, 0); };
-  var info = function(x){ return '<span class="t2">'+esc(x.name||'')+' · <a href="tel:'+esc(e164(x.phone))+'">'+esc(fmtPhone(x.phone))+'</a> · '+esc(x.email||'')+(x.city ? ' · ' + esc(x.city) : '')+'</span><br><span class="t2">'+(x.taxId ? 'TX tax permit: <b>'+esc(x.taxId)+'</b>' : 'No tax permit given')+' · applied '+esc(rel(x.createdAt))+'</span>'; };
+  var info = function(x){ return '<span class="t2">'+esc(x.name||'')+' · <a href="tel:'+esc(e164(x.phone))+'">'+esc(fmtPhone(x.phone))+'</a> · '+esc(x.email||'')+(x.city ? ' · ' + esc(x.city) : '')+'</span><br><span class="t2">'+(x.taxId ? 'TX tax permit: <b>'+esc(x.taxId)+'</b> · <a href="https://comptroller.texas.gov/taxes/sales/taxpayer-search.php" target="_blank" rel="noopener">Check it’s active ↗</a>' : 'No tax permit given')+' · applied '+esc(rel(x.createdAt))+'</span>'; };
   var h = '';
   h += '<div class="panel"><h2>Waiting for approval'+(pend.length ? ' ('+pend.length+')' : '')+'</h2>' + (pend.length ? pend.map(function(x){
     return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b><br>'+info(x)+'</span><span class="acts"><button class="btn sm ghost" data-act="wsdecline" data-id="'+esc(x.id)+'">Decline</button><button class="btn sm" data-act="wsapprove" data-id="'+esc(x.id)+'">Approve</button></span></div>';
   }).join('') : '<p class="muted">No new applications. Shops apply at ifixphones.net/wholesale.</p>') + '</div>';
   h += '<div class="panel"><h2>Approved shops'+(ok.length ? ' ('+ok.length+')' : '')+'</h2>' + (ok.length ? ok.map(function(x){
     return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b> <span class="tagk ok">'+money(spent(x.id))+' bought</span><br>'+info(x)+
-      '<label class="check" style="margin-top:6px"><input type="checkbox" data-wsexempt="'+esc(x.id)+'"'+(x.taxExempt?' checked':'')+'>Tax-free: I have their resale certificate on file</label></span>' +
+      '<label class="check" style="margin-top:6px"><input type="checkbox" data-wsexempt="'+esc(x.id)+'"'+(x.taxExempt?' checked':'')+(x.taxId||x.taxExempt?'':' disabled')+'>Tax-free: signed Form 01-339 on file and permit checked active'+(x.taxExempt && x.certAt ? ' <span class="t2">(since '+esc(dateOnly(x.certAt))+')</span>' : '')+'</label></span>' +
       '<span class="acts"><a class="btn sm ghost" href="sms:'+esc(e164(x.phone))+'">Text</a><button class="btn sm ghost" data-act="wsoff" data-id="'+esc(x.id)+'">Turn off</button></span></div>';
   }).join('') : '<p class="muted">Nobody approved yet.</p>') +
-  '<p class="hint" style="margin-top:10px">Texas: only mark a shop tax-free once you have their signed resale certificate (Form 01-339) with their sales tax permit number. Keep it on file.</p></div>';
+  '<p class="hint" style="margin-top:10px"><b>Texas rules:</b> a permit number alone isn’t enough. Only tick Tax-free once you have their <b>signed Form 01-339</b> and the permit shows <b>active</b> on the Comptroller’s search. Keep the signed form (a photo in a folder is fine) for at least 4 years. If anything looks off, charge the 8.25%.</p></div>';
   if (off.length) h += '<div class="panel"><h2>Turned off / declined</h2>' + off.map(function(x){
     return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b><br>'+info(x)+'</span><span class="acts"><button class="btn sm ghost" data-act="wsapprove" data-id="'+esc(x.id)+'">Approve</button></span></div>';
   }).join('') + '</div>';
@@ -3401,7 +3401,7 @@ document.addEventListener('change', function(e){
   if (cm) { var co = Object.assign({}, S.settings.commission||{}); co[cm] = num(el.value); saveSettings({commission: co}); toast('Saved'); return; }
   if (el.hasAttribute && el.hasAttribute('data-wsp')) { wsSaveField(el); return; }
   var wx = el.getAttribute && el.getAttribute('data-wsexempt');
-  if (wx) { var wsx = wsShop(wx); if (wsx.id) wsSetShop(wsx, {taxExempt: el.checked}, el.checked ? 'Tax-free for ' + wsx.shop : 'Sales tax on for ' + wsx.shop); return; }
+  if (wx) { var wsx = wsShop(wx); if (wsx.id) wsSetShop(wsx, el.checked ? {taxExempt:true, certAt:Date.now(), certBy:who()} : {taxExempt:false}, el.checked ? 'Tax-free for ' + wsx.shop : 'Sales tax on for ' + wsx.shop); return; }
   var sk = el.getAttribute('data-setting');
   if (sk) { var o = {}; o[sk] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(o); toast('Saved'); return; }
   var t = S.openId ? byId(S.openId) : null;
