@@ -728,9 +728,9 @@ function startData(){
     if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
     render();
   }, function(){ S.reqsErr = true; render(); }));
-  unsubs.push(db.collection('inventory').onSnapshot(function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); S.invLoaded = !snap.metadata.fromCache || S.invLoaded; render(); }, function(){}));
-  unsubs.push(db.collection('wsprices').onSnapshot(function(snap){ var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.wsp = o; S.wspLoaded = !snap.metadata.fromCache || S.wspLoaded; render(); }, function(){}));
-  unsubs.push(db.doc('wholesale/catalog').onSnapshot(function(snap){ S.wsCat = snap.exists ? clone(snap.data()) : {}; S.wsCatLoaded = !snap.metadata.fromCache || S.wsCatLoaded; render(); }, function(){}));
+  unsubs.push(db.collection('inventory').onSnapshot({includeMetadataChanges:true}, function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); S.invLoaded = !snap.metadata.fromCache || S.invLoaded; render(); }, function(){}));
+  unsubs.push(db.collection('wsprices').onSnapshot({includeMetadataChanges:true}, function(snap){ var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.wsp = o; S.wspLoaded = !snap.metadata.fromCache || S.wspLoaded; render(); }, function(){}));
+  unsubs.push(db.doc('wholesale/catalog').onSnapshot({includeMetadataChanges:true}, function(snap){ S.wsCat = snap.exists ? clone(snap.data()) : {}; S.wsCatLoaded = !snap.metadata.fromCache || S.wsCatLoaded; render(); }, function(){}));
   var seenWs = null, seenShops = null;
   unsubs.push(db.collection('wsorders').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
     S.wsOrders = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
@@ -1461,15 +1461,16 @@ function wsCatalog(){
 var wsPubT = 0, wsLast = null;
 function wsPublishSoon(){
   if (!S.db || !S.wspLoaded || !S.invLoaded || !S.wsCatLoaded) return;
-  clearTimeout(wsPubT); wsPubT = setTimeout(wsPublish, 1000);
+  clearTimeout(wsPubT); wsPubT = setTimeout(function(){ var r = wsPublish(); if (r && r.catch) r.catch(function(){}); }, 1000);
 }
-function wsPublish(){
+function wsPublish(force){
   var items = wsCatalog(), js = JSON.stringify(items);
-  if (js === JSON.stringify((S.wsCat||{}).items || []) || js === wsLast) return;
+  if (!force && (js === JSON.stringify((S.wsCat||{}).items || []) || js === wsLast)) return;
   wsLast = js;
-  S.db.doc('wholesale/catalog').set({items:items, updatedAt:Date.now()}).catch(function(){ wsLast = null; });
+  var p1 = S.db.doc('wholesale/catalog').set({items:items, updatedAt:Date.now()});
+  p1.catch(function(){ wsLast = null; });
   // public browse list for the wholesale page (no prices, just in stock or not)
-  S.db.doc('public/wscatalog').set({items:items.map(function(i){ return {id:i.id, cat:i.cat, brand:i.brand, model:i.model, label:i.label, inStock:i.avail > 0}; }), updatedAt:Date.now()}).catch(function(){});
+  return Promise.all([p1, S.db.doc('public/wscatalog').set({items:items.map(function(i){ return {id:i.id, cat:i.cat, brand:i.brand, model:i.model, label:i.label, inStock:i.avail > 0}; }), updatedAt:Date.now()})]);
 }
 function wsTotals(o){
   var sh = wsShop(o.uid), sub = r2((o.items||[]).reduce(function(a, l){ return a + num(l.price) * Math.round(num(l.qty)); }, 0));
@@ -1532,7 +1533,7 @@ function wsPricesView(){
   var brands = BRANDS.filter(function(b){ return b !== 'Other' && (CATALOG[b]||[]).length; });
   S.wsBrand = S.wsBrand || brands[0];
   var listed = wsCatalog();
-  var head = '<div class="panel" style="padding:16px 20px"><p class="muted" style="margin:0">Set a price and it shows on the wholesale page right away. <b>In stock</b> comes from your Parts. <b>Keep</b> holds that many back for your own repairs, so shops only see the rest. '+listed.length+' item'+(listed.length===1?'':'s')+' listed now.</p></div>';
+  var head = '<div class="panel" style="padding:16px 20px"><p class="muted" style="margin:0">Set a price and it shows on the wholesale page right away. <b>In stock</b> comes from your Parts. <b>Keep</b> holds that many back for your own repairs, so shops only see the rest. '+listed.length+' item'+(listed.length===1?'':'s')+' listed now.</p><div class="acts" style="margin-top:10px"><button class="btn sm" data-act="wspublish">Update wholesale page now</button><a class="btn sm ghost" href="https://ifixphones.net/wholesale" target="_blank" rel="noopener">View page ↗</a></div></div>';
   var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search models</label><input id="q" type="search" placeholder="Search a model, e.g. 15 Pro" value="'+esc(S.q)+'" autocomplete="off"></div>' +
     '<button class="btn sm ghost" data-act="wslisted" aria-pressed="'+!!S.wsListed+'">'+(S.wsListed?'Showing: listed only':'Showing: all models')+'</button></div>';
   var chips = '<div class="chips" style="margin-bottom:12px">' + brands.map(function(b){ var n = listed.filter(function(i){ return i.brand === b; }).length; return '<button class="chip" data-act="wsbrand" data-v="'+esc(b)+'" aria-pressed="'+(!q && S.wsBrand===b)+'">'+esc(b.replace('Apple ',''))+(n?' <i>'+n+'</i>':'')+'</button>'; }).join('') + '</div>';
@@ -3352,6 +3353,7 @@ document.addEventListener('click', async function(e){
     case 'wsfilter': S.wsFilter = a.getAttribute('data-v'); render(); break;
     case 'wsbrand': S.wsBrand = a.getAttribute('data-v'); S.q = ''; render(); break;
     case 'wslisted': S.wsListed = !S.wsListed; render(); break;
+    case 'wspublish': { a.disabled = true; wsLast = null; Promise.resolve().then(function(){ return wsPublish(true); }).then(function(){ toast('Wholesale page updated · ' + wsCatalog().length + ' items'); }, function(e){ toast('Couldn’t update: ' + String(e && (e.code || e.message) || '').slice(0, 60)); }).then(function(){ a.disabled = false; }); break; }
     case 'wsorder': { var wo = (S.wsOrders||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (wo) wsOrderBox(wo); break; }
     case 'wsapprove': { var wa = wsShop(a.getAttribute('data-id')); if (wa.id) wsApprove(wa); break; }
     case 'wsdecline': { var wd = wsShop(a.getAttribute('data-id')); if (wd.id && await confirmBox('Decline ' + wd.shop + '?', 'They won’t see prices. You can approve them later.', 'Decline', true)) wsSetShop(wd, {status:'declined'}, 'Declined'); break; }
