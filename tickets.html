@@ -1454,7 +1454,7 @@ function wsCatalog(){
   BRANDS.forEach(function(b){ (CATALOG[b]||[]).forEach(function(m){ wsParts(b, m).forEach(function(pt){
     var id = stockId(b, m, pt), p = wsP(id);
     if (!p || p.on === false || !(num(p.price) > 0)) return;
-    items.push({id:id, cat:wsCat(pt), brand:b, model:m, label:String(p.label || wsDefaultLabel(pt)).slice(0, 40), price:num(p.price), avail:wsAvail(id)});
+    items.push({id:id, cat:wsCat(pt), brand:b, model:m, label:String(p.label || wsDefaultLabel(pt)).slice(0, 40), maker:/OLED/.test(pt) ? String(p.maker||'') : '', price:num(p.price), avail:wsAvail(id)});
   }); }); });
   return items;
 }
@@ -1470,7 +1470,7 @@ function wsPublish(force){
   var p1 = S.db.doc('wholesale/catalog').set({items:items, updatedAt:Date.now()});
   p1.catch(function(){ wsLast = null; });
   // public browse list for the wholesale page (no prices, just in stock or not)
-  return Promise.all([p1, S.db.doc('public/wscatalog').set({items:items.map(function(i){ return {id:i.id, cat:i.cat, brand:i.brand, model:i.model, label:i.label, inStock:i.avail > 0}; }), updatedAt:Date.now()})]);
+  return Promise.all([p1, S.db.doc('public/wscatalog').set({items:items.map(function(i){ return {id:i.id, cat:i.cat, brand:i.brand, model:i.model, label:i.label, maker:i.maker, inStock:i.avail > 0}; }), updatedAt:Date.now()})]);
 }
 function wsTotals(o){
   var sh = wsShop(o.uid), sub = r2((o.items||[]).reduce(function(a, l){ return a + num(l.price) * Math.round(num(l.qty)); }, 0));
@@ -1545,15 +1545,16 @@ function wsPricesView(){
     if (parts.length) rows.push({b:b, m:m, parts:parts});
   }); });
   if (!rows.length) return head + bar + chips + '<div class="panel empty"><h3>'+(S.wsListed ? 'Nothing listed here yet' : 'No models match')+'</h3><p>'+(S.wsListed ? 'Tap “Showing: listed only” to see every model and add prices.' : 'Try a shorter search.')+'</p></div>';
-  var grid = 'grid-template-columns:minmax(0,1.3fr) minmax(0,1.1fr) 62px 62px 92px 50px';
-  return head + bar + chips + '<div class="panel" style="padding:8px 18px;overflow-x:auto"><div class="prow2 wsgrid" style="'+grid+';font-size:12px;color:var(--muted,#6e6e73);font-weight:600;min-width:560px"><span>Part</span><span>Name shops see</span><span>In stock</span><span>Keep</span><span>Price</span><span>Show</span></div>' +
+  var grid = 'grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 78px 62px 62px 92px 50px';
+  return head + bar + chips + '<div class="panel" style="padding:8px 18px;overflow-x:auto"><div class="prow2 wsgrid" style="'+grid+';font-size:12px;color:var(--muted,#6e6e73);font-weight:600;min-width:660px"><span>Part</span><span>Name shops see</span><span>Maker</span><span>In stock</span><span>Keep</span><span>Price</span><span>Show</span></div>' +
     rows.map(function(r){
-      return '<div style="font-weight:700;padding:12px 0 2px;min-width:560px">'+esc(r.m)+'</div>' + r.parts.map(function(pt){
+      return '<div style="font-weight:700;padding:12px 0 2px;min-width:660px">'+esc(r.m)+'</div>' + r.parts.map(function(pt){
         var id = stockId(r.b, r.m, pt), p = wsP(id) || {}, inv = invById(id), have = inv ? num(inv.qty) : 0;
         var spec = esc(JSON.stringify({id:id, brand:r.b, model:r.m, part:pt}));
         var cost = inv && num(inv.cost) ? '<span class="t2" style="display:block;font-size:11.5px">cost '+money(inv.cost)+(num(p.price) ? ' · +'+money(r2(num(p.price) - num(inv.cost))) : '')+'</span>' : '';
-        return '<div class="prow2" style="'+grid+';min-width:560px"><span>'+esc(pt)+cost+'</span>' +
+        return '<div class="prow2" style="'+grid+';min-width:660px"><span>'+esc(pt)+cost+'</span>' +
           '<input class="in" style="min-height:36px;padding:6px 10px;font-size:14px" id="wsl-'+esc(id)+'" data-wsp="label" data-spec="'+spec+'" maxlength="40" placeholder="'+esc(wsDefaultLabel(pt))+'" value="'+esc(p.label||'')+'" aria-label="Name shops see for '+esc(r.m+' '+pt)+'">' +
+          (/OLED/.test(pt) ? '<select class="in" style="min-height:36px;padding:4px 6px;font-size:13px" data-wsp="maker" data-spec="'+spec+'" aria-label="Panel maker">'+['','DD','RJ','JK','Other'].map(function(mk){ return '<option value="'+mk+'"'+((p.maker||'')===mk?' selected':'')+'>'+(mk||'—')+'</option>'; }).join('')+'</select>' : '<span></span>') +
           '<span style="text-align:center;font-weight:600'+(have<=0?';color:#c9302c':'')+'">'+have+'</span>' +
           '<input class="in" style="min-height:36px;padding:6px 8px;font-size:14px;text-align:center" id="wsk-'+esc(id)+'" data-wsp="keep" data-spec="'+spec+'" inputmode="numeric" value="'+esc(p.keep ? Math.round(num(p.keep)) : '')+'" placeholder="0" aria-label="Keep for shop">' +
           '<input class="in" style="min-height:36px;padding:6px 8px;font-size:14px" id="wsp-'+esc(id)+'" data-wsp="price" data-spec="'+spec+'" inputmode="decimal" value="'+esc(num(p.price) ? num(p.price).toFixed(2) : '')+'" placeholder="$" aria-label="Wholesale price">' +
@@ -1567,6 +1568,7 @@ function wsSaveField(el){
   if (f === 'price') { o.price = num(el.value); if (o.price > 0 && cur.on == null) o.on = true; }
   else if (f === 'keep') o.keep = Math.max(0, Math.round(num(el.value)));
   else if (f === 'label') o.label = el.value.trim().slice(0, 40);
+  else if (f === 'maker') o.maker = el.value;
   else if (f === 'on') o.on = el.checked;
   S.wsp = Object.assign({}, S.wsp); S.wsp[spec.id] = Object.assign({}, cur, o);
   S.db.doc('wsprices/' + spec.id).set(o, {merge:true}).then(function(){ toast(f === 'on' ? (o.on ? 'Showing to shops' : 'Hidden from shops') : 'Saved'); }).catch(writeErr);
