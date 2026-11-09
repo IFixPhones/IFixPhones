@@ -1444,7 +1444,7 @@ var WS_MAP = {}; WS_ST.forEach(function(x){ WS_MAP[x[0]] = x[1]; });
 var WS_PILL = {new:'background:#e8f1fd;color:#0058b0', confirmed:'background:#fff4dd;color:#8a5a00', ready:'background:#e6f4ea;color:#1a7f37', done:'background:#f0f0f2;color:#3a3a3c', cancelled:'background:#fbeceb;color:#9b2c27'};
 function wsPill(s){ return '<span class="tagk" style="'+(WS_PILL[s]||'')+'">'+esc(WS_MAP[s]||s)+'</span>'; }
 function wsParts(brand, model){ return partTypes(brand, model).filter(function(p){ return /screen|lcd|battery/i.test(p); }); }
-function wsDefaultLabel(part){ if (/Incell/.test(part)) return 'JK Incell'; if (/OLED/.test(part)) return 'JK Soft OLED'; if (/Original/.test(part)) return 'Original'; return part; }
+function wsDefaultLabel(part){ if (/Incell/.test(part)) return 'FX5 Incell'; if (/OLED/.test(part)) return 'FX7 OLED'; if (/Original/.test(part)) return 'Original'; return part; }
 function wsCat(part){ return /battery/i.test(part) ? 'Batteries' : 'Screens'; }
 function wsP(id){ return (S.wsp||{})[id] || null; }
 function wsAvail(id){ var i = invById(id), p = wsP(id) || {}; return Math.max(0, (i ? num(i.qty) : 0) - Math.round(num(p.keep))); }
@@ -1980,7 +1980,7 @@ function receiptDoc(t){
       (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') + (num(t.depSurcharge) ? tr('Credit card fee on deposit', money(t.depSurcharge)) : '') +
       tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(total(t) - num(t.deposit) + num(t.surcharge))), 1) +
       (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
-    '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (/incell/i.test(repairsText(t)) ? '. Incell parts have no warranty.' : '') + '<br>Warranty covers the part only when our supplier does; cracks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' +
+    '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (/incell|oled/i.test(repairsText(t)) ? '. Incell and Soft OLED screens: 30 days, defects only (not breakage).' : '') + '<br>Warranty covers defects in the part only; cracks, pressure marks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' +
     '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
 }
 
@@ -2670,7 +2670,7 @@ function renderSheet(){
         payBlock +
         '<div class="g2" style="margin-top:14px"><div class="f"><label for="asg">Technician</label><select class="in" id="asg" data-act="assign" '+(ro?'disabled':'')+'>'+techOpts+'</select></div>' +
         '<div class="f"><label for="war">Warranty</label><select class="in" id="war" data-act="warranty" '+(ro?'disabled':'')+'>'+warrOpts+'</select></div></div>' +
-        (/incell/i.test(repairsText(t)) ? '<p class="hint">Incell parts have no warranty under your policy.</p>' : '') +
+        (/incell/i.test(repairsText(t)) ? '<p class="hint">Incell and Soft OLED screens: 30-day warranty for defects only (not breakage).</p>' : '') +
         (t.status==='done' && warrantyEnd(t) ? (warrantyEnd(t) > Date.now() ? '<div class="match" style="margin-top:12px">Warranty active until <b>'+esc(dateOnly(warrantyEnd(t)))+'</b>.</div>' : '<p class="hint">Warranty ended '+esc(dateOnly(warrantyEnd(t)))+'.</p>') : '') +
         (num(partsCost(t)) && tot ? '<p class="hint">Part costs '+money(partsCost(t))+' · after parts '+money(tot - partsCost(t))+'</p>' : '') +
       '</div>' +
@@ -2912,7 +2912,7 @@ function ticketForm(existing, prefill){
         '<div class="f" style="margin-top:14px"><label for="tf-dmg">Existing damage</label><textarea class="in" id="tf-dmg" placeholder="Cracked back glass, dent on bottom left corner, scratches on screen…">'+esc(t&&t.damage)+'</textarea></div>' +
         '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
       '</div>' +
-      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms and Incell no-warranty were explained.</span></label>' +
+      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms (30-day defect warranty on Incell and Soft OLED, no breakage) were explained.</span></label>' +
         '<div class="sigwrap"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
     '</div>' +
     '<div class="mfoot"><span class="err" id="tf-err" role="alert"></span><button type="button" class="btn ghost" data-tf-close>Cancel</button><button type="submit" class="btn" id="tf-save">'+(t?'Save changes':'Check in')+'</button></div>' +
@@ -2960,7 +2960,7 @@ function ticketForm(existing, prefill){
   m.addEventListener('change', function(e){
     if (e.target.closest('.irow')) {
       syncItems();
-      if (e.target.getAttribute('data-f') === 'part' && NT.items.every(function(x){ return x.part === 'Incell'; })) { var wsel = $('#tf-war'); if (wsel && wsel.value !== 'None') { wsel.value = 'None'; toast('Warranty set to None. Incell parts have no warranty.'); } }
+      if (e.target.getAttribute('data-f') === 'part' && NT.items.length && NT.items.every(function(x){ return /^(Incell|OLED)$/.test(x.part); })) { var wsel = $('#tf-war'); if (wsel && wsel.value !== '30 days') { wsel.value = '30 days'; toast('Warranty set to 30 days (defects only).'); } }
       if (e.target.getAttribute('data-f') === 'repair') { var ri = +e.target.closest('.irow').getAttribute('data-i'); renderItems(); var dd = $('#it-d' + ri); if (dd) dd.focus(); }
       updateTotal(); hintPrices();
     }
@@ -3128,10 +3128,10 @@ function ticketDoc(t){
     (dep?'<tr><td>Deposit</td><td style="text-align:right">−'+money(dep)+'</td></tr><tr><td>Balance</td><td style="text-align:right">'+money(Math.max(0,tot-dep))+'</td></tr>':'') +
     (t.paid?(num(t.surcharge)?'<tr><td>Credit card surcharge</td><td style="text-align:right">'+money(t.surcharge)+'</td></tr>':'')+'<tr><td>Paid'+(payLabel(t)?' ('+esc(payLabel(t))+')':'')+'</td><td style="text-align:right">'+esc(dt(t.paidAt))+'</td></tr>':'') + '</table>' +
     (surRate() ? '<p style="font-size:11px;color:#555">Credit card payments include a '+surRate()+'% surcharge. No surcharge on debit cards or cash.</p>' : '') +
-    (t.dueAt?'<p><b>Promised by:</b> '+esc(dt(t.dueAt))+'</p>':'')+'<p><b>Warranty:</b> '+esc(t.warranty||'None')+(/incell/i.test(repairsText(t))?' (Incell parts have no warranty)':'')+' · <b>Technician:</b> '+esc(t.assigned||'—')+'</p>' +
+    (t.dueAt?'<p><b>Promised by:</b> '+esc(dt(t.dueAt))+'</p>':'')+'<p><b>Warranty:</b> '+esc(t.warranty||'None')+(/incell|oled/i.test(repairsText(t))?' (Incell / Soft OLED: defects only, not breakage)':'')+' · <b>Technician:</b> '+esc(t.assigned||'—')+'</p>' +
     '<h2>Condition at check-in</h2><div class="cl">'+pre+'</div>' +
     '<p><b>Existing damage:</b> '+esc(t.damage||'None noted')+(t.liquid?' · <b>Signs of liquid damage</b>':'')+'</p>' +
-    '<div class="box"><b>Please read.</b> Back up your data; we aren’t responsible for data loss. Opening a phone carries risks even when done correctly, including damage to the original screen, loss of water resistance and parts notices in Settings. We warranty a part only when our supplier does; Incell parts have no warranty. Any new cracks, pressure marks, frame damage or liquid voids the warranty. Payment is due when the repair is done. Full policy: ifixphones.net/policy.html</div>' +
+    '<div class="box"><b>Please read.</b> Back up your data; we aren’t responsible for data loss. Opening a phone carries risks even when done correctly, including damage to the original screen, loss of water resistance and parts notices in Settings. Incell and Soft OLED screens have a 30-day warranty for defects only (not breakage); other parts are covered only when our supplier warranties them. Any new cracks, pressure marks, frame damage or liquid voids the warranty. Payment is due when the repair is done. Full policy: ifixphones.net/policy.html</div>' +
     '<div style="display:flex;gap:14px;align-items:center;margin-top:14px;border:1px solid #ddd;border-radius:8px;padding:8px 12px">' + qrSvg(statusUrl(t), 84) + '<div><b>Check your repair anytime</b><br>Scan the code or visit <b>ifixphones.net/status.html</b><br>Ticket #'+esc(t.num)+' · last 4 of your phone number</div></div>' +
     '<p style="margin-top:12px">I agree to the iFixPhones Warranty and Repair Policy and approve the repairs listed above.</p>' +
     (t.sig ? '<div class="sig"><div class="sv"><img src="'+esc(t.sig)+'" alt=""><span>Customer signature</span></div><div class="sv"><b>'+esc(dateOnly(t.sigAt))+'</b><span>Date</span></div></div>' : '<div class="sig"><div>Customer signature</div><div>Date</div></div>') +

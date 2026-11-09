@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>iFixPhones Wholesale | Screens &amp; Batteries at the Best Price</title>
-<meta name="description" content="Wholesale JK Soft OLED and JK Incell screens and batteries for repair shops. Best prices, tested parts, same-day pickup in San Antonio.">
+<meta name="description" content="Wholesale FX7 OLED and FX5 Incell screens and batteries for repair shops. Best prices, tested parts, same-day pickup in San Antonio.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b1220">
 <link rel="icon" href="icon-192.png">
@@ -248,7 +248,7 @@ footer a{color:#424245}
   var approved = function(){ return S.me && S.me.status === 'approved'; };
   function list(){ return approved() ? S.items : S.pub; }
   function kind(i){ var id = String(i.id||''); if (i.cat === 'Batteries' || /battery/.test(id)) return 'batt'; if (/oled/.test(id) || /oled/i.test(i.label)) return 'oled'; if (/original/.test(id)) return 'orig'; return 'incell'; }
-  var KIND = {oled:['Soft OLED','b-oled'], incell:['Incell','b-incell'], batt:['Battery','b-batt'], orig:['Original','b-orig']};
+  var KIND = {oled:['FX7 OLED','b-oled'], incell:['FX5 Incell','b-incell'], batt:['Battery','b-batt'], orig:['Original','b-orig']};
   function seriesOf(m){ var x = /iPhone (\d+)/.exec(m); if (x) return x[1]; if (/Air/.test(m)) return 'Air'; return 'Other'; }
   function itemById(id){ return S.items.filter(function(i){ return i.id === id; })[0]; }
   function loadCart(){ try { S.cart = JSON.parse(localStorage.getItem('ifx_ws_cart_' + S.user.uid) || '{}') || {}; } catch(e) { S.cart = {}; } }
@@ -306,12 +306,12 @@ footer a{color:#424245}
   function state(ic, h, p, extra){ return '<div class="state"><div class="ic" aria-hidden="true">' + ic + '</div><h2>' + h + '</h2><p>' + p + '</p>' + (extra||'') + '</div>'; }
   function hero(){
     if (approved()) return '<section class="hero slim"><div class="w"><div class="eyebrow">Welcome back, ' + esc((S.me.name||'').split(' ')[0] || 'partner') + '.</div><h1>' + esc(S.me.shop || 'Your shop') + '</h1></div></section>';
-    return '<section class="hero"><div class="w reveal"><div class="eyebrow">iFixPhones Wholesale</div><h1>Screens and batteries.<br><em>Best price.</em></h1><p>JK Soft OLED and JK Incell screens, plus batteries, for every iPhone. Tested, in stock, ready for pickup today.</p><div class="cta"><button class="btn" data-a="auth" data-v="apply">Apply for an account</button><button class="more" data-a="auth" data-v="signin">Sign in</button></div></div>' +
+    return '<section class="hero"><div class="w reveal"><div class="eyebrow">iFixPhones Wholesale</div><h1>Screens and batteries.<br><em>Best price.</em></h1><p>FX7 OLED and FX5 Incell screens, plus batteries, for every iPhone. Tested, in stock, ready for pickup today.</p><div class="cta"><button class="btn" data-a="auth" data-v="apply">Apply for an account</button><button class="more" data-a="auth" data-v="signin">Sign in</button></div></div>' +
       '<div class="w"><div class="art reveal" aria-hidden="true"><div class="ph"></div></div></div></section>';
   }
 
   function trust(){
-    return '<div class="w"><div class="facts reveal"><div><b>JK only</b><span>Soft OLED and Incell</span></div><div><b>Covered</b><span>Screen breakage covered</span></div><div><b>Same day</b><span>Pickup or local delivery</span></div><div><b>Tax-free</b><span>With a Texas resale certificate</span></div></div></div>';
+    return '<div class="w"><div class="facts reveal"><div><b>FX7 · FX5</b><span>Two grades. No guesswork.</span></div><div><b>3 months</b><span>Warranty on every screen</span></div><div><b>Same day</b><span>Pickup or local delivery</span></div><div><b>Tax-free</b><span>With a Texas resale certificate</span></div></div></div>';
   }
 
   function band(){
@@ -327,13 +327,13 @@ footer a{color:#424245}
       if (S.cat === 'incell' && k !== 'incell') return false;
       if (S.cat === 'batt' && k !== 'batt') return false;
       if (S.series !== 'all' && seriesOf(i.model) !== S.series) return false;
-      if (q) { var hay = (i.model + ' ' + i.label + ' ' + KIND[k][0] + ' ' + (k === 'batt' ? 'battery' : 'screen lcd display')).toLowerCase(); if (!q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; })) return false; }
+      if (q) { var hay = (i.model + ' ' + i.label + ' ' + KIND[k][0] + ' ' + (k === 'batt' ? 'battery' : 'screen lcd display') + (k === 'oled' ? ' soft oled' : k === 'incell' ? ' incell' : '')).toLowerCase(); if (!q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; })) return false; }
       return true;
     });
   }
   function catalogSection(locked){
     var L = list();
-    var cats = [['all','All'],['oled','Soft OLED'],['incell','Incell'],['batt','Batteries']];
+    var cats = [['all','All'],['oled','FX7 OLED'],['incell','FX5 Incell'],['batt','Batteries']];
     var ser = []; L.forEach(function(i){ var s = seriesOf(i.model); if (ser.indexOf(s) < 0) ser.push(s); });
     ser.sort(function(a, b){ var x = parseInt(a, 10), y = parseInt(b, 10); return (isNaN(y) ? -1 : y) - (isNaN(x) ? -1 : x); });
     var items = filtered();
@@ -349,8 +349,8 @@ footer a{color:#424245}
   function card(i, locked){
     var k = kind(i), av = locked ? (i.inStock ? 5 : 0) : i.avail;
     var st = av <= 0 ? '<div class="stock out">Out of stock</div>' : (!locked && av <= 3) ? '<div class="stock low">Only ' + av + ' left</div>' : '<div class="stock">In stock</div>';
-    var sub = k === 'batt' ? (/battery/i.test(i.label) ? 'Replacement battery' : esc(i.label)) : esc(i.label);
-    var body = '<div class="cbody"><div class="kind ' + k + '">' + KIND[k][0] + '</div><h3>' + esc(i.model) + '</h3><div class="q">' + sub + '</div>' + (k === 'oled' || k === 'incell' ? '<div><span class="cover">Breakage covered</span></div>' : '');
+    var sub = k === 'batt' ? (/battery/i.test(i.label) ? 'Replacement battery' : esc(i.label)) : (String(i.label).toLowerCase() === KIND[k][0].toLowerCase() ? 'Screen assembly' : esc(i.label));
+    var body = '<div class="cbody"><div class="kind ' + k + '">' + KIND[k][0] + '</div><h3>' + esc(i.model) + '</h3><div class="q">' + sub + '</div>' + (k !== 'batt' ? '<div><span class="cover">3-month warranty</span></div>' : '');
     if (locked) body += st + '<button class="lockp" data-a="auth" data-v="' + (S.st === 'in' ? 'none' : 'signin') + '"' + (S.st === 'in' ? ' disabled' : '') + '>' + (S.st === 'in' ? 'Price after approval' : 'Sign in for price') + '</button>';
     else {
       var n = S.cart[i.id] || 0;
@@ -380,12 +380,12 @@ footer a{color:#424245}
   var SHARED = {'iPhone 12|incell':['iPhone 12','iPhone 12 Pro'],'iPhone 12 Pro|incell':['iPhone 12','iPhone 12 Pro'],'iPhone 12|oled':['iPhone 12','iPhone 12 Pro'],'iPhone 12 Pro|oled':['iPhone 12','iPhone 12 Pro'],'iPhone 12|orig':['iPhone 12','iPhone 12 Pro'],'iPhone 12 Pro|orig':['iPhone 12','iPhone 12 Pro'],'iPhone 16e|incell':['iPhone 16e','iPhone 17e'],'iPhone 17e|incell':['iPhone 16e','iPhone 17e'],'iPhone 16e|orig':['iPhone 16e','iPhone 17e'],'iPhone 17e|orig':['iPhone 16e','iPhone 17e']};
   function info(i){
     var k = kind(i), m = i.model;
-    if (k === 'oled') return {desc:'A flexible (soft) OLED screen assembly. It’s the closest aftermarket match to the original: thin, bright, with deep blacks and accurate color, and the same flex layout so it installs like the original.',
-      rows:[['Panel','Soft (flexible) OLED'],['Look','True blacks, bright, sharp'],['Fit','Same thickness and flex layout as the original'],['True Tone','Keeps True Tone after IC transfer (programmer needed)'],['Coverage','Breakage covered'],['Quality','Tested before it leaves the shop']]};
-    if (k === 'incell') return {desc:'An Incell LCD screen assembly with the touch layer built into the display. A dependable, budget-friendly choice for everyday repairs when the customer wants the lowest price.',
-      rows:[['Panel','Incell LCD with built-in touch'],['Look','Good brightness; blacks are not as deep as OLED'],['Fit','Slightly thicker than OLED, same connectors'],['True Tone','Keeps True Tone after IC transfer (programmer needed)'],['Coverage','Breakage covered'],['Quality','Tested before it leaves the shop']]};
+    if (k === 'oled') return {desc:'FX7 OLED is our top grade: a flexible (soft) OLED screen assembly. It’s the closest aftermarket match to the original: thin, bright, with deep blacks and accurate color, and the same flex layout so it installs like the original.',
+      rows:[['Grade','FX7 (top grade)'],['Panel','Soft (flexible) OLED, made by JK'],['Look','True blacks, bright, sharp'],['Fit','Same thickness and flex layout as the original'],['True Tone','Keeps True Tone after IC transfer (programmer needed)'],['Warranty','3 months: dead on arrival and defects (not physical damage)'],['Quality','Tested with you at pickup']]};
+    if (k === 'incell') return {desc:'FX5 Incell is our value grade: an Incell LCD screen assembly with the touch layer built into the display. A dependable, budget-friendly choice for everyday repairs when the customer wants the lowest price.',
+      rows:[['Grade','FX5 (value grade)'],['Panel','Incell LCD with built-in touch, made by JK'],['Look','Good brightness; blacks are not as deep as OLED'],['Fit','Slightly thicker than OLED, same connectors'],['True Tone','Keeps True Tone after IC transfer (programmer needed)'],['Warranty','3 months: dead on arrival and defects (not physical damage)'],['Quality','Tested with you at pickup']]};
     if (k === 'orig') return {desc:'An original-grade display assembly for the best possible color, brightness and touch feel, when your customer wants it just like factory.',
-      rows:[['Panel','Original-grade (premium / refurbished)'],['Look','Factory color and brightness'],['Fit','Original thickness and connectors'],['Quality','Tested before it leaves the shop']]};
+      rows:[['Panel','Original-grade (premium / refurbished)'],['Look','Factory color and brightness'],['Fit','Original thickness and connectors'],['Warranty','3 months: dead on arrival and defects (not physical damage)'],['Quality','Tested with you at pickup']]};
     return {desc:'A new replacement Li-ion battery made to fit ' + m + '. A quick, low-cost fix for phones that die fast or shut off early.',
       rows:[['Type','Li-ion polymer, new'],['Fit','Made for ' + m + ' with matching connector'],['Battery health','On newer iPhones, showing battery health may need a battery programmer or cell transfer'],['Install','Use new adhesive strips for a clean install'],['Quality','Checked before it leaves the shop']]};
   }
@@ -402,7 +402,7 @@ footer a{color:#424245}
     el.innerHTML = '<div class="pd" role="dialog" aria-modal="true" aria-labelledby="pd-h"><button class="x" data-close aria-label="Close">×</button><div class="pdg">' +
       '<div class="zoom" id="pd-z">' + pic(k, 0, i.model) + '<span class="zhint">' + ('ontouchstart' in window ? 'Tap to zoom' : 'Click to zoom') + '</span></div>' +
       '<div class="pdi"><div class="kind ' + k + '">' + KIND[k][0] + '</div><h2 id="pd-h">' + esc(i.model) + '</h2><div class="q">' + (k === 'batt' ? 'Replacement battery' : esc(i.label) + ' screen assembly') + '</div>' +
-      (k === 'oled' || k === 'incell' ? '<div><span class="cover">Breakage covered</span></div>' : '') + buy +
+      (k !== 'batt' ? '<div><span class="cover">3-month warranty</span></div>' : '') + buy +
       '<p class="desc">' + esc(inf.desc) + '</p><ul class="feat">' + inf.rows.map(function(r){ return '<li><b>' + esc(r[0]) + '</b><span>' + esc(r[1]) + '</span></li>'; }).join('') + '</ul>' +
       (fits ? '<div class="fits">Fits ' + fits.map(esc).join(' and ') + '.</div>' : '') + '</div></div></div>';
     document.body.appendChild(el);
@@ -425,7 +425,7 @@ footer a{color:#424245}
       (lines.length ? '<div class="db">' + lines.map(function(l){ var k = kind(l.item); return '<div class="line"><div class="mini">' + pic(k, 1, l.item.model) + '</div><div class="nm">' + esc(l.item.model) + '<span>' + esc(l.item.label) + ' · ' + money(l.item.price) + '</span></div><div class="qty"><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="-1" aria-label="One less">−</button><b>' + l.qty + '</b><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="1" aria-label="One more"' + (l.qty >= l.item.avail ? ' disabled' : '') + '>+</button></div><div class="lt">' + money(l.qty * l.item.price) + '</div></div>'; }).join('') +
         '<div class="opts" role="radiogroup" aria-label="Pickup or delivery"><label><input type="radio" name="mt" value="pickup" checked> Pickup</label><label><input type="radio" name="mt" value="delivery"> Local delivery</label></div>' +
         '<div class="field"><label for="rv-note">Note (optional)</label><textarea id="rv-note" maxlength="400"></textarea></div>' +
-        '<p class="hint">This sends an order request. We’ll confirm stock and text you when it’s ready. Pay at pickup: cash, Zelle, or card (+3%).</p></div>' +
+        '<p class="hint">This sends an order request. We’ll confirm stock and text you when it’s ready. Pay at pickup: cash, Zelle, or card (+3%). Screens carry a 3-month warranty for dead-on-arrival and defects (<a href="policy.html#s20">details</a>).</p></div>' +
         '<div class="df"><div class="tot"><div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>' + (exempt() ? 'Sales tax (resale certificate on file)' : 'Sales tax 8.25%') + '</span><span>' + money(tax) + '</span></div><div class="big"><span>Estimated total</span><span>' + money(sub + tax) + '</span></div></div><button class="btn full" id="rv-send" style="margin-top:12px">Send order · ' + money(sub + tax) + '</button><div class="err" id="rv-err" role="alert"></div></div>'
       : '<div class="db"><div class="empty"><h3>Your bag is empty</h3><p>Add screens or batteries to get started.</p></div></div>') + '</aside>';
     document.body.appendChild(el);

@@ -681,7 +681,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         </details>
         <details>
           <summary>Do you offer a warranty?</summary>
-          <p>On select phones and parts. We warranty a part when our supplier warranties it. OLED screens can be covered, depending on your phone's condition. Incell screens have no warranty. Any new cracks, pressure marks, frame damage or liquid voids the warranty. <a href="policy.html">Read our full warranty and repair policy</a>.</p>
+          <p>Yes. Incell and Soft OLED screens have a 30-day warranty for defects, like a screen that stops working on its own. It doesn't cover breakage, and we test every screen with you before you leave. Original parts are covered on select phones when our supplier warranties them. Any new cracks, pressure marks, frame damage or liquid voids the warranty. <a href="policy.html">Read our full warranty and repair policy</a>.</p>
         </details>
         <details>
           <summary>Why can't I see prices online?</summary>
@@ -998,8 +998,8 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
   // ---- screen comparison ----
   var TIERS = {
-    incell:{tag:'Best price', name:'Incell', desc:'An LCD-style replacement at the lowest price. Blacks look a little gray and colors are softer, and it can use a bit more battery.', r:{black:2,color:3,bright:3,touch:3}, price:'$', warr:'None', fits:'Most iPhone models, including 17e (not iPhone 17, 17 Pro or Air)'},
-    oled:{tag:'Our best aftermarket screen', name:'OLED', desc:'True deep blacks and bright, sharp color like the original, for a lot less.', r:{black:5,color:4,bright:4,touch:4}, price:'$$', warr:'When supplier-covered', fits:'iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air'},
+    incell:{tag:'Best price', name:'Incell', desc:'An LCD-style replacement at the lowest price. Blacks look a little gray and colors are softer, and it can use a bit more battery.', r:{black:2,color:3,bright:3,touch:3}, price:'$', warr:'30 days (defects)', fits:'Most iPhone models, including 17e (not iPhone 17, 17 Pro or Air)'},
+    oled:{tag:'Our best aftermarket screen', name:'OLED', desc:'True deep blacks and bright, sharp color like the original, for a lot less.', r:{black:5,color:4,bright:4,touch:4}, price:'$$', warr:'30 days (defects)', fits:'iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air'},
     original:{tag:'Closest to factory', name:'Original', desc:'A refurbished original screen, or a brand-new genuine Apple part for a higher price. Factory color, brightness and touch.', r:{black:5,color:5,bright:5,touch:5}, price:'$$$', warr:'Select phones', fits:'Ask us for your model'}
   };
   function pickTier(t){
