@@ -347,7 +347,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
           <p class="lede">Phone and iPad repair in San Antonio. In store or at your door.</p>
           <div class="actions">
             <a class="btn" href="#book">Book a repair</a>
-            <a class="more" href="sms:+12107242800">Text us</a>
+            <a class="more" href="sms:+12107733548">Text us</a>
             <a class="more" href="tel:+12107733548">Call (210) 773-3548</a>
             <a class="more" href="status.html">Check my repair</a>
           </div>
@@ -501,7 +501,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
           <h3>Got it.</h3>
           <p>We'll text your quote to <b id="qdoneNum" style="color:var(--ink)"></b>.</p>
         </div>
-        <p class="alt">Easier to show us? <a href="sms:+12107242800">Text a photo to (210) 724-2800</a></p>
+        <p class="alt">Easier to show us? <a href="sms:+12107733548">Text a photo to (210) 773-3548</a></p>
       </div>
     </div>
   </section>
@@ -714,7 +714,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
 <div class="bar">
   <a href="tel:+12107733548">Call</a>
-  <a href="sms:+12107242800">Text</a>
+  <a href="sms:+12107733548">Text</a>
   <a class="pri" href="#book">Book</a>
 </div>
 
@@ -935,7 +935,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         showErr('Sorry, <b>' + t + '</b> was just booked by someone else. Please pick another time.');
         return;
       }
-      showErr('We couldn’t send that. Please call or text <a href="tel:+12107242800">(210) 724-2800</a> and we’ll book you in.');
+      showErr('We couldn’t send that. Please call or text <a href="tel:+12107733548">(210) 773-3548</a> and we’ll book you in.');
     });
   });
 
@@ -993,7 +993,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     var loc = b.where === 'mobile' ? b.address : 'iFixPhones, 9055 Marbach Rd Suite 105, San Antonio, TX';
     var esc = function(t){ return String(t||'').replace(/[\\,;]/g, function(c){ return '\\' + c; }).replace(/\n/g,'\\n'); };
     return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//iFixPhones//Booking//EN','BEGIN:VEVENT','UID:' + rid() + '@ifixphones.net','DTSTAMP:' + f(new Date()),'DTSTART:' + f(d),'DTEND:' + f(e),
-      'SUMMARY:' + esc('iFixPhones: ' + b.repair + ' (' + b.device + ')'),'LOCATION:' + esc(loc),'DESCRIPTION:' + esc('Questions? Call or text (210) 724-2800.'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+      'SUMMARY:' + esc('iFixPhones: ' + b.repair + ' (' + b.device + ')'),'LOCATION:' + esc(loc),'DESCRIPTION:' + esc('Questions? Call or text ' + (b.where === 'mobile' ? '(210) 724-2800' : '(210) 773-3548') + '.'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
   }
 
   // ---- screen comparison ----
@@ -1043,7 +1043,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       })
       .catch(function(){
         b.disabled = false; b.textContent = 'Get my free quote';
-        qe.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107242800">(210) 724-2800</a> instead.'; qe.classList.remove('hidden');
+        qe.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107733548">(210) 773-3548</a> instead.'; qe.classList.remove('hidden');
       });
   });
   ['qdevice','qphone','qissue'].forEach(function(id){ $(id).addEventListener('input', function(){ this.parentNode.classList.remove('bad'); }); });
@@ -1071,7 +1071,7 @@ footer .w{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         form.classList.add('hidden'); $(o.done).classList.remove('hidden'); $(o.done).focus();
       }).catch(function(){
         btn.disabled = false; btn.textContent = label;
-        errEl.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107242800">(210) 724-2800</a> instead.'; errEl.classList.remove('hidden');
+        errEl.innerHTML = 'We couldn’t send that. Please text <a href="sms:+12107733548">(210) 773-3548</a> instead.'; errEl.classList.remove('hidden');
       });
     });
   }
