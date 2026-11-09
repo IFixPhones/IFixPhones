@@ -132,6 +132,7 @@ a{color:var(--link);text-decoration:none}
 .mparts{padding:0 18px 8px;border-top:1px solid var(--line2)}
 .prow2{display:grid;grid-template-columns:minmax(0,1fr) 46px auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line2)}
 .prow2:last-child{border-bottom:0}
+.wst td{padding:7px 4px;vertical-align:top;border-bottom:1px solid var(--line2)}.wst tr:last-child td{border-bottom:0}
 .pname{border:0;background:none;text-align:left;padding:4px 0;display:flex;flex-direction:column;font-size:15px}
 .pstat{font-size:12.5px;text-align:right}
 .qty button:disabled{opacity:.35}
@@ -451,7 +452,7 @@ var DEFAULT_TECHS = ['Mark','Ray','David'];
 var SUPPLIERS = ['MobileSentrix','XcellParts/Balad','Phone LCD Parts','Amazon','Other'];
 var PSTAT = [['needed','Needs order'],['ordered','Ordered'],['arrived','Arrived'],['used','Installed']];
 var PSMAP = {}; PSTAT.forEach(function(p){ PSMAP[p[0]] = p[1]; });
-var VIEWS = [['tickets','Tickets'],['bookings','Bookings'],['parts','Parts'],['buyback','Buyback'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
+var VIEWS = [['tickets','Tickets'],['bookings','Bookings'],['parts','Parts'],['buyback','Buyback'],['wholesale','Wholesale'],['customers','Customers'],['reports','Reports'],['settings','Settings']];
 var SHOP = {name:'iFixPhones', addr:'9055 Marbach Rd, Suite 105, San Antonio, TX', shop:'(210) 773-3548', mobile:'(210) 724-2800', web:'ifixphones.net'};
 
 /* ---------- state ---------- */
@@ -727,7 +728,28 @@ function startData(){
     if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
     render();
   }, function(){ S.reqsErr = true; render(); }));
-  unsubs.push(db.collection('inventory').onSnapshot(function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
+  unsubs.push(db.collection('inventory').onSnapshot(function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); S.invLoaded = !snap.metadata.fromCache || S.invLoaded; render(); }, function(){}));
+  unsubs.push(db.collection('wsprices').onSnapshot(function(snap){ var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.wsp = o; S.wspLoaded = !snap.metadata.fromCache || S.wspLoaded; render(); }, function(){}));
+  unsubs.push(db.doc('wholesale/catalog').onSnapshot(function(snap){ S.wsCat = snap.exists ? clone(snap.data()) : {}; S.wsCatLoaded = !snap.metadata.fromCache || S.wsCatLoaded; render(); }, function(){}));
+  var seenWs = null, seenShops = null;
+  unsubs.push(db.collection('wsorders').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){
+    S.wsOrders = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    if (seenWs && !snap.metadata.fromCache) snap.docChanges().forEach(function(ch){
+      if (ch.type !== 'added' || seenWs[ch.doc.id]) return; var o = ch.doc.data() || {};
+      alertNew('New WHOLESALE order ' + (o.code||''), (o.shop||'') + ' · ' + (o.items||[]).length + ' lines · ' + money(o.subtotal), function(){ S.view = 'wholesale'; S.wsTab = 'orders'; render(); var x = (S.wsOrders||[]).filter(function(y){ return y.id === ch.doc.id; })[0]; if (x) wsOrderBox(x); });
+    });
+    if (!snap.metadata.fromCache) { seenWs = {}; S.wsOrders.forEach(function(o){ seenWs[o.id] = 1; }); }
+    render();
+  }, function(){}));
+  unsubs.push(db.collection('wholesalers').onSnapshot(function(snap){
+    S.wsShops = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    if (seenShops && !snap.metadata.fromCache) snap.docChanges().forEach(function(ch){
+      if (ch.type !== 'added' || seenShops[ch.doc.id]) return; var o = ch.doc.data() || {};
+      if (o.status === 'pending') alertNew('New wholesale application', (o.shop||'') + ' · ' + (o.name||''), function(){ S.view = 'wholesale'; S.wsTab = 'shops'; render(); });
+    });
+    if (!snap.metadata.fromCache) { seenShops = {}; S.wsShops.forEach(function(o){ seenShops[o.id] = 1; }); }
+    render();
+  }, function(){}));
   unsubs.push(db.collection('buybacks').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){ S.bb = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
   var seenApv = null;
   unsubs.push(db.collection('approvals').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
@@ -789,7 +811,7 @@ function startData(){
     stopListening();
     if (!u) { S.authUser = null; gate(); return; }
     var em = String(u.email||'').toLowerCase();
-    if (ALLOWED.indexOf(em) < 0) {
+    if (ALLOWED.indexOf(em) < 0 || u.emailVerified === false) {
       firebase.auth().signOut().then(function(){ gate(em + ' doesn’t have access. Sign in with the shop account.'); });
       return;
     }
@@ -811,17 +833,20 @@ function renderSoon(){ if (raf) return; raf = requestAnimationFrame(function(){ 
 function render(){
   if (S.status === 'signin') return;
   var app = $('#app');
+  var ae = document.activeElement, keep = ae && ae.id && ae.hasAttribute && ae.hasAttribute('data-wsp') && ae.type !== 'checkbox' ? {id:ae.id, v:ae.value, s:ae.selectionStart, e:ae.selectionEnd} : null;
   app.innerHTML = topbar() + '<div class="wrap">' + mobileTabs() + body() + '</div>' +
     (S.view === 'tickets' && S.status === 'ready' && S.canWrite ? '<button class="btn fab" data-act="new">+ New ticket</button>' : '');
   restoreSearchFocus();
   if (S.openId) renderSheet(); else if (S.profile) renderProfile();
   maybeAskWho();
   if (S.status === 'ready' && !S.cacheOnly) backfillStatus();
+  if (S.status === 'ready') wsPublishSoon();
+  if (keep) { var ke = document.getElementById(keep.id); if (ke) { ke.value = keep.v; ke.focus(); try { ke.setSelectionRange(keep.s, keep.e); } catch(e) {} } }
   if (S.status === 'ready' && /#t=\d+/.test(location.hash||'')) setTimeout(checkHash, 50);
 }
 
 function newReqCount(){ return (S.reqs||[]).filter(function(r){ return r.status === 'new'; }).length; }
-function tabBadge(v){ if (v === 'parts') { var lc = lowCount(); return lc ? '<span class="tbadge" style="background:#b25000" aria-label="'+lc+' running low">'+lc+'</span>' : ''; } if (v !== 'bookings') return ''; var n = newReqCount(); return n ? '<span class="tbadge" aria-label="'+n+' new">'+n+'</span>' : ''; }
+function tabBadge(v){ if (v === 'wholesale') { var wn = wsBadge(); return wn ? '<span class="tbadge" aria-label="'+wn+' new">'+wn+'</span>' : ''; } if (v === 'parts') { var lc = lowCount(); return lc ? '<span class="tbadge" style="background:#b25000" aria-label="'+lc+' running low">'+lc+'</span>' : ''; } if (v !== 'bookings') return ''; var n = newReqCount(); return n ? '<span class="tbadge" aria-label="'+n+' new">'+n+'</span>' : ''; }
 function topbar(){
   var tabs = VIEWS.map(function(t){
     return '<button data-act="view" data-v="'+t[0]+'" aria-pressed="'+(S.view===t[0])+'">'+t[1]+tabBadge(t[0])+'</button>';
@@ -853,6 +878,7 @@ function body(){
   if (S.view === 'settings') return note + settingsView();
   if (S.view === 'bookings') return note + bookingsView();
   if (S.view === 'buyback') return note + buybackView();
+  if (S.view === 'wholesale') return note + wholesaleView();
   return note + ticketsView();
 }
 
@@ -1409,6 +1435,236 @@ function useStock(t, id){
   var part = {id:uid(), name:i.name, supplier:'From stock', cost:num(i.cost), status:'arrived', orderNo:'', addedAt:Date.now(), arrivedAt:Date.now(), stockId:i.id};
   patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('took “' + i.name + '” from stock')]);
   stockQty(i.id, -1);
+}
+
+/* ---------- wholesale (screens + batteries for approved shops) ---------- */
+var WS_TAX = 8.25;
+var WS_ST = [['new','New'],['confirmed','Confirmed'],['ready','Ready'],['done','Picked up · paid'],['cancelled','Cancelled']];
+var WS_MAP = {}; WS_ST.forEach(function(x){ WS_MAP[x[0]] = x[1]; });
+var WS_PILL = {new:'background:#e8f1fd;color:#0058b0', confirmed:'background:#fff4dd;color:#8a5a00', ready:'background:#e6f4ea;color:#1a7f37', done:'background:#f0f0f2;color:#3a3a3c', cancelled:'background:#fbeceb;color:#9b2c27'};
+function wsPill(s){ return '<span class="tagk" style="'+(WS_PILL[s]||'')+'">'+esc(WS_MAP[s]||s)+'</span>'; }
+function wsParts(brand, model){ return partTypes(brand, model).filter(function(p){ return /screen|lcd|battery/i.test(p); }); }
+function wsDefaultLabel(part){ if (/Incell/.test(part)) return 'JK Incell'; if (/OLED/.test(part)) return 'JK Soft OLED'; if (/Original/.test(part)) return 'Original'; return part; }
+function wsCat(part){ return /battery/i.test(part) ? 'Batteries' : 'Screens'; }
+function wsP(id){ return (S.wsp||{})[id] || null; }
+function wsAvail(id){ var i = invById(id), p = wsP(id) || {}; return Math.max(0, (i ? num(i.qty) : 0) - Math.round(num(p.keep))); }
+function wsShop(uid){ return (S.wsShops||[]).filter(function(x){ return x.id === uid; })[0] || {}; }
+function wsCatalog(){
+  var items = [];
+  BRANDS.forEach(function(b){ (CATALOG[b]||[]).forEach(function(m){ wsParts(b, m).forEach(function(pt){
+    var id = stockId(b, m, pt), p = wsP(id);
+    if (!p || p.on === false || !(num(p.price) > 0)) return;
+    items.push({id:id, cat:wsCat(pt), brand:b, model:m, label:String(p.label || wsDefaultLabel(pt)).slice(0, 40), price:num(p.price), avail:wsAvail(id)});
+  }); }); });
+  return items;
+}
+var wsPubT = 0, wsLast = null;
+function wsPublishSoon(){
+  if (!S.db || !S.wspLoaded || !S.invLoaded || !S.wsCatLoaded) return;
+  clearTimeout(wsPubT); wsPubT = setTimeout(wsPublish, 1000);
+}
+function wsPublish(){
+  var items = wsCatalog(), js = JSON.stringify(items);
+  if (js === JSON.stringify((S.wsCat||{}).items || []) || js === wsLast) return;
+  wsLast = js;
+  S.db.doc('wholesale/catalog').set({items:items, updatedAt:Date.now()}).catch(function(){ wsLast = null; });
+}
+function wsTotals(o){
+  var sh = wsShop(o.uid), sub = r2((o.items||[]).reduce(function(a, l){ return a + num(l.price) * Math.round(num(l.qty)); }, 0));
+  var exempt = o.taxExempt != null ? !!o.taxExempt : !!sh.taxExempt;
+  var tax = exempt ? 0 : rHE(sub * WS_TAX / 100);
+  return {sub:sub, tax:tax, total:r2(sub + tax), exempt:exempt};
+}
+function wsBadge(){ return (S.wsOrders||[]).filter(function(o){ return o.status === 'new'; }).length + (S.wsShops||[]).filter(function(x){ return x.status === 'pending'; }).length; }
+function wsFirst(n){ return String(n||'').split(' ')[0] || 'there'; }
+
+function wholesaleView(){
+  var orders = S.wsOrders || [], shops = S.wsShops || [];
+  var nNew = orders.filter(function(o){ return o.status === 'new'; }).length, nPend = shops.filter(function(x){ return x.status === 'pending'; }).length;
+  var listed = wsCatalog().length;
+  S.wsTab = S.wsTab || 'orders';
+  var tabs = [['orders','Orders' + (nNew ? ' <i>'+nNew+'</i>' : '')], ['shops','Shops' + (nPend ? ' <i>'+nPend+'</i>' : '')], ['prices','Price list' + (listed ? ' <i>'+listed+'</i>' : '')]];
+  var h = '<div class="chips" style="margin-bottom:14px">' + tabs.map(function(x){ return '<button class="chip" data-act="wstab" data-v="'+x[0]+'" aria-pressed="'+(S.wsTab===x[0])+'">'+x[1]+'</button>'; }).join('') +
+    '<a class="chip" href="https://ifixphones.net/wholesale" target="_blank" rel="noopener" style="margin-left:auto">Open wholesale page ↗</a></div>';
+  if (S.wsTab === 'shops') return h + wsShopsView();
+  if (S.wsTab === 'prices') return h + wsPricesView();
+  return h + wsOrdersView();
+}
+function wsOrdersView(){
+  var orders = S.wsOrders || [], now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  var open = orders.filter(function(o){ return ['new','confirmed','ready'].indexOf(o.status) > -1; });
+  var month = orders.filter(function(o){ return o.status === 'done' && (o.paidAt||0) >= m0; });
+  var monthSum = month.reduce(function(a, o){ return a + num(o.subtotal); }, 0);
+  var head = '<div class="rgrid"><div class="stat"><b>'+orders.filter(function(o){ return o.status === 'new'; }).length+'</b><span>New orders to confirm</span></div><div class="stat"><b>'+open.length+'</b><span>Open orders</span></div><div class="stat"><b>'+money(monthSum)+'</b><span>Wholesale sales this month (before tax)</span></div></div>';
+  S.wsFilter = S.wsFilter || 'open';
+  var list = S.wsFilter === 'open' ? open : orders;
+  var bar = '<div class="chips" style="margin-bottom:12px"><button class="chip" data-act="wsfilter" data-v="open" aria-pressed="'+(S.wsFilter==='open')+'">Open</button><button class="chip" data-act="wsfilter" data-v="all" aria-pressed="'+(S.wsFilter==='all')+'">All orders</button></div>';
+  if (!list.length) return head + bar + '<div class="panel empty"><h3>'+(orders.length ? 'No open orders' : 'No wholesale orders yet')+'</h3><p>'+(orders.length ? 'Tap “All orders” to see past ones.' : 'Approve a shop and set prices in the Price list, then orders from ifixphones.net/wholesale show up here.')+'</p></div>';
+  return head + bar + '<div class="panel" style="padding:6px 18px">' + list.map(function(o){
+    var tt = wsTotals(o), n = (o.items||[]).reduce(function(a, l){ return a + Math.round(num(l.qty)); }, 0);
+    return '<button class="prow2" data-act="wsorder" data-id="'+esc(o.id)+'" style="width:100%;border:0;background:none;text-align:left;cursor:pointer;grid-template-columns:minmax(0,1fr) auto auto;padding:12px 0"><span><b>'+esc(o.shop||'Shop')+'</b> <span class="t2">· '+esc(o.code||'')+' · '+n+' item'+(n===1?'':'s')+' · '+(o.method === 'delivery' ? 'Delivery' : 'Pickup')+' · '+esc(rel(o.createdAt))+'</span></span><b>'+money(o.total || tt.total)+'</b>'+wsPill(o.status)+'</button>';
+  }).join('') + '</div>';
+}
+function wsShopsView(){
+  var shops = (S.wsShops || []).slice().sort(function(a, b){ return (b.createdAt||0) - (a.createdAt||0); });
+  var pend = shops.filter(function(x){ return x.status === 'pending'; }), ok = shops.filter(function(x){ return x.status === 'approved'; }), off = shops.filter(function(x){ return x.status === 'declined' || x.status === 'off'; });
+  var spent = function(uid){ return (S.wsOrders||[]).filter(function(o){ return o.uid === uid && o.status === 'done'; }).reduce(function(a, o){ return a + num(o.subtotal); }, 0); };
+  var info = function(x){ return '<span class="t2">'+esc(x.name||'')+' · <a href="tel:'+esc(e164(x.phone))+'">'+esc(fmtPhone(x.phone))+'</a> · '+esc(x.email||'')+(x.city ? ' · ' + esc(x.city) : '')+'</span><br><span class="t2">'+(x.taxId ? 'TX tax permit: <b>'+esc(x.taxId)+'</b>' : 'No tax permit given')+' · applied '+esc(rel(x.createdAt))+'</span>'; };
+  var h = '';
+  h += '<div class="panel"><h2>Waiting for approval'+(pend.length ? ' ('+pend.length+')' : '')+'</h2>' + (pend.length ? pend.map(function(x){
+    return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b><br>'+info(x)+'</span><span class="acts"><button class="btn sm ghost" data-act="wsdecline" data-id="'+esc(x.id)+'">Decline</button><button class="btn sm" data-act="wsapprove" data-id="'+esc(x.id)+'">Approve</button></span></div>';
+  }).join('') : '<p class="muted">No new applications. Shops apply at ifixphones.net/wholesale.</p>') + '</div>';
+  h += '<div class="panel"><h2>Approved shops'+(ok.length ? ' ('+ok.length+')' : '')+'</h2>' + (ok.length ? ok.map(function(x){
+    return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b> <span class="tagk ok">'+money(spent(x.id))+' bought</span><br>'+info(x)+
+      '<label class="check" style="margin-top:6px"><input type="checkbox" data-wsexempt="'+esc(x.id)+'"'+(x.taxExempt?' checked':'')+'>Tax-free: I have their resale certificate on file</label></span>' +
+      '<span class="acts"><a class="btn sm ghost" href="sms:'+esc(e164(x.phone))+'">Text</a><button class="btn sm ghost" data-act="wsoff" data-id="'+esc(x.id)+'">Turn off</button></span></div>';
+  }).join('') : '<p class="muted">Nobody approved yet.</p>') +
+  '<p class="hint" style="margin-top:10px">Texas: only mark a shop tax-free once you have their signed resale certificate (Form 01-339) with their sales tax permit number. Keep it on file.</p></div>';
+  if (off.length) h += '<div class="panel"><h2>Turned off / declined</h2>' + off.map(function(x){
+    return '<div class="prow2" style="grid-template-columns:minmax(0,1fr) auto"><span><b>'+esc(x.shop)+'</b><br>'+info(x)+'</span><span class="acts"><button class="btn sm ghost" data-act="wsapprove" data-id="'+esc(x.id)+'">Approve</button></span></div>';
+  }).join('') + '</div>';
+  return h;
+}
+function wsPricesView(){
+  var q = (S.q||'').toLowerCase().trim();
+  var brands = BRANDS.filter(function(b){ return b !== 'Other' && (CATALOG[b]||[]).length; });
+  S.wsBrand = S.wsBrand || brands[0];
+  var listed = wsCatalog();
+  var head = '<div class="panel" style="padding:16px 20px"><p class="muted" style="margin:0">Set a price and it shows on the wholesale page right away. <b>In stock</b> comes from your Parts. <b>Keep</b> holds that many back for your own repairs, so shops only see the rest. '+listed.length+' item'+(listed.length===1?'':'s')+' listed now.</p></div>';
+  var bar = '<div class="bar"><div class="search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><label class="sr" for="q">Search models</label><input id="q" type="search" placeholder="Search a model, e.g. 15 Pro" value="'+esc(S.q)+'" autocomplete="off"></div>' +
+    '<button class="btn sm ghost" data-act="wslisted" aria-pressed="'+!!S.wsListed+'">'+(S.wsListed?'Showing: listed only':'Showing: all models')+'</button></div>';
+  var chips = '<div class="chips" style="margin-bottom:12px">' + brands.map(function(b){ var n = listed.filter(function(i){ return i.brand === b; }).length; return '<button class="chip" data-act="wsbrand" data-v="'+esc(b)+'" aria-pressed="'+(!q && S.wsBrand===b)+'">'+esc(b.replace('Apple ',''))+(n?' <i>'+n+'</i>':'')+'</button>'; }).join('') + '</div>';
+  var rows = [];
+  (q ? brands : [S.wsBrand]).forEach(function(b){ (CATALOG[b]||[]).forEach(function(m){
+    if (q && !q.split(/\s+/).every(function(w){ return m.toLowerCase().indexOf(w) > -1; })) return;
+    var parts = wsParts(b, m);
+    if (S.wsListed) parts = parts.filter(function(pt){ var p = wsP(stockId(b, m, pt)); return p && p.on !== false && num(p.price) > 0; });
+    if (parts.length) rows.push({b:b, m:m, parts:parts});
+  }); });
+  if (!rows.length) return head + bar + chips + '<div class="panel empty"><h3>'+(S.wsListed ? 'Nothing listed here yet' : 'No models match')+'</h3><p>'+(S.wsListed ? 'Tap “Showing: listed only” to see every model and add prices.' : 'Try a shorter search.')+'</p></div>';
+  var grid = 'grid-template-columns:minmax(0,1.3fr) minmax(0,1.1fr) 62px 62px 92px 50px';
+  return head + bar + chips + '<div class="panel" style="padding:8px 18px;overflow-x:auto"><div class="prow2 wsgrid" style="'+grid+';font-size:12px;color:var(--muted,#6e6e73);font-weight:600;min-width:560px"><span>Part</span><span>Name shops see</span><span>In stock</span><span>Keep</span><span>Price</span><span>Show</span></div>' +
+    rows.map(function(r){
+      return '<div style="font-weight:700;padding:12px 0 2px;min-width:560px">'+esc(r.m)+'</div>' + r.parts.map(function(pt){
+        var id = stockId(r.b, r.m, pt), p = wsP(id) || {}, inv = invById(id), have = inv ? num(inv.qty) : 0;
+        var spec = esc(JSON.stringify({id:id, brand:r.b, model:r.m, part:pt}));
+        var cost = inv && num(inv.cost) ? '<span class="t2" style="display:block;font-size:11.5px">cost '+money(inv.cost)+(num(p.price) ? ' · +'+money(r2(num(p.price) - num(inv.cost))) : '')+'</span>' : '';
+        return '<div class="prow2" style="'+grid+';min-width:560px"><span>'+esc(pt)+cost+'</span>' +
+          '<input class="in" style="min-height:36px;padding:6px 10px;font-size:14px" id="wsl-'+esc(id)+'" data-wsp="label" data-spec="'+spec+'" maxlength="40" placeholder="'+esc(wsDefaultLabel(pt))+'" value="'+esc(p.label||'')+'" aria-label="Name shops see for '+esc(r.m+' '+pt)+'">' +
+          '<span style="text-align:center;font-weight:600'+(have<=0?';color:#c9302c':'')+'">'+have+'</span>' +
+          '<input class="in" style="min-height:36px;padding:6px 8px;font-size:14px;text-align:center" id="wsk-'+esc(id)+'" data-wsp="keep" data-spec="'+spec+'" inputmode="numeric" value="'+esc(p.keep ? Math.round(num(p.keep)) : '')+'" placeholder="0" aria-label="Keep for shop">' +
+          '<input class="in" style="min-height:36px;padding:6px 8px;font-size:14px" id="wsp-'+esc(id)+'" data-wsp="price" data-spec="'+spec+'" inputmode="decimal" value="'+esc(num(p.price) ? num(p.price).toFixed(2) : '')+'" placeholder="$" aria-label="Wholesale price">' +
+          '<label style="display:flex;justify-content:center"><input type="checkbox" data-wsp="on" data-spec="'+spec+'"'+(num(p.price) > 0 && p.on !== false ? ' checked' : '')+(num(p.price) > 0 ? '' : ' disabled')+' aria-label="Show to shops" style="width:20px;height:20px"></label></div>';
+      }).join('');
+    }).join('') + '</div>';
+}
+function wsSaveField(el){
+  var spec; try { spec = JSON.parse(el.getAttribute('data-spec')); } catch(e) { return; }
+  var f = el.getAttribute('data-wsp'), cur = wsP(spec.id) || {}, o = {brand:spec.brand, model:spec.model, part:spec.part, updatedAt:Date.now()};
+  if (f === 'price') { o.price = num(el.value); if (o.price > 0 && cur.on == null) o.on = true; }
+  else if (f === 'keep') o.keep = Math.max(0, Math.round(num(el.value)));
+  else if (f === 'label') o.label = el.value.trim().slice(0, 40);
+  else if (f === 'on') o.on = el.checked;
+  S.wsp = Object.assign({}, S.wsp); S.wsp[spec.id] = Object.assign({}, cur, o);
+  S.db.doc('wsprices/' + spec.id).set(o, {merge:true}).then(function(){ toast(f === 'on' ? (o.on ? 'Showing to shops' : 'Hidden from shops') : 'Saved'); }).catch(writeErr);
+  render();
+}
+function wsSetShop(x, patch, msg){
+  Object.assign(x, patch); render();
+  return S.db.doc('wholesalers/' + x.id).update(Object.assign({updatedAt:Date.now()}, patch)).then(function(){ if (msg) toast(msg); }).catch(writeErr);
+}
+function wsApprove(x){
+  wsSetShop(x, {status:'approved', approvedAt:Date.now(), approvedBy:who()}, x.shop + ' approved');
+  var mm = modalShell('wsa', 'Approved ' + esc(x.shop),
+    '<p class="muted">Let them know they can order now. They sign in with the email and password they used to apply.</p>' +
+    '<p class="hint" style="margin-top:10px">To make them tax-free, get their Texas resale certificate first, then tick the box on their row.</p>',
+    '<button class="btn ghost" data-mclose>Not now</button><button class="btn" id="wsa-go">Text them</button>');
+  $('#wsa-go', mm).addEventListener('click', function(){ mm.remove(); openSms('sms:' + e164(x.phone) + '?&body=' + encodeURIComponent('Hi ' + wsFirst(x.name) + ', this is iFixPhones. ' + x.shop + ' is approved for wholesale! Sign in at ifixphones.net/wholesale with your email and password to see prices and order screens and batteries.')); });
+}
+function wsTakeStock(o, sign){
+  var b = S.db.batch();
+  (o.items||[]).forEach(function(l){ if (l.id) b.set(S.db.doc('inventory/' + l.id), {qty:FV().increment(sign * Math.round(num(l.qty))), updatedAt:Date.now()}, {merge:true}); });
+  return b;
+}
+function wsSetOrder(o, patch, stockSign, msg){
+  var b = stockSign ? wsTakeStock(o, stockSign) : S.db.batch();
+  b.update(S.db.doc('wsorders/' + o.id), Object.assign({updatedAt:Date.now(), handledBy:who()}, patch));
+  Object.assign(o, patch); render();
+  return b.commit().then(function(){ if (msg) toast(msg); }).catch(writeErr);
+}
+function wsOrderBox(o){
+  var sh = wsShop(o.uid), tt = wsTotals(o), first = wsFirst(o.name || sh.name);
+  var listNow = {}; wsCatalog().forEach(function(i){ listNow[i.id] = i; });
+  var changed = false;
+  var lines = (o.items||[]).map(function(l){
+    var cur = listNow[l.id], diff = cur && num(cur.price) !== num(l.price), inv = invById(l.id), have = inv ? num(inv.qty) : 0;
+    if (diff && o.status === 'new') changed = true;
+    return '<tr><td>'+Math.round(num(l.qty))+' ×</td><td><b>'+esc(l.model)+'</b> · '+esc(l.label)+(o.status === 'new' ? '<br><span class="t2"'+(have < num(l.qty) ? ' style="color:#c9302c"' : '')+'>You have '+have+(diff ? ' · list price now '+money(cur.price) : '')+'</span>' : '')+'</td><td style="text-align:right">'+money(num(l.price) * Math.round(num(l.qty)))+'</td></tr>';
+  }).join('');
+  var short = o.status === 'new' && (o.items||[]).some(function(l){ var inv = invById(l.id); return (inv ? num(inv.qty) : 0) < num(l.qty); });
+  var tr = function(a, b, bold){ return '<tr'+(bold?' style="font-weight:700"':'')+'><td></td><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
+  var paid = o.status === 'done';
+  var body = '<p class="muted" style="margin-bottom:10px"><b>'+esc(o.shop||sh.shop||'')+'</b> · '+esc(o.name||'')+' · <a href="tel:'+esc(e164(o.phone))+'">'+esc(fmtPhone(o.phone))+'</a><br>'+esc(dt(o.createdAt))+' · '+(o.method === 'delivery' ? '<b>Local delivery</b>' : 'Pickup')+' · '+wsPill(o.status)+'</p>' +
+    (o.note ? '<div class="notice" style="margin-bottom:10px">“'+esc(o.note)+'”</div>' : '') +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px" class="wst">' + lines +
+      tr('Subtotal', money(tt.sub)) + tr(tt.exempt ? 'Sales tax (resale certificate)' : 'Sales tax 8.25%', money(tt.tax)) + tr('Total', money(o.total || tt.total), 1) +
+      (paid && num(o.surcharge) ? tr('Card fee', money(o.surcharge)) : '') + (paid ? tr('Paid · ' + esc(o.payMethod||''), money(r2(num(o.total || tt.total) + num(o.surcharge))), 1) : '') + '</table>' +
+    (changed ? '<p class="hint" style="margin-top:8px">Some prices changed since they ordered. Confirming uses your current list prices.</p>' : '') +
+    (short ? '<p class="hint" style="margin-top:8px;color:#c9302c">You don’t have enough of some items. Edit stock in Parts, or text them before confirming.</p>' : '') +
+    (o.status === 'ready' ? '<div class="g2" style="margin-top:14px"><div class="f"><label for="wo-pay">Paid with</label><select class="in" id="wo-pay">'+PAY.map(function(p){ return '<option>'+esc(p)+'</option>'; }).join('')+'</select></div><div class="f"><label>Collect</label><div class="in" id="wo-amt" style="display:flex;align-items:center;font-weight:700">'+money(tt.total)+'</div></div></div>' : '') +
+    (['new','confirmed','ready'].indexOf(o.status) > -1 ? '<label class="check" style="margin-top:12px"><input type="checkbox" id="wo-text" checked>Text the shop</label>' : '') +
+    '<div class="f" style="margin-top:12px"><label for="wo-note">Note to the shop (shows in their orders)</label><input class="in" id="wo-note" maxlength="200" value="'+esc(o.shopNote||'')+'"></div>';
+  var acts = '<button class="btn ghost" id="wo-print" style="margin-right:auto">Print invoice</button>' +
+    (['new','confirmed','ready'].indexOf(o.status) > -1 ? '<button class="btn ghost" id="wo-cancel">Cancel order</button>' : '') +
+    (o.status === 'new' ? '<button class="btn" id="wo-go">Confirm · take from stock</button>' : o.status === 'confirmed' ? '<button class="btn" id="wo-go">Mark ready</button>' : o.status === 'ready' ? '<button class="btn" id="wo-go">Picked up &amp; paid</button>' : '<button class="btn ghost" data-mclose>Close</button>');
+  var m = modalShell('wo', 'Wholesale order ' + esc(o.code||''), body, acts, true);
+  var pay = $('#wo-pay', m);
+  if (pay) pay.addEventListener('change', function(){ $('#wo-amt', m).textContent = money(CARDISH.indexOf(pay.value) > -1 ? withCard(tt.total, {taxRate: tt.exempt ? 0 : WS_TAX}) : tt.total) + (CARDISH.indexOf(pay.value) > -1 ? ' (card +3%)' : ''); });
+  var note = function(){ var v = $('#wo-note', m).value.trim(); return v === (o.shopNote||'') ? {} : {shopNote:v}; };
+  var texting = function(){ var c = $('#wo-text', m); return c && c.checked; };
+  var sms = function(msg){ openSms('sms:' + e164(o.phone) + '?&body=' + encodeURIComponent(msg)); };
+  $('#wo-print', m).addEventListener('click', function(){ printHtml(wsInvoice(o)); });
+  var cn = $('#wo-cancel', m);
+  if (cn) cn.addEventListener('click', async function(){
+    var ok = await confirmBox('Cancel order ' + (o.code||'') + '?', o.stockTaken ? 'The items go back into your stock.' : 'Nothing was taken from stock yet.', 'Cancel order', true);
+    if (!ok) return;
+    var tx = texting(); m.remove();
+    wsSetOrder(o, Object.assign({status:'cancelled', cancelledAt:Date.now(), stockTaken:false}, note()), o.stockTaken ? 1 : 0, 'Order cancelled');
+    if (tx) sms('Hi ' + first + ', this is iFixPhones. Your wholesale order ' + (o.code||'') + ' was cancelled. Call or text us at ' + SHOP.shop + ' with any questions.');
+  });
+  var go = $('#wo-go', m);
+  if (go && o.status !== 'done' && o.status !== 'cancelled') go.addEventListener('click', function(){
+    var tx = texting();
+    if (o.status === 'new') {
+      var items = (o.items||[]).map(function(l){ var cur = listNow[l.id]; return Object.assign({}, l, cur ? {price:num(cur.price)} : {}); });
+      var o2 = Object.assign({}, o, {items:items}), t2 = wsTotals(o2);
+      m.remove();
+      wsSetOrder(o, Object.assign({status:'confirmed', confirmedAt:Date.now(), items:items, subtotal:t2.sub, taxExempt:t2.exempt, tax:t2.tax, total:t2.total, stockTaken:true}, note()), -1, 'Confirmed · taken from stock');
+      if (tx) sms('Hi ' + first + ', this is iFixPhones. Your wholesale order ' + (o.code||'') + ' is confirmed: ' + items.reduce(function(a, l){ return a + Math.round(num(l.qty)); }, 0) + ' items, ' + money(t2.total) + '. We’ll text you when it’s ' + (o.method === 'delivery' ? 'on the way.' : 'ready for pickup.'));
+    } else if (o.status === 'confirmed') {
+      m.remove();
+      wsSetOrder(o, Object.assign({status:'ready', readyAt:Date.now()}, note()), 0, 'Marked ready');
+      if (tx) sms('Hi ' + first + ', your iFixPhones wholesale order ' + (o.code||'') + ' is ' + (o.method === 'delivery' ? 'ready to go out for delivery' : 'ready for pickup at ' + SHOP.addr) + '. Total ' + money(o.total || tt.total) + ' (cash or Zelle; cards +3%).');
+    } else if (o.status === 'ready') {
+      var pm = $('#wo-pay', m).value, fee = CARDISH.indexOf(pm) > -1 ? cardFee(tt.total, tt.exempt ? 0 : WS_TAX) : {all:0, tax:0};
+      m.remove();
+      wsSetOrder(o, Object.assign({status:'done', paidAt:Date.now(), payMethod:pm, subtotal:tt.sub, tax:tt.tax, total:o.total || tt.total, surcharge:fee.all, surTax:fee.tax}, note()), 0, 'Paid · order complete');
+      if (tx) sms('Thanks ' + first + '! Your iFixPhones wholesale order ' + (o.code||'') + ' is complete. Paid ' + money(r2((o.total || tt.total) + fee.all)) + ' by ' + pm + '.');
+    }
+  });
+}
+function wsInvoice(o){
+  var tt = wsTotals(o), sh = wsShop(o.uid);
+  var tr = function(a, b, c, bold){ return '<tr'+(bold?' style="font-weight:700"':'')+'><td>'+a+'</td><td>'+b+'</td><td style="text-align:right">'+c+'</td></tr>'; };
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Invoice '+esc(o.code||'')+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;max-width:640px;margin:24px auto;padding:0 18px;font-size:13px;line-height:1.45}h1{font-size:22px;margin:0}table{width:100%;border-collapse:collapse;margin-top:14px}td{padding:6px 4px;border-bottom:1px solid #eee;vertical-align:top}.m{color:#555}.top{display:flex;justify-content:space-between;gap:20px}</style></head><body>' +
+    '<div class="top"><div><h1>iFixPhones</h1><div class="m">'+esc(SHOP.addr)+'<br>'+esc(SHOP.shop)+' · '+esc(SHOP.web)+'</div></div><div style="text-align:right"><b style="font-size:16px">Wholesale invoice</b><br>'+esc(o.code||'')+'<br>'+esc(dateOnly(o.paidAt || o.createdAt))+'</div></div>' +
+    '<p style="margin-top:16px"><b>Bill to</b><br>'+esc(o.shop||sh.shop||'')+'<br>'+esc(o.name||'')+' · '+esc(fmtPhone(o.phone))+(sh.taxId ? '<br>TX sales tax permit: '+esc(sh.taxId) : '')+'</p>' +
+    '<table><tr style="font-weight:700"><td>Qty</td><td>Item</td><td style="text-align:right">Amount</td></tr>' +
+    (o.items||[]).map(function(l){ return tr(Math.round(num(l.qty)), esc(l.model) + ' · ' + esc(l.label) + ' <span class="m">@ ' + money(l.price) + '</span>', money(num(l.price) * Math.round(num(l.qty)))); }).join('') +
+    tr('', 'Subtotal', money(tt.sub)) + tr('', tt.exempt ? 'Sales tax (exempt, resale certificate on file)' : 'Sales tax 8.25%', money(tt.tax)) + tr('', 'Total', money(o.total || tt.total), 1) +
+    (num(o.surcharge) ? tr('', 'Credit card fee', money(o.surcharge)) : '') +
+    (o.status === 'done' ? tr('', 'Paid · ' + esc(o.payMethod||''), money(r2(num(o.total || tt.total) + num(o.surcharge))), 1) : tr('', 'Balance due', money(o.total || tt.total), 1)) + '</table>' +
+    '<p class="m" style="margin-top:18px">Thank you for your business. Screens and batteries are tested before pickup. Report any defective part right away with this invoice. Parts that are cracked, bent or damaged after install aren’t covered.</p></body></html>';
 }
 
 /* ---------- buyback ---------- */
@@ -3090,6 +3346,14 @@ document.addEventListener('click', async function(e){
     case 'pmode': S.pMode = a.getAttribute('data-v'); S.q = ''; render(); break;
     case 'stockadd': stockBox(null); break;
     case 'sbrand': S.sBrand = a.getAttribute('data-v'); S.q = ''; render(); break;
+    case 'wstab': S.wsTab = a.getAttribute('data-v'); S.q = ''; render(); break;
+    case 'wsfilter': S.wsFilter = a.getAttribute('data-v'); render(); break;
+    case 'wsbrand': S.wsBrand = a.getAttribute('data-v'); S.q = ''; render(); break;
+    case 'wslisted': S.wsListed = !S.wsListed; render(); break;
+    case 'wsorder': { var wo = (S.wsOrders||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (wo) wsOrderBox(wo); break; }
+    case 'wsapprove': { var wa = wsShop(a.getAttribute('data-id')); if (wa.id) wsApprove(wa); break; }
+    case 'wsdecline': { var wd = wsShop(a.getAttribute('data-id')); if (wd.id && await confirmBox('Decline ' + wd.shop + '?', 'They won’t see prices. You can approve them later.', 'Decline', true)) wsSetShop(wd, {status:'declined'}, 'Declined'); break; }
+    case 'wsoff': { var wf = wsShop(a.getAttribute('data-id')); if (wf.id && await confirmBox('Turn off ' + wf.shop + '?', 'They’ll be locked out of wholesale prices right away. You can turn them back on anytime.', 'Turn off', true)) wsSetShop(wf, {status:'off'}, 'Turned off'); break; }
     case 'smodel': { S.openModels = S.openModels || {}; var mk = a.getAttribute('data-v'); S.openModels[mk] = !S.openModels[mk]; render(); break; }
     case 'stockonly': S.stockOnly = !S.stockOnly; render(); break;
     case 'pbump': bumpPart(JSON.parse(a.getAttribute('data-spec')), +a.getAttribute('data-v')); break;
@@ -3135,6 +3399,9 @@ document.addEventListener('change', function(e){
   if (el.hasAttribute && el.hasAttribute('data-photoin')) { var pt = S.openId ? byId(S.openId) : null; if (pt) addPhotos(pt, el.files); el.value = ''; return; }
   var cm = el.getAttribute('data-comm');
   if (cm) { var co = Object.assign({}, S.settings.commission||{}); co[cm] = num(el.value); saveSettings({commission: co}); toast('Saved'); return; }
+  if (el.hasAttribute && el.hasAttribute('data-wsp')) { wsSaveField(el); return; }
+  var wx = el.getAttribute && el.getAttribute('data-wsexempt');
+  if (wx) { var wsx = wsShop(wx); if (wsx.id) wsSetShop(wsx, {taxExempt: el.checked}, el.checked ? 'Tax-free for ' + wsx.shop : 'Sales tax on for ' + wsx.shop); return; }
   var sk = el.getAttribute('data-setting');
   if (sk) { var o = {}; o[sk] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(o); toast('Saved'); return; }
   var t = S.openId ? byId(S.openId) : null;
