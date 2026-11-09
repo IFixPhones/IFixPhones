@@ -1468,6 +1468,8 @@ function wsPublish(){
   if (js === JSON.stringify((S.wsCat||{}).items || []) || js === wsLast) return;
   wsLast = js;
   S.db.doc('wholesale/catalog').set({items:items, updatedAt:Date.now()}).catch(function(){ wsLast = null; });
+  // public browse list for the wholesale page (no prices, just in stock or not)
+  S.db.doc('public/wscatalog').set({items:items.map(function(i){ return {id:i.id, cat:i.cat, brand:i.brand, model:i.model, label:i.label, inStock:i.avail > 0}; }), updatedAt:Date.now()}).catch(function(){});
 }
 function wsTotals(o){
   var sh = wsShop(o.uid), sub = r2((o.items||[]).reduce(function(a, l){ return a + num(l.price) * Math.round(num(l.qty)); }, 0));

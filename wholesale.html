@@ -3,119 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wholesale | iFixPhones</title>
-<meta name="description" content="iFixPhones wholesale screens and batteries for approved repair shops in San Antonio.">
+<title>iFixPhones Wholesale | Screens &amp; Batteries at the Best Price</title>
+<meta name="description" content="Wholesale JK Soft OLED and JK Incell screens and batteries for repair shops. Best prices, tested parts, same-day pickup in San Antonio.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#0b1220">
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--mist:#f5f5f7;--ink:#1d1d1f;--graphite:#6e6e73;--blue:#0071e3;--green:#1a7f37;--red:#c9302c;--line:#d2d2d7;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif}
+:root{--bg:#f3f4f7;--ink:#0f172a;--sub:#5b6474;--line:#e3e6ec;--blue:#0a66ff;--blue2:#0052d6;--navy:#0b1220;--green:#13854a;--amber:#b25e00;--red:#c9302c;--card:#fff;--font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;--r:14px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);color:var(--ink);background:var(--mist);-webkit-font-smoothing:antialiased;letter-spacing:-.01em;min-height:100vh}
-a{color:#0066cc;text-decoration:none}
-button{font:inherit;color:inherit}
-.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
-.nav .w{display:flex;align-items:center;justify-content:space-between;height:52px;gap:12px}
-.brand{font-weight:600;font-size:18px;color:var(--ink)}
-.brand span{color:var(--graphite);font-weight:500;margin-left:6px}
-.w{max-width:980px;margin:0 auto;padding:0 22px}
-.narrow{max-width:520px}
-h1{font-size:clamp(32px,6vw,46px);letter-spacing:-.03em;line-height:1.05;margin-top:44px;text-align:center}
-.lede{font-size:18px;color:var(--graphite);text-align:center;margin-top:10px;line-height:1.4}
-.card{background:#fff;border-radius:22px;padding:24px;margin-top:24px;box-shadow:0 2px 20px rgba(0,0,0,.04)}
-.seg{display:flex;background:#e8e8ed;border-radius:12px;padding:3px;gap:3px}
-.seg button{flex:1;border:0;background:none;border-radius:9px;padding:9px 10px;font-size:15px;font-weight:500;cursor:pointer;color:var(--graphite);white-space:nowrap}
-.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
-.fields{display:grid;gap:12px;margin-top:18px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:480px){.g2{grid-template-columns:1fr}}
-.field{position:relative}
-.field input,.field textarea,.field select{width:100%;font:inherit;font-size:17px;background:#fff;border:1px solid #86868b;border-radius:12px;padding:25px 14px 8px;outline:none;min-height:58px;-webkit-appearance:none;appearance:none}
-.field textarea{min-height:84px;resize:vertical}
-.field label{position:absolute;left:15px;top:8px;font-size:12px;color:var(--graphite);pointer-events:none}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.2)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--blue);color:#fff;border-radius:999px;padding:13px 26px;font-size:17px;font-weight:500;cursor:pointer}
-.btn.full{width:100%;margin-top:16px}
-.btn.ghost{background:#e8e8ed;color:var(--ink)}
-.btn.sm{padding:8px 16px;font-size:15px}
-.btn:disabled{opacity:.55;cursor:default}
-.link{background:none;border:0;color:#0066cc;cursor:pointer;font-size:15px;padding:6px 0}
-.err{color:var(--red);margin-top:12px;font-size:15px;min-height:1px}
-.ok{color:var(--green)}
-.hint{font-size:13px;color:var(--graphite);margin-top:10px;line-height:1.45}
-.center{text-align:center}
-.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:13px;font-weight:600}
-.pill.new{background:#e8f1fd;color:#0058b0}.pill.confirmed{background:#fff4dd;color:#8a5a00}.pill.ready{background:#e3f6e8;color:var(--green)}.pill.done{background:#ececf0;color:#3a3a3c}.pill.cancelled{background:#fdecec;color:var(--red)}
-/* shop */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}
-.top h2{font-size:28px;letter-spacing:-.02em}
-.top .who{color:var(--graphite);font-size:15px}
-.tools{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap}
-.tools .seg{flex:0 1 420px}
-.search{flex:1 1 220px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 12px;min-height:44px}
-.search input{border:0;outline:0;font:inherit;font-size:16px;flex:1;background:none;min-width:0}
-.chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:2px}
-.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;cursor:pointer;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.models{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;padding-bottom:120px}
-.model{background:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 2px 14px rgba(0,0,0,.035)}
-.model h3{font-size:18px;letter-spacing:-.01em}
-.item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid #ececf0}
-.model h3+.item{border-top:0;margin-top:4px}
-.item .nm{flex:1;min-width:0}
-.item .nm b{display:block;font-size:15px;font-weight:600}
-.item .nm span{font-size:13px;color:var(--graphite)}
-.item .nm span.out{color:var(--red)}
-.item .pr{font-weight:600;font-size:16px;white-space:nowrap}
-.step{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.step button{border:0;background:#fff;width:34px;height:34px;font-size:19px;cursor:pointer;color:var(--blue)}
-.step button:disabled{color:#c7c7cc;cursor:default}
-.step b{min-width:26px;text-align:center;font-size:15px}
-.add{border:0;background:#e8f1fd;color:#0058b0;border-radius:999px;padding:8px 16px;font-size:15px;font-weight:600;cursor:pointer}
-.add:disabled{background:#f0f0f3;color:#aeaeb2;cursor:default}
-.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:25;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.08)}
-.cartbar .w{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.cartbar .sum b{font-size:18px}.cartbar .sum span{display:block;font-size:13px;color:var(--graphite)}
-.empty{text-align:center;padding:50px 20px;color:var(--graphite)}
-.empty h3{color:var(--ink);font-size:20px;margin-bottom:6px}
-.orders{margin-top:16px;display:grid;gap:12px;padding-bottom:60px}
-.ord{background:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 2px 14px rgba(0,0,0,.035)}
-.ord .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.ord .hd b{font-size:17px}
-.ord ul{list-style:none;margin-top:10px;font-size:15px}
-.ord li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;color:#3a3a3c}
-.ord .tot{display:flex;justify-content:space-between;border-top:1px solid #ececf0;margin-top:8px;padding-top:8px;font-weight:600}
-/* modal */
-.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40;display:flex;align-items:flex-end;justify-content:center}
-@media (min-width:640px){.scrim{align-items:center}}
-.sheet{background:#fff;width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 22px calc(22px + env(safe-area-inset-bottom))}
-@media (min-width:640px){.sheet{border-radius:22px}}
-.sheet h2{font-size:22px;letter-spacing:-.02em}
-.lines{margin-top:14px}
-.line{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #ececf0}
-.line .nm{flex:1;min-width:0;font-size:15px}.line .nm span{display:block;color:var(--graphite);font-size:13px}
-.totals{border-top:1px solid #ececf0;margin-top:6px;padding-top:12px;font-size:15px}
-.totals div{display:flex;justify-content:space-between;padding:3px 0}
-.totals .big{font-size:18px;font-weight:700}
-.opts{display:flex;gap:8px;margin-top:14px}
-.opts label{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;font-size:15px}
-.opts input{accent-color:var(--blue)}
-.state{max-width:520px;margin:0 auto;text-align:center}
-.state .ic{width:64px;height:64px;border-radius:50%;margin:48px auto 0;display:flex;align-items:center;justify-content:center;font-size:30px;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.06)}
-.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:11px 18px;border-radius:999px;font-size:15px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.on{opacity:1}
-footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color:var(--graphite);margin-top:30px}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.w{max-width:1280px;margin:0 auto;padding:0 20px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.skel{height:120px;border-radius:18px;background:linear-gradient(90deg,#ececf0,#f6f6f8,#ececf0);background-size:200% 100%;animation:sk 1.2s infinite}
+/* utility bar */
+.util{background:var(--navy);color:#c7cfdd;font-size:12.5px}
+.util .w{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:34px;flex-wrap:wrap}
+.util b{color:#fff;font-weight:600}
+.util a{color:#8fb6ff}
+@media (max-width:640px){.util .hide-s{display:none}}
+/* header */
+.hdr{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line)}
+.hdr .w{display:flex;align-items:center;gap:18px;min-height:66px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;letter-spacing:-.03em;color:var(--ink);white-space:nowrap}
+.logo .tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;background:var(--blue);color:#fff;border-radius:5px;padding:3px 6px}
+.hsearch{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid transparent;border-radius:10px;padding:0 14px;min-height:44px;max-width:640px}
+.hsearch:focus-within{border-color:var(--blue);background:#fff}
+.hsearch input{border:0;outline:0;background:none;font:inherit;font-size:15px;flex:1;min-width:0}
+.hact{display:flex;align-items:center;gap:8px;margin-left:auto}
+.hbtn{display:inline-flex;align-items:center;gap:7px;border:0;background:none;border-radius:10px;padding:9px 12px;font-size:14px;font-weight:600;white-space:nowrap}
+.hbtn:hover{background:var(--bg)}
+.hbtn.solid{background:var(--blue);color:#fff}.hbtn.solid:hover{background:var(--blue2)}
+.cartbtn{position:relative}
+.cartbtn i{position:absolute;top:2px;right:2px;min-width:18px;height:18px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+@media (max-width:760px){.hdr .w{flex-wrap:wrap;gap:10px;padding-top:10px;padding-bottom:10px}.hsearch{order:3;flex-basis:100%;max-width:none}.hbtn .t{display:none}}
+/* hero */
+.hero{background:radial-gradient(1200px 500px at 85% -10%,rgba(10,102,255,.55),transparent 60%),linear-gradient(135deg,#0b1220 0%,#0e1d3d 60%,#0b1220 100%);color:#fff;overflow:hidden}
+.hero .w{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding-top:46px;padding-bottom:46px}
+.hero .kick{display:inline-flex;gap:8px;align-items:center;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9cc0ff;background:rgba(10,102,255,.18);border:1px solid rgba(143,182,255,.25);border-radius:999px;padding:6px 12px}
+.hero h1{font-size:clamp(36px,5.4vw,64px);line-height:1.02;letter-spacing:-.04em;margin-top:16px;font-weight:800}
+.hero h1 span{background:linear-gradient(90deg,#5fa2ff,#9b7bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:#c3cbe0;font-size:17px;line-height:1.55;margin-top:14px;max-width:560px}
+.hero .cta{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:13px 22px;font-size:15.5px;font-weight:700;background:var(--blue);color:#fff}
+.btn:hover{background:var(--blue2)}
+.btn.light{background:#fff;color:var(--ink)}.btn.light:hover{background:#e9edf5}
+.btn.ghost{background:var(--bg);color:var(--ink)}.btn.ghost:hover{background:#e7eaf0}
+.btn.full{width:100%}
+.btn:disabled{opacity:.55;cursor:default}
+.hero .art{position:relative;height:300px}
+.hero .art svg{position:absolute;filter:drop-shadow(0 30px 40px rgba(0,0,0,.5))}
+.hero.slim .w{grid-template-columns:1fr;padding-top:26px;padding-bottom:26px}
+.hero.slim h1{font-size:clamp(26px,3.6vw,38px);margin-top:10px}
+.hero.slim .art,.hero.slim p{display:none}
+@media (max-width:820px){.hero .w{grid-template-columns:1fr}.hero .art{display:none}}
+/* trust */
+.trust{background:#fff;border-bottom:1px solid var(--line)}
+.trust .w{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding-top:14px;padding-bottom:14px}
+.trust div{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--sub);line-height:1.3}
+.trust b{display:block;color:var(--ink);font-size:13.5px}
+.trust svg{flex:none}
+@media (max-width:980px){.trust .w{grid-template-columns:repeat(2,1fr)}.trust div:last-child{grid-column:span 2}}
+/* catalog */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+.cats{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;overflow-x:auto}
+.cats button{border:0;background:none;border-radius:9px;padding:9px 14px;font-size:14px;font-weight:600;color:var(--sub);white-space:nowrap}
+.cats button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.series{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
+.series button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.series button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.count{margin-left:auto;font-size:13px;color:var(--sub)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:16px;padding-bottom:60px}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.add.in{display:none}.buy .qty{flex:1;justify-content:space-between}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+.card:hover{box-shadow:0 10px 30px rgba(15,23,42,.08);transform:translateY(-1px)}
+.thumb{position:relative;background:linear-gradient(160deg,#f6f7fa,#e9ecf2);aspect-ratio:16/11;display:flex;align-items:center;justify-content:center}
+.thumb svg{height:80%;width:auto}
+.badge{position:absolute;top:10px;left:10px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:4px 7px}
+.b-oled{background:#111827;color:#fff}.b-incell{background:#e0ebff;color:#0047c2}.b-batt{background:#dcf5e5;color:#0d6b39}.b-orig{background:#f3e8ff;color:#6b21a8}
+.cbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.cbody h3{font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.cbody .q{font-size:13px;color:var(--sub)}
+.stock{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px}
+.stock i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-in{color:var(--green)}.st-low{color:var(--amber)}.st-out{color:var(--red)}
+.pr{display:flex;align-items:baseline;gap:6px;margin-top:auto;padding-top:6px}
+.pr b{font-size:21px;font-weight:800;letter-spacing:-.02em}
+.pr span{font-size:12px;color:var(--sub)}
+.buy{display:flex;gap:8px;align-items:center;margin-top:8px}
+.qty{display:flex;align-items:center;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none}
+.qty button{border:0;background:#fff;width:32px;height:38px;font-size:18px;color:var(--ink)}
+.qty button:disabled{color:#c3c8d2;cursor:default}
+.qty b{min-width:26px;text-align:center;font-size:14px}
+.add{flex:1;border:0;border-radius:9px;background:var(--blue);color:#fff;font-weight:700;font-size:14px;min-height:38px;padding:0 10px}
+.add:hover{background:var(--blue2)}
+.add.in{background:#e8f0ff;color:var(--blue2)}
+.add:disabled{background:#eef0f4;color:#9aa2b1;cursor:default}
+.lockp{margin-top:auto;padding-top:8px}
+.lockp button{width:100%;border:1px dashed #b9c3d6;background:#f7f9fd;color:var(--blue2);border-radius:9px;min-height:38px;font-size:13.5px;font-weight:700}
+.empty{text-align:center;padding:60px 20px;color:var(--sub)}
+.empty h3{color:var(--ink);font-size:20px;margin-bottom:6px}
+.skel{height:280px;border-radius:var(--r);background:linear-gradient(90deg,#e8ebf0,#f4f5f8,#e8ebf0);background-size:200% 100%;animation:sk 1.2s infinite}
 @keyframes sk{to{background-position:-200% 0}}
+/* why / apply band */
+.band{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:10px}
+.band .w{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding-top:34px;padding-bottom:34px}
+.band h3{font-size:17px;margin-bottom:6px}.band p{color:var(--sub);font-size:14.5px;line-height:1.55}
+.band .n{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:8px}
+@media (max-width:760px){.band .w{grid-template-columns:1fr}}
+/* modal + drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,15,30,.45);z-index:50;display:flex;justify-content:center;align-items:flex-end}
+@media (min-width:640px){.scrim.center{align-items:center}}
+.dlg{background:#fff;width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:24px 22px calc(22px + env(safe-area-inset-bottom))}
+@media (min-width:640px){.dlg{border-radius:18px}}
+.dlg h2{font-size:22px;letter-spacing:-.02em}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:#fff;z-index:51;display:flex;flex-direction:column;box-shadow:-20px 0 50px rgba(0,0,0,.15)}
+.drawer .dh{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}
+.drawer .dh h2{font-size:19px}
+.drawer .db{flex:1;overflow:auto;padding:6px 20px}
+.drawer .df{border-top:1px solid var(--line);padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
+.x{border:0;background:var(--bg);width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1}
+.line{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.line .mini{width:46px;height:46px;border-radius:9px;background:linear-gradient(160deg,#f6f7fa,#e9ecf2);display:flex;align-items:center;justify-content:center;flex:none}
+.line .mini svg{height:38px;width:auto}
+.line .nm{flex:1;min-width:0;font-size:14px;font-weight:600}.line .nm span{display:block;color:var(--sub);font-size:12.5px;font-weight:500}
+.line .lt{font-weight:700;font-size:14px;min-width:64px;text-align:right}
+.tot div{display:flex;justify-content:space-between;font-size:14px;padding:3px 0;color:var(--sub)}
+.tot .big{font-size:18px;font-weight:800;color:var(--ink);padding-top:8px}
+.opts{display:flex;gap:8px;margin-top:12px}
+.opts label{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600}
+.opts input{accent-color:var(--blue)}
+.field{position:relative;margin-top:10px}
+.field input,.field textarea{width:100%;font:inherit;font-size:16px;background:#fff;border:1px solid #c9cfda;border-radius:10px;padding:24px 13px 8px;outline:none;min-height:56px;-webkit-appearance:none;appearance:none}
+.field textarea{min-height:70px;resize:vertical}
+.field label{position:absolute;left:14px;top:8px;font-size:11.5px;color:var(--sub);pointer-events:none}
+.field input:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,102,255,.15)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.g2{grid-template-columns:1fr}}
+.seg{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:3px;margin-top:16px}
+.seg button{flex:1;border:0;background:none;border-radius:8px;padding:9px;font-size:14px;font-weight:600;color:var(--sub)}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.hint{font-size:12.5px;color:var(--sub);margin-top:10px;line-height:1.5}
+.err{color:var(--red);font-size:14px;margin-top:10px;min-height:1px}.ok{color:var(--green)}
+.link{border:0;background:none;color:var(--blue);font-size:14px;font-weight:600;padding:6px 0}
+/* orders + states */
+.page{padding:26px 0 60px}
+.page h2{font-size:26px;letter-spacing:-.02em}
+.orders{display:grid;gap:12px;margin-top:16px}
+.ord{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.ord .hd{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.ord ul{list-style:none;margin-top:10px;font-size:14px}
+.ord li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;color:#334155}
+.ord .t{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:700}
+.pill{display:inline-flex;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:700}
+.pill.new{background:#e0ebff;color:#0047c2}.pill.confirmed{background:#fff2d9;color:#8a5a00}.pill.ready{background:#dcf5e5;color:var(--green)}.pill.done{background:#eceef2;color:#334155}.pill.cancelled{background:#fde8e8;color:var(--red)}
+.state{max-width:560px;margin:50px auto;text-align:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:34px 26px}
+.state .ic{font-size:34px}.state h2{font-size:26px;margin-top:10px;letter-spacing:-.02em}.state p{color:var(--sub);margin-top:8px;line-height:1.55}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+footer{background:var(--navy);color:#9aa6bd;font-size:13px}
+footer .w{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:22px;padding-bottom:26px}
+footer a{color:#cbd6ea}
 </style>
 </head>
 <body>
-<nav class="nav"><div class="w"><a class="brand" href="/">iFixPhones<span>Wholesale</span></a><div id="navr"></div></div></nav>
-<main id="app"><div class="w"><div class="skel" style="margin-top:40px"></div></div></main>
+<div class="util"><div class="w"><span><b>Screens &amp; batteries only.</b> Best prices for repair shops.</span><span class="hide-s">Pickup: 9055 Marbach Rd, Suite 105 · <a href="tel:2107733548">(210) 773-3548</a></span></div></div>
+<header class="hdr"><div class="w">
+  <a class="logo" href="wholesale.html">iFixPhones <span class="tag">WHOLESALE</span></a>
+  <label class="hsearch"><span class="sr">Search parts</span><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#5b6474" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><input id="q" type="search" placeholder="Search model, e.g. 15 Pro Max OLED" autocomplete="off"></label>
+  <div class="hact" id="hact"></div>
+</div></header>
+<main id="app"><div class="w"><div class="skel" style="margin-top:30px"></div></div></main>
+<footer><div class="w"><span>© <span id="yr"></span> iFixPhones Wholesale · 9055 Marbach Rd, Suite 105, San Antonio, TX</span><span><a href="/">Retail repairs</a> · <a href="policy.html">Warranty policy</a> · <a href="tel:2107733548">(210) 773-3548</a></span></div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="fb-app.js"></script>
@@ -126,8 +188,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
   var FB_CONFIG = {apiKey:"AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI", authDomain:"ifixphones-ca10e.firebaseapp.com", projectId:"ifixphones-ca10e", storageBucket:"ifixphones-ca10e.firebasestorage.app", messagingSenderId:"230387153893", appId:"1:230387153893:web:ddbdac71ff0b1c56284d0c"};
   var SHOP_EMAIL = 'ubringifix24@gmail.com', SHOP_PHONE = '(210) 773-3548', TAX = 0.0825;
   var PO_TOKEN = 'a5kkcfdzh96mzd9vvq56cof48ncp38', PO_USER = 'uku53twtd8174esng6mszeyofke9kh';
-  var S = {st:'loading', mode:'signin', tab:'Screens', q:'', brand:'', cart:{}, items:[], orders:[], me:null, user:null};
-  var unsubs = [];
+  var S = {st:'loading', view:'shop', cat:'all', series:'all', q:'', cart:{}, items:[], pub:[], orders:[], me:null, user:null};
+  var unsubs = [], shopUnsubs = [];
   function $(s, r){ return (r||document).querySelector(s); }
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function money(n){ n = Math.round((Number(n)||0) * 100) / 100; return '$' + n.toFixed(2); }
@@ -136,6 +198,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
   function toast(m){ var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ t.classList.remove('on'); }, 2600); }
   function push(title, msg){ try { fetch('https://api.pushover.net/1/messages.json', {method:'POST', mode:'no-cors', body:new URLSearchParams({token:PO_TOKEN, user:PO_USER, title:title, message:msg, priority:'1', url:'https://ifixphones.net/tickets.html', url_title:'Open tickets'})}).catch(function(){}); } catch(e) {} }
   function stop(){ unsubs.forEach(function(u){ try { u(); } catch(e) {} }); unsubs = []; }
+  function stopShop(){ shopUnsubs.forEach(function(u){ try { u(); } catch(e) {} }); shopUnsubs = []; }
+  $('#yr').textContent = new Date().getFullYear();
   function authMsg(e){
     var c = (e && e.code) || '';
     if (/wrong-password|invalid-credential|user-not-found|invalid-login/.test(c)) return 'That email and password don’t match. Try again or reset your password.';
@@ -147,146 +211,184 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
     if (/operation-not-allowed/.test(c)) return 'Wholesale sign-in isn’t turned on yet. Call us at ' + SHOP_PHONE + '.';
     return 'Something went wrong. Try again, or call ' + SHOP_PHONE + '.';
   }
+  var approved = function(){ return S.me && S.me.status === 'approved'; };
+  function list(){ return approved() ? S.items : S.pub; }
+  function kind(i){ var id = String(i.id||''); if (i.cat === 'Batteries' || /battery/.test(id)) return 'batt'; if (/oled/.test(id) || /oled/i.test(i.label)) return 'oled'; if (/original/.test(id)) return 'orig'; return 'incell'; }
+  var KIND = {oled:['Soft OLED','b-oled'], incell:['Incell','b-incell'], batt:['Battery','b-batt'], orig:['Original','b-orig']};
+  function seriesOf(m){ var x = /iPhone (\d+)/.exec(m); if (x) return x[1]; if (/Air/.test(m)) return 'Air'; return 'Other'; }
+  function itemById(id){ return S.items.filter(function(i){ return i.id === id; })[0]; }
   function loadCart(){ try { S.cart = JSON.parse(localStorage.getItem('ifx_ws_cart_' + S.user.uid) || '{}') || {}; } catch(e) { S.cart = {}; } }
   function saveCart(){ try { localStorage.setItem('ifx_ws_cart_' + S.user.uid, JSON.stringify(S.cart)); } catch(e) {} }
-  function itemById(id){ return S.items.filter(function(i){ return i.id === id; })[0]; }
   function cartLines(){ return Object.keys(S.cart).map(function(id){ var i = itemById(id); return i && S.cart[id] > 0 ? {item:i, qty:Math.min(S.cart[id], Math.max(0, i.avail))} : null; }).filter(function(x){ return x && x.qty > 0; }); }
   function cartCount(){ return cartLines().reduce(function(a, l){ return a + l.qty; }, 0); }
   function cartSub(){ return cartLines().reduce(function(a, l){ return a + l.qty * l.item.price; }, 0); }
   function exempt(){ return !!(S.me && S.me.taxExempt); }
 
+  /* ---------- product art ---------- */
+  function art(k, small){
+    if (k === 'batt') return '<svg viewBox="0 0 120 180" aria-hidden="true"><defs><linearGradient id="bg1" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2d3036"/><stop offset="1" stop-color="#16181c"/></linearGradient></defs><rect x="14" y="10" width="92" height="160" rx="10" fill="url(#bg1)"/><rect x="14" y="10" width="92" height="160" rx="10" fill="none" stroke="#4a4f58"/><rect x="26" y="56" width="68" height="56" rx="4" fill="none" stroke="rgba(255,255,255,.35)"/>' + (small ? '' : '<text x="60" y="78" fill="#e6e9ef" font-size="9" font-family="Arial" font-weight="700" text-anchor="middle">Li-ion</text><text x="60" y="92" fill="#aab2c0" font-size="7" font-family="Arial" text-anchor="middle">3.87V ⎓ Polymer</text>') + '<rect x="40" y="0" width="40" height="16" rx="3" fill="#c98a2b"/><rect x="48" y="2" width="24" height="9" rx="2" fill="#e8c27a"/><path d="M14 30h92" stroke="rgba(255,255,255,.06)"/></svg>';
+    var oled = k === 'oled';
+    return '<svg viewBox="0 0 120 200" aria-hidden="true"><defs><linearGradient id="g' + k + '" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="' + (oled ? '#1b2440' : '#1a1d24') + '"/><stop offset="1" stop-color="#05060a"/></linearGradient><linearGradient id="s' + k + '" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="rgba(255,255,255,.22)"/><stop offset=".5" stop-color="rgba(255,255,255,.03)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/></linearGradient></defs>' +
+      '<rect x="100" y="56" width="18" height="34" rx="3" fill="#c46a1f"/><rect x="106" y="60" width="10" height="12" rx="2" fill="#d9a35a"/>' +
+      '<rect x="8" y="4" width="98" height="192" rx="18" fill="#0a0b0e"/><rect x="12" y="8" width="90" height="184" rx="15" fill="url(#g' + k + ')"/><circle cx="57" cy="20" r="3.4" fill="#000" stroke="#2b3040"/>' +
+      '<path d="M12 8h50L22 192h-10z" fill="url(#s' + k + ')" opacity=".9"/>' + (oled ? '<rect x="12" y="8" width="90" height="184" rx="15" fill="none" stroke="rgba(120,150,255,.25)"/>' : '') + '</svg>';
+  }
+
   /* ---------- render ---------- */
+  function header(){
+    var h = $('#hact'), n = cartCount();
+    if (S.st === 'out' || S.st === 'loading') h.innerHTML = '<button class="hbtn" data-a="auth" data-v="signin"><span>Sign in</span></button><button class="hbtn solid" data-a="auth" data-v="apply">Apply<span class="t">&nbsp;for an account</span></button>';
+    else if (approved()) h.innerHTML = '<button class="hbtn" data-a="view" data-v="orders" aria-label="My orders"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="12" height="15" rx="2"/><path d="M7 7h6M7 10.5h6M7 14h4"/></svg><span class="t">Orders</span></button><button class="hbtn cartbtn" data-a="cart" aria-label="Cart, ' + n + ' items"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2 3h2.5l2 10h9l2-7H6"/><circle cx="8" cy="16.5" r="1.3"/><circle cx="14.5" cy="16.5" r="1.3"/></svg><span class="t">Cart</span>' + (n ? '<i>' + n + '</i>' : '') + '</button><button class="hbtn" data-a="signout"><span class="t">Sign out</span><svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M8 4H5a1 1 0 00-1 1v10a1 1 0 001 1h3M12 6l4 4-4 4M16 10H8"/></svg></button>';
+    else if (S.st === 'shop') h.innerHTML = '<a class="hbtn solid" href="/tickets.html">Open Tickets</a>';
+    else h.innerHTML = '<button class="hbtn" data-a="signout">Sign out</button>';
+    $('.hsearch').style.visibility = (S.view === 'orders' || S.st === 'shop') ? 'hidden' : 'visible';
+  }
   function render(){
-    var app = $('#app'), nav = $('#navr');
-    nav.innerHTML = S.user && S.st !== 'shop' ? '<button class="link" data-a="signout">Sign out</button>' : '<a class="link" href="tel:2107733548">' + SHOP_PHONE + '</a>';
-    if (S.st === 'loading') { app.innerHTML = '<div class="w"><div class="skel" style="margin-top:40px"></div></div>'; return; }
-    if (S.st === 'nodb') { app.innerHTML = state('⚠️', 'Couldn’t load', 'Check your internet connection and reload the page.'); return; }
-    if (S.st === 'out') { app.innerHTML = authView(); return; }
-    if (S.st === 'shop') { app.innerHTML = state('🛠️', 'You’re signed in as the shop', 'Manage wholesale shops, prices and orders in the Tickets app → Wholesale tab.', '<a class="btn full" href="/tickets.html">Open Tickets</a>'); return; }
-    if (S.st === 'nodoc') { app.innerHTML = state('📝', 'Finish your application', 'We need a few details about your shop.', '') ; app.querySelector('.state').insertAdjacentHTML('beforeend', '<div class="card" style="text-align:left">' + applyFields(true) + '</div>'); return; }
+    header();
+    var app = $('#app');
+    if (S.st === 'loading') { app.innerHTML = '<div class="w"><div class="grid">' + '<div class="skel"></div>'.repeat(4) + '</div></div>'; return; }
+    if (S.st === 'nodb') { app.innerHTML = '<div class="w">' + state('⚠️', 'Couldn’t load', 'Check your internet connection and reload the page.') + '</div>'; return; }
+    if (S.st === 'shop') { app.innerHTML = '<div class="w">' + state('🛠️', 'You’re signed in as the shop', 'Manage wholesale shops, prices and orders in the Tickets app → Wholesale tab.', '<a class="btn" style="margin-top:16px" href="/tickets.html">Open Tickets</a>') + '</div>'; return; }
+    if (S.st === 'nodoc') { app.innerHTML = '<div class="w"><div class="state" style="text-align:left"><h2>Finish your application</h2><p>We need a few details about your shop.</p>' + applyFields(true) + '</div></div>'; return; }
     var me = S.me || {};
-    if (me.status === 'pending') { app.innerHTML = state('⏳', 'Thanks, ' + esc((me.name||'').split(' ')[0] || 'there') + '!', '<b>' + esc(me.shop) + '</b> is waiting for approval. We usually review new shops within one business day and will text you at ' + esc(fmtPhone(me.phone)) + '.', '<p class="hint">Questions? Call or text ' + SHOP_PHONE + '.</p>'); return; }
-    if (me.status === 'declined' || me.status === 'off') { app.innerHTML = state('🔒', 'Wholesale access is off', 'This account can’t see wholesale prices right now. Call or text ' + SHOP_PHONE + ' if you think this is a mistake.'); return; }
-    app.innerHTML = shopView();
-    var q = $('#q'); if (q && S.focusQ) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+    if (S.st === 'in' && me.status === 'pending') { app.innerHTML = '<div class="w">' + state('⏳', 'Thanks, ' + esc((me.name||'').split(' ')[0] || 'there') + '!', '<b>' + esc(me.shop) + '</b> is waiting for approval. We usually review new shops within one business day and will text you at ' + esc(fmtPhone(me.phone)) + '.', '<p class="hint">To buy tax-free, bring a signed Texas Resale Certificate (Form 01-339) to your first pickup. Questions? Call or text ' + SHOP_PHONE + '.</p>') + '</div>' + catalogSection(true); return; }
+    if (S.st === 'in' && (me.status === 'declined' || me.status === 'off')) { app.innerHTML = '<div class="w">' + state('🔒', 'Wholesale access is off', 'This account can’t see wholesale prices right now. Call or text ' + SHOP_PHONE + ' if you think this is a mistake.') + '</div>'; return; }
+    if (approved() && S.view === 'orders') { app.innerHTML = ordersView(); return; }
+    app.innerHTML = hero() + trust() + catalogSection(false) + (approved() ? '' : band());
   }
-  function state(ic, h, p, extra){ return '<div class="w"><div class="state"><div class="ic" aria-hidden="true">' + ic + '</div><h1 style="margin-top:18px;font-size:32px">' + h + '</h1><p class="lede">' + p + '</p>' + (extra||'') + '</div></div>'; }
-
-  function authView(){
-    var signin = S.mode === 'signin', reset = S.mode === 'reset';
-    var form = reset ?
-      '<div class="fields"><div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" value="' + esc(S.em||'') + '"></div></div>' +
-      '<button class="btn full" data-a="reset">Send reset link</button><div class="err" id="err" role="alert"></div><p class="center"><button class="link" data-a="mode" data-v="signin">Back to sign in</button></p>'
-    : signin ?
-      '<div class="fields"><div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" value="' + esc(S.em||'') + '"></div>' +
-      '<div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password"></div></div>' +
-      '<button class="btn full" data-a="signin">Sign in</button><div class="err" id="err" role="alert"></div><p class="center"><button class="link" data-a="mode" data-v="reset">Forgot password?</button></p>'
-    : applyFields(false);
-    return '<div class="w narrow"><h1>Wholesale</h1><p class="lede">Screens and batteries for repair shops. Approved shops only.</p>' +
-      '<div class="card">' + (reset ? '<h2 style="font-size:20px">Reset your password</h2><p class="hint">We’ll email you a link.</p>' :
-      '<div class="seg" role="group" aria-label="Sign in or apply"><button data-a="mode" data-v="signin" aria-pressed="' + signin + '">Sign in</button><button data-a="mode" data-v="apply" aria-pressed="' + !signin + '">Apply for access</button></div>') +
-      form + '</div>' +
-      '<p class="hint center" style="margin-top:18px">Prices are only shown to shops we’ve approved. Need help? Call ' + SHOP_PHONE + '.</p></div>';
+  function state(ic, h, p, extra){ return '<div class="state"><div class="ic" aria-hidden="true">' + ic + '</div><h2>' + h + '</h2><p>' + p + '</p>' + (extra||'') + '</div>'; }
+  function hero(){
+    if (approved()) return '<section class="hero slim"><div class="w"><div><span class="kick">Welcome back, ' + esc((S.me.name||'').split(' ')[0] || 'partner') + '</span><h1>' + esc(S.me.shop || 'Your shop') + ' · <span>wholesale pricing</span></h1></div></div></section>';
+    return '<section class="hero"><div class="w"><div><span class="kick">Wholesale for repair shops</span><h1>Screens &amp; batteries.<br><span>Best price.</span></h1><p>We stick to what matters most: JK Soft OLED and JK Incell screens plus batteries for every iPhone. Tested, in stock, and ready for same-day pickup in San Antonio.</p><div class="cta"><button class="btn" data-a="auth" data-v="apply">Apply for an account</button><button class="btn light" data-a="auth" data-v="signin">Sign in</button></div></div>' +
+      '<div class="art" aria-hidden="true"><div style="position:absolute;left:4%;top:8%;width:30%;transform:rotate(-12deg)">' + art('incell') + '</div><div style="position:absolute;left:34%;top:0;width:32%;z-index:2">' + art('oled') + '</div><div style="position:absolute;left:66%;top:22%;width:26%;transform:rotate(10deg)">' + art('batt') + '</div></div></div></section>';
   }
-  function applyFields(existing){
-    return '<div class="fields">' +
-      '<div class="field"><label for="ap-shop">Shop / business name</label><input id="ap-shop" maxlength="80" autocomplete="organization"></div>' +
-      '<div class="g2"><div class="field"><label for="ap-name">Your name</label><input id="ap-name" maxlength="60" autocomplete="name"></div>' +
-      '<div class="field"><label for="ap-phone">Cell phone</label><input id="ap-phone" type="tel" maxlength="20" autocomplete="tel"></div></div>' +
-      '<div class="g2"><div class="field"><label for="ap-city">City</label><input id="ap-city" maxlength="60" value="San Antonio"></div>' +
-      '<div class="field"><label for="ap-tax">TX sales tax permit # (11 digits, optional)</label><input id="ap-tax" maxlength="30" inputmode="numeric"></div></div>' +
-      (existing ? '' :
-      '<div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email"></div>' +
-      '<div class="field"><label for="pw">Create a password (8+ characters)</label><input id="pw" type="password" autocomplete="new-password"></div>') +
-      '</div><p class="hint"><b>Buying tax-free:</b> enter your Texas sales tax permit number, then give us a signed Texas Resale Certificate (Form 01-339) at your first pickup. Until we have it, 8.25% sales tax is added. A permit number alone isn’t enough under Texas rules.</p>' +
-      '<button class="btn full" data-a="' + (existing ? 'finish' : 'apply') + '">Apply for wholesale</button><div class="err" id="err" role="alert"></div>';
+  function trust(){
+    var ic = function(p){ return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0a66ff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
+    return '<section class="trust"><div class="w">' +
+      '<div>' + ic('<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/>') + '<span><b>JK Soft OLED &amp; Incell</b>Only the screens we trust</span></div>' +
+      '<div>' + ic('<path d="M20 6L9 17l-5-5"/>') + '<span><b>Every part tested</b>Before it leaves the shop</span></div>' +
+      '<div>' + ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>') + '<span><b>Same-day pickup</b>Order now, grab it today</span></div>' +
+      '<div>' + ic('<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/>') + '<span><b>Local delivery</b>Around San Antonio</span></div>' +
+      '<div>' + ic('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>') + '<span><b>Tax-free with resale cert</b>Texas Form 01-339</span></div>' +
+      '</div></section>';
   }
-
-  function shopView(){
-    var me = S.me || {};
-    var tabs = ['Screens', 'Batteries', 'My orders'];
-    var openN = S.orders.filter(function(o){ return o.status !== 'done' && o.status !== 'cancelled'; }).length;
-    var h = '<div class="w"><div class="top"><div><h2>' + esc(me.shop || 'Wholesale') + '</h2><div class="who">Wholesale prices · ' + (exempt() ? 'tax-free (resale certificate on file)' : '8.25% sales tax added · bring a signed Form 01-339 to buy tax-free') + '</div></div></div>' +
-      '<div class="tools"><div class="seg" role="group" aria-label="Section">' + tabs.map(function(t){ return '<button data-a="tab" data-v="' + t + '" aria-pressed="' + (S.tab === t) + '">' + t + (t === 'My orders' && openN ? ' (' + openN + ')' : '') + '</button>'; }).join('') + '</div>' +
-      (S.tab !== 'My orders' ? '<label class="search"><span class="sr">Search models</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><input id="q" type="search" placeholder="Search, e.g. 14 Pro Max" value="' + esc(S.q) + '" autocomplete="off"></label>' : '') + '</div>';
-    if (S.tab === 'My orders') return h + ordersView() + '</div>';
-    var list = S.items.filter(function(i){ return i.cat === S.tab; });
-    var brands = []; list.forEach(function(i){ if (brands.indexOf(i.brand) < 0) brands.push(i.brand); });
-    if (brands.length > 1) { if (brands.indexOf(S.brand) < 0) S.brand = brands[0]; h += '<div class="chips">' + brands.map(function(b){ return '<button class="chip" data-a="brand" data-v="' + esc(b) + '" aria-pressed="' + (S.brand === b && !S.q) + '">' + esc(b.replace('Apple ', '')) + '</button>'; }).join('') + '</div>'; }
-    var q = S.q.toLowerCase().trim();
-    if (q) list = list.filter(function(i){ var hay = (i.model + ' ' + i.label).toLowerCase(); return q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; }); });
-    else if (brands.length > 1) list = list.filter(function(i){ return i.brand === S.brand; });
-    var groups = [], by = {};
-    list.forEach(function(i){ if (!by[i.model]) { by[i.model] = []; groups.push(i.model); } by[i.model].push(i); });
-    if (!groups.length) h += '<div class="empty"><h3>' + (q ? 'No matches' : 'Nothing listed yet') + '</h3><p>' + (q ? 'Try a shorter search, like “14 Pro”.' : 'Check back soon, or call ' + SHOP_PHONE + '.') + '</p></div>';
-    else h += '<div class="models">' + groups.map(function(m){
-      return '<section class="model"><h3>' + esc(m) + '</h3>' + by[m].map(itemRow).join('') + '</section>';
-    }).join('') + '</div>';
-    var n = cartCount();
-    if (n) h += '<div class="cartbar"><div class="w"><div class="sum"><b>' + money(cartSub()) + '</b><span>' + n + ' item' + (n > 1 ? 's' : '') + (exempt() ? '' : ' · plus tax') + '</span></div><button class="btn" data-a="review">Review order</button></div></div>';
+  function band(){
+    return '<section class="band"><div class="w"><div><div class="n">1 · APPLY</div><h3>Open a free account</h3><p>Tell us about your shop. It takes a minute, and there’s no minimum to apply.</p></div><div><div class="n">2 · GET APPROVED</div><h3>See our prices</h3><p>We review shops within one business day and text you when you’re in.</p></div><div><div class="n">3 · ORDER</div><h3>Pick up today</h3><p>Send your order online, and we’ll text you when it’s packed. Pay at pickup: cash, Zelle or card.</p></div></div></section>';
+  }
+  function filtered(){
+    var q = S.q.toLowerCase().trim(), L = list();
+    return L.filter(function(i){
+      var k = kind(i);
+      if (S.cat === 'screens' && k === 'batt') return false;
+      if (S.cat === 'oled' && k !== 'oled') return false;
+      if (S.cat === 'incell' && k !== 'incell') return false;
+      if (S.cat === 'batt' && k !== 'batt') return false;
+      if (S.series !== 'all' && seriesOf(i.model) !== S.series) return false;
+      if (q) { var hay = (i.model + ' ' + i.label + ' ' + KIND[k][0] + ' ' + (k === 'batt' ? 'battery' : 'screen lcd display')).toLowerCase(); if (!q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; })) return false; }
+      return true;
+    });
+  }
+  function catalogSection(locked){
+    var L = list();
+    var cats = [['all','All parts'],['screens','Screens'],['oled','Soft OLED'],['incell','Incell'],['batt','Batteries']];
+    var ser = []; L.forEach(function(i){ var s = seriesOf(i.model); if (ser.indexOf(s) < 0) ser.push(s); });
+    ser.sort(function(a, b){ var x = parseInt(a, 10), y = parseInt(b, 10); return (isNaN(y) ? -1 : y) - (isNaN(x) ? -1 : x); });
+    var items = filtered();
+    var h = '<div class="w"><div class="bar"><div class="cats" role="group" aria-label="Category">' + cats.map(function(c){ return '<button data-a="cat" data-v="' + c[0] + '" aria-pressed="' + (S.cat === c[0]) + '">' + c[1] + '</button>'; }).join('') + '</div><span class="count">' + items.length + ' part' + (items.length === 1 ? '' : 's') + '</span></div>';
+    if (ser.length > 1) h += '<div class="series" role="group" aria-label="Model">' + [['all','All models']].concat(ser.map(function(s){ return [s, /^\d+$/.test(s) ? 'iPhone ' + s : s === 'Air' ? 'iPhone Air' : s]; })).map(function(s){ return '<button data-a="series" data-v="' + esc(s[0]) + '" aria-pressed="' + (S.series === s[0]) + '">' + esc(s[1]) + '</button>'; }).join('') + '</div>';
+    if (!L.length) h += '<div class="empty"><h3>New stock is on the way</h3><p>Our JK screen shipment is landing soon. ' + (approved() ? 'Check back shortly.' : 'Apply now so you’re approved when it arrives.') + '</p></div>';
+    else if (!items.length) h += '<div class="empty"><h3>No matches</h3><p>Try a shorter search, like “14 Pro”, or pick “All parts”.</p></div>';
+    else h += '<div class="grid">' + items.map(function(i){ return card(i, locked || !approved()); }).join('') + '</div>';
     return h + '</div>';
   }
-  function itemRow(i){
-    var inCart = S.cart[i.id] || 0, out = i.avail <= 0;
-    var stock = out ? '<span class="out">Out of stock</span>' : '<span>' + (i.avail >= 20 ? '20+' : i.avail) + ' in stock</span>';
-    var ctl = inCart ? '<div class="step"><button data-a="q" data-id="' + esc(i.id) + '" data-v="-1" aria-label="One less">−</button><b>' + inCart + '</b><button data-a="q" data-id="' + esc(i.id) + '" data-v="1" aria-label="One more"' + (inCart >= i.avail ? ' disabled' : '') + '>+</button></div>'
-      : '<button class="add" data-a="q" data-id="' + esc(i.id) + '" data-v="1"' + (out ? ' disabled' : '') + '>Add</button>';
-    return '<div class="item"><div class="nm"><b>' + esc(i.label) + '</b>' + stock + '</div><div class="pr">' + money(i.price) + '</div>' + ctl + '</div>';
+  function card(i, locked){
+    var k = kind(i), av = locked ? (i.inStock ? 5 : 0) : i.avail;
+    var st = av <= 0 ? '<span class="stock st-out"><i></i>Out of stock</span>' : (!locked && av <= 3) ? '<span class="stock st-low"><i></i>Only ' + av + ' left</span>' : '<span class="stock st-in"><i></i>In stock' + (!locked && av < 20 ? ' · ' + av : !locked ? ' · 20+' : '') + '</span>';
+    var body = '<div class="cbody"><h3>' + esc(i.model) + '</h3><div class="q">' + (k === 'batt' ? esc(i.label) + (/battery/i.test(i.label) ? '' : ' · Battery') : esc(i.label) + ' · Screen') + '</div>' + st;
+    if (locked) body += '<div class="lockp"><button data-a="auth" data-v="' + (S.st === 'in' ? 'none' : 'signin') + '"' + (S.st === 'in' ? ' disabled' : '') + '>' + (S.st === 'in' ? 'Price after approval' : '🔒 Log in for price') + '</button></div>';
+    else {
+      var n = S.cart[i.id] || 0;
+      body += '<div class="pr"><b>' + money(i.price) + '</b><span>each</span></div><div class="buy">' +
+        (n ? '<div class="qty"><button data-a="q" data-id="' + esc(i.id) + '" data-v="-1" aria-label="One less">−</button><b>' + n + '</b><button data-a="q" data-id="' + esc(i.id) + '" data-v="1" aria-label="One more"' + (n >= i.avail ? ' disabled' : '') + '>+</button></div><button class="add in" data-a="cart">View cart</button>'
+           : '<button class="add" data-a="q" data-id="' + esc(i.id) + '" data-v="1"' + (av <= 0 ? ' disabled' : '') + '>' + (av <= 0 ? 'Out of stock' : 'Add to cart') + '</button>') + '</div>';
+    }
+    return '<article class="card"><div class="thumb"><span class="badge ' + KIND[k][1] + '">' + KIND[k][0] + '</span>' + art(k) + '</div>' + body + '</div></article>';
   }
   var ST = {new:'Sent', confirmed:'Confirmed', ready:'Ready for pickup', done:'Completed', cancelled:'Cancelled'};
   function ordersView(){
-    if (!S.orders.length) return '<div class="empty"><h3>No orders yet</h3><p>Pick screens or batteries and send your first order.</p></div>';
-    return '<div class="orders">' + S.orders.map(function(o){
+    var h = '<div class="w page"><button class="link" data-a="view" data-v="shop">‹ Back to parts</button><h2 style="margin-top:6px">My orders</h2>';
+    if (!S.orders.length) return h + '<div class="empty"><h3>No orders yet</h3><p>Add screens or batteries to your cart and send your first order.</p><button class="btn" style="margin-top:14px" data-a="view" data-v="shop">Shop parts</button></div></div>';
+    return h + '<div class="orders">' + S.orders.map(function(o){
       var d = new Date(o.createdAt);
-      return '<article class="ord"><div class="hd"><div><b>Order ' + esc(o.code) + '</b><div class="hint" style="margin-top:2px">' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) + ' · ' + (o.method === 'delivery' ? 'Delivery' : 'Pickup') + '</div></div><span class="pill ' + esc(o.status) + '">' + esc(ST[o.status] || o.status) + '</span></div>' +
+      return '<article class="ord"><div class="hd"><div><b style="font-size:16px">Order ' + esc(o.code) + '</b><div class="hint" style="margin-top:2px">' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) + ' · ' + (o.method === 'delivery' ? 'Delivery' : 'Pickup') + '</div></div><span class="pill ' + esc(o.status) + '">' + esc(ST[o.status] || o.status) + '</span></div>' +
         '<ul>' + (o.items||[]).map(function(l){ return '<li><span>' + l.qty + ' × ' + esc(l.model) + ' · ' + esc(l.label) + '</span><span>' + money(l.qty * l.price) + '</span></li>'; }).join('') + '</ul>' +
-        '<div class="tot"><span>' + (o.total ? 'Total' : 'Subtotal') + '</span><span>' + money(o.total || o.subtotal) + '</span></div>' +
-        (o.status === 'new' ? '<p style="margin-top:10px"><button class="link" style="color:var(--red)" data-a="cancel" data-id="' + esc(o.id) + '">Cancel this order</button></p>' : '') +
-        (o.shopNote ? '<p class="hint">Note from iFixPhones: ' + esc(o.shopNote) + '</p>' : '') + '</article>';
-    }).join('') + '</div>';
+        '<div class="t"><span>' + (o.total ? 'Total' : 'Subtotal') + '</span><span>' + money(o.total || o.subtotal) + '</span></div>' +
+        (o.shopNote ? '<p class="hint">Note from iFixPhones: ' + esc(o.shopNote) + '</p>' : '') +
+        '<div style="display:flex;gap:14px;margin-top:8px">' + (o.status === 'new' ? '<button class="link" style="color:var(--red)" data-a="cancel" data-id="' + esc(o.id) + '">Cancel order</button>' : '') + '<button class="link" data-a="reorder" data-id="' + esc(o.id) + '">Order again</button></div></article>';
+    }).join('') + '</div></div>';
   }
 
-  /* ---------- cart / review ---------- */
-  function review(){
-    var lines = cartLines(); if (!lines.length) return;
-    var sub = cartSub(), tax = exempt() ? 0 : Math.round(sub * TAX * 100) / 100;
-    var el = document.createElement('div'); el.className = 'scrim';
-    el.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="rv-h"><h2 id="rv-h">Review order</h2><div class="lines">' + lines.map(function(l){
-      return '<div class="line"><div class="nm">' + esc(l.item.model) + '<span>' + esc(l.item.label) + ' · ' + money(l.item.price) + ' each</span></div><div class="step"><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="-1" aria-label="One less">−</button><b>' + l.qty + '</b><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="1" aria-label="One more"' + (l.qty >= l.item.avail ? ' disabled' : '') + '>+</button></div><div style="width:72px;text-align:right;font-weight:600">' + money(l.qty * l.item.price) + '</div></div>';
-    }).join('') + '</div>' +
-    '<div class="totals"><div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>' + (exempt() ? 'Sales tax (resale certificate on file)' : 'Sales tax 8.25%') + '</span><span>' + money(tax) + '</span></div><div class="big"><span>Estimated total</span><span>' + money(sub + tax) + '</span></div></div>' +
-    '<div class="opts" role="radiogroup" aria-label="Pickup or delivery"><label><input type="radio" name="mt" value="pickup" checked> Pickup at shop</label><label><input type="radio" name="mt" value="delivery"> Local delivery</label></div>' +
-    '<div class="field" style="margin-top:12px"><label for="rv-note">Note (optional)</label><textarea id="rv-note" maxlength="400" placeholder=" "></textarea></div>' +
-    '<p class="hint">This sends an order request. We’ll confirm stock and text you when it’s ready. Pay at pickup: cash, Zelle, or card (3% card fee).</p>' +
-    '<button class="btn full" id="rv-send">Send order · ' + money(sub + tax) + '</button><button class="btn ghost full" style="margin-top:8px" data-close>Keep shopping</button><div class="err" id="rv-err" role="alert"></div></div>';
+  /* ---------- cart drawer ---------- */
+  var drawer = null;
+  function closeDrawer(){ if (drawer) { drawer.remove(); drawer = null; } }
+  function openCart(){
+    closeDrawer();
+    var lines = cartLines(), sub = cartSub(), tax = exempt() ? 0 : Math.round(sub * TAX * 100) / 100;
+    var el = document.createElement('div'); drawer = el;
+    el.innerHTML = '<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="cart-h"><div class="dh"><h2 id="cart-h">Your cart</h2><button class="x" data-close aria-label="Close">×</button></div>' +
+      (lines.length ? '<div class="db">' + lines.map(function(l){ var k = kind(l.item); return '<div class="line"><div class="mini">' + art(k, 1) + '</div><div class="nm">' + esc(l.item.model) + '<span>' + esc(l.item.label) + ' · ' + money(l.item.price) + '</span></div><div class="qty"><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="-1" aria-label="One less">−</button><b>' + l.qty + '</b><button data-a="q" data-id="' + esc(l.item.id) + '" data-v="1" aria-label="One more"' + (l.qty >= l.item.avail ? ' disabled' : '') + '>+</button></div><div class="lt">' + money(l.qty * l.item.price) + '</div></div>'; }).join('') +
+        '<div class="opts" role="radiogroup" aria-label="Pickup or delivery"><label><input type="radio" name="mt" value="pickup" checked> Pickup</label><label><input type="radio" name="mt" value="delivery"> Local delivery</label></div>' +
+        '<div class="field"><label for="rv-note">Note (optional)</label><textarea id="rv-note" maxlength="400"></textarea></div>' +
+        '<p class="hint">This sends an order request. We’ll confirm stock and text you when it’s ready. Pay at pickup: cash, Zelle, or card (+3%).</p></div>' +
+        '<div class="df"><div class="tot"><div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>' + (exempt() ? 'Sales tax (resale certificate on file)' : 'Sales tax 8.25%') + '</span><span>' + money(tax) + '</span></div><div class="big"><span>Estimated total</span><span>' + money(sub + tax) + '</span></div></div><button class="btn full" id="rv-send" style="margin-top:12px">Send order · ' + money(sub + tax) + '</button><div class="err" id="rv-err" role="alert"></div></div>'
+      : '<div class="db"><div class="empty"><h3>Your cart is empty</h3><p>Add screens or batteries to get started.</p></div></div>') + '</aside>';
     document.body.appendChild(el);
-    el.addEventListener('click', function(e){ if (e.target === el || e.target.hasAttribute('data-close')) el.remove(); });
-    $('#rv-send', el).addEventListener('click', function(){ sendOrder(el); });
-    S.modal = el;
+    el.addEventListener('click', function(e){ if (e.target.closest('[data-close]')) closeDrawer(); });
+    var s = $('#rv-send', el); if (s) s.addEventListener('click', function(){ sendOrder(el); });
   }
   function sendOrder(el){
     var btn = $('#rv-send', el), err = $('#rv-err', el), lines = cartLines(); if (!lines.length) return;
     btn.disabled = true; btn.textContent = 'Sending…'; err.textContent = '';
-    var me = S.me || {}, now = Date.now(), sub = Math.round(cartSub() * 100) / 100;
-    var code = 'W' + now.toString(36).slice(-5).toUpperCase();
+    var me = S.me || {}, now = Date.now(), sub = Math.round(cartSub() * 100) / 100, code = 'W' + now.toString(36).slice(-5).toUpperCase();
     var o = {uid:S.user.uid, shop:me.shop || '', name:me.name || '', phone:me.phone || '', email:S.user.email || '',
       items:lines.map(function(l){ return {id:l.item.id, brand:l.item.brand, model:l.item.model, label:l.item.label, cat:l.item.cat, price:l.item.price, qty:l.qty}; }),
       subtotal:sub, method:(el.querySelector('input[name=mt]:checked')||{}).value || 'pickup', note:$('#rv-note', el).value.trim().slice(0, 400), status:'new', createdAt:now, code:code};
     firebase.firestore().collection('wsorders').add(o).then(function(){
-      push('New WHOLESALE order ' + code, (me.shop || '') + ' · ' + lines.reduce(function(a,l){ return a + l.qty; }, 0) + ' items · ' + money(sub) + '\n' + lines.map(function(l){ return l.qty + '× ' + l.item.model + ' ' + l.item.label; }).join('\n'));
-      S.cart = {}; saveCart(); el.remove(); S.modal = null; S.tab = 'My orders'; render(); toast('Order sent! We’ll text you when it’s ready.');
+      push('New WHOLESALE order ' + code, (me.shop || '') + ' · ' + lines.reduce(function(a, l){ return a + l.qty; }, 0) + ' items · ' + money(sub) + '\n' + lines.map(function(l){ return l.qty + '× ' + l.item.model + ' ' + l.item.label; }).join('\n'));
+      S.cart = {}; saveCart(); closeDrawer(); S.view = 'orders'; render(); window.scrollTo(0, 0); toast('Order sent! We’ll text you when it’s ready.');
     }).catch(function(e){ btn.disabled = false; btn.textContent = 'Send order'; err.textContent = /permission/.test(e && e.code) ? 'Your account can’t order right now. Call ' + SHOP_PHONE + '.' : 'Couldn’t send. Check your connection and try again.'; });
   }
   function bump(id, d){
     var i = itemById(id); if (!i) return;
     var n = Math.max(0, Math.min((S.cart[id] || 0) + d, Math.max(0, i.avail)));
     if (n) S.cart[id] = n; else delete S.cart[id];
-    saveCart();
-    if (S.modal) { S.modal.remove(); S.modal = null; render(); if (cartCount()) review(); }
-    else render();
+    saveCart(); render();
+    if (drawer) openCart(); else if (d > 0 && n === 1) toast('Added to cart');
   }
 
-  /* ---------- auth actions ---------- */
+  /* ---------- sign in / apply ---------- */
+  var dlg = null;
+  function closeDlg(){ if (dlg) { dlg.remove(); dlg = null; } }
+  function authBox(mode){
+    closeDlg(); S.mode = mode;
+    var el = document.createElement('div'); dlg = el; el.className = 'scrim center';
+    var body;
+    if (mode === 'reset') body = '<h2>Reset your password</h2><p class="hint">We’ll email you a link.</p><div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" value="' + esc(S.em||'') + '"></div><button class="btn full" style="margin-top:14px" data-a="reset">Send reset link</button><div class="err" id="err" role="alert"></div><p style="text-align:center"><button class="link" data-a="auth" data-v="signin">Back to sign in</button></p>';
+    else body = '<h2>' + (mode === 'apply' ? 'Apply for wholesale' : 'Sign in') + '</h2><div class="seg" role="group"><button data-a="auth" data-v="signin" aria-pressed="' + (mode === 'signin') + '">Sign in</button><button data-a="auth" data-v="apply" aria-pressed="' + (mode === 'apply') + '">Apply</button></div>' +
+      (mode === 'signin' ? '<div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" value="' + esc(S.em||'') + '"></div><div class="field"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password"></div><button class="btn full" style="margin-top:14px" data-a="signin">Sign in</button><div class="err" id="err" role="alert"></div><p style="text-align:center"><button class="link" data-a="auth" data-v="reset">Forgot password?</button></p>' : applyFields(false));
+    el.innerHTML = '<div class="dlg" role="dialog" aria-modal="true"><div style="display:flex;justify-content:flex-end;margin:-8px -6px 0 0"><button class="x" data-close aria-label="Close">×</button></div>' + body + '</div>';
+    document.body.appendChild(el);
+    el.addEventListener('click', function(e){ if (e.target === el || e.target.closest('[data-close]')) closeDlg(); });
+    var f = el.querySelector('input'); if (f) setTimeout(function(){ f.focus(); }, 30);
+  }
+  function applyFields(existing){
+    return '<div class="field"><label for="ap-shop">Shop / business name</label><input id="ap-shop" maxlength="80" autocomplete="organization"></div>' +
+      '<div class="g2"><div class="field"><label for="ap-name">Your name</label><input id="ap-name" maxlength="60" autocomplete="name"></div><div class="field"><label for="ap-phone">Cell phone</label><input id="ap-phone" type="tel" maxlength="20" autocomplete="tel"></div></div>' +
+      '<div class="g2"><div class="field"><label for="ap-city">City</label><input id="ap-city" maxlength="60" value="San Antonio"></div><div class="field"><label for="ap-tax">TX tax permit # (optional)</label><input id="ap-tax" maxlength="30" inputmode="numeric"></div></div>' +
+      (existing ? '' : '<div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email"></div><div class="field"><label for="pw">Create a password (8+ characters)</label><input id="pw" type="password" autocomplete="new-password"></div>') +
+      '<p class="hint"><b>Buying tax-free:</b> add your 11-digit Texas sales tax permit number, then bring a signed Texas Resale Certificate (Form 01-339) to your first pickup. Until we have it, 8.25% sales tax is added.</p>' +
+      '<button class="btn full" style="margin-top:12px" data-a="' + (existing ? 'finish' : 'apply') + '">Apply for wholesale</button><div class="err" id="err" role="alert"></div>';
+  }
   function val(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; }
   function appData(){
     var o = {shop:val('ap-shop'), name:val('ap-name'), phone:val('ap-phone'), city:val('ap-city'), taxId:val('ap-tax')};
@@ -305,13 +407,13 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
   document.addEventListener('click', function(e){
     var b = e.target.closest('[data-a]'); if (!b) return;
     var a = b.getAttribute('data-a'), v = b.getAttribute('data-v'), err = $('#err');
-    function fail(m){ if (err) err.textContent = m; b.disabled = false; }
-    if (a === 'mode') { S.em = val('em') || S.em; S.mode = v; render(); var f = $('#app input'); if (f) f.focus(); }
+    function fail(m){ if (err) { err.className = 'err'; err.textContent = m; } b.disabled = false; }
+    if (a === 'auth') { if (v === 'none') return; S.em = val('em') || S.em; authBox(v); }
     else if (a === 'signin') {
       var em = val('em'), pw = (document.getElementById('pw')||{}).value || '';
       if (!em || !pw) return fail('Enter your email and password.');
       b.disabled = true; S.em = em;
-      firebase.auth().signInWithEmailAndPassword(em, pw).catch(function(x){ fail(authMsg(x)); });
+      firebase.auth().signInWithEmailAndPassword(em, pw).then(function(){ closeDlg(); }).catch(function(x){ fail(authMsg(x)); });
     }
     else if (a === 'reset') {
       var em2 = val('em'); if (!em2) return fail('Enter your email.');
@@ -325,33 +427,36 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
       if (pw3.length < 8) return fail('Use a password with at least 8 characters.');
       if (em3.toLowerCase() === SHOP_EMAIL) return fail('Use your own shop’s email.');
       b.disabled = true; b.textContent = 'Sending…'; S.applying = o;
-      firebase.auth().createUserWithEmailAndPassword(em3, pw3).catch(function(x){ S.applying = null; b.textContent = 'Apply for wholesale'; fail(authMsg(x)); });
+      firebase.auth().createUserWithEmailAndPassword(em3, pw3).then(function(){ closeDlg(); window.scrollTo(0, 0); }).catch(function(x){ S.applying = null; b.textContent = 'Apply for wholesale'; fail(authMsg(x)); });
     }
-    else if (a === 'finish') {
-      var o2 = appData(); if (typeof o2 === 'string') return fail(o2);
-      b.disabled = true;
-      writeApp(S.user, o2).catch(function(){ fail('Couldn’t send. Try again.'); });
-    }
-    else if (a === 'signout') { stop(); firebase.auth().signOut(); }
-    else if (a === 'tab') { S.tab = v; S.q = ''; render(); window.scrollTo(0, 0); }
-    else if (a === 'brand') { S.brand = v; S.q = ''; render(); }
+    else if (a === 'finish') { var o2 = appData(); if (typeof o2 === 'string') return fail(o2); b.disabled = true; writeApp(S.user, o2).catch(function(){ fail('Couldn’t send. Try again.'); }); }
+    else if (a === 'signout') { if (!confirm('Sign out?')) return; stop(); stopShop(); firebase.auth().signOut(); }
+    else if (a === 'cat') { S.cat = v; render(); }
+    else if (a === 'series') { S.series = v; render(); }
+    else if (a === 'view') { S.view = v; closeDrawer(); render(); window.scrollTo(0, 0); }
+    else if (a === 'cart') openCart();
     else if (a === 'q') bump(b.getAttribute('data-id'), Number(v));
-    else if (a === 'review') review();
+    else if (a === 'reorder') {
+      var ro = S.orders.filter(function(x){ return x.id === b.getAttribute('data-id'); })[0]; if (!ro) return;
+      var added = 0; (ro.items||[]).forEach(function(l){ var it = itemById(l.id); if (it && it.avail > 0) { S.cart[l.id] = Math.min(it.avail, (S.cart[l.id] || 0) + l.qty); added++; } });
+      saveCart(); S.view = 'shop'; render(); if (added) openCart(); else toast('Those parts are out of stock right now');
+    }
     else if (a === 'cancel') {
       if (!confirm('Cancel this order?')) return;
       var o3 = S.orders.filter(function(x){ return x.id === b.getAttribute('data-id'); })[0];
-      firebase.firestore().doc('wsorders/' + b.getAttribute('data-id')).update({status:'cancelled', cancelledAt:Date.now()}).then(function(){
-        toast('Order cancelled'); push('Wholesale order cancelled', (o3 && o3.code || '') + ' · ' + ((S.me||{}).shop || ''));
-      }).catch(function(){ toast('Couldn’t cancel. Call ' + SHOP_PHONE + '.'); });
+      firebase.firestore().doc('wsorders/' + b.getAttribute('data-id')).update({status:'cancelled', cancelledAt:Date.now()}).then(function(){ toast('Order cancelled'); push('Wholesale order cancelled', (o3 && o3.code || '') + ' · ' + ((S.me||{}).shop || '')); }).catch(function(){ toast('Couldn’t cancel. Call ' + SHOP_PHONE + '.'); });
     }
   });
-  document.addEventListener('input', function(e){ if (e.target.id === 'q') { S.q = e.target.value; S.focusQ = true; render(); S.focusQ = false; } });
+  var qT; $('#q').addEventListener('input', function(e){ S.q = e.target.value; clearTimeout(qT); qT = setTimeout(function(){ if (S.view !== 'shop') S.view = 'shop'; render(); }, 120); });
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Enter' && e.target.matches && e.target.matches('#app .card input')) { var btn = $('#app .card .btn.full'); if (btn) btn.click(); }
-    if (e.key === 'Escape' && S.modal) { S.modal.remove(); S.modal = null; }
+    if (e.key === 'Enter' && dlg && e.target.matches && e.target.matches('.dlg input')) { var bt = dlg.querySelector('.btn.full'); if (bt) bt.click(); }
+    if (e.key === 'Escape') { closeDlg(); closeDrawer(); }
   });
 
   /* ---------- data ---------- */
+  function listenPublic(){
+    unsubs.push(firebase.firestore().doc('public/wscatalog').onSnapshot(function(snap){ S.pub = (snap.exists && (snap.data() || {}).items) || []; render(); }, function(){}));
+  }
   function listen(u){
     var db = firebase.firestore();
     unsubs.push(db.doc('wholesalers/' + u.uid).onSnapshot(function(snap){
@@ -366,14 +471,10 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
       render();
     }, function(){ S.st = 'nodb'; render(); }));
   }
-  var shopUnsubs = [];
-  function stopShop(){ shopUnsubs.forEach(function(x){ try { x(); } catch(e) {} }); shopUnsubs = []; }
   function startShop(u){
     stopShop(); loadCart();
     var db = firebase.firestore();
-    shopUnsubs.push(db.doc('wholesale/catalog').onSnapshot(function(snap){
-      S.items = (snap.exists && (snap.data() || {}).items) || []; render();
-    }, function(){ S.items = []; render(); }));
+    shopUnsubs.push(db.doc('wholesale/catalog').onSnapshot(function(snap){ S.items = (snap.exists && (snap.data() || {}).items) || []; render(); }, function(){ S.items = []; render(); }));
     shopUnsubs.push(db.collection('wsorders').where('uid', '==', u.uid).onSnapshot(function(snap){
       S.orders = snap.docs.map(function(d){ var o = d.data(); o.id = d.id; return o; }).sort(function(a, b){ return b.createdAt - a.createdAt; }); render();
     }, function(){}));
@@ -382,7 +483,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:12px;color
   if (!window.firebase) { S.st = 'nodb'; render(); return; }
   firebase.initializeApp(FB_CONFIG);
   firebase.auth().onAuthStateChanged(function(u){
-    stop(); stopShop(); S.user = u; S.me = null; S.items = []; S.orders = [];
+    stop(); stopShop(); S.user = u; S.me = null; S.items = []; S.orders = []; S.view = 'shop';
+    listenPublic();
     if (!u) { S.st = 'out'; render(); return; }
     if (String(u.email||'').toLowerCase() === SHOP_EMAIL) { S.st = 'shop'; render(); return; }
     S.st = 'loading'; render(); listen(u);
