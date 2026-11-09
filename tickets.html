@@ -1880,44 +1880,47 @@ function wipeDoc(b){
 /* ---------- Niimbot direct printing (USB) ---------- */
 var NIIM = {client:null, busy:false};
 function isNiimLabel(){ return /^niimbot/.test(S.settings.labelSize || ''); }
-window.__niimCanvas = function(t, c){ return c ? niimCustCanvas(t) : niimCanvas(t); };
+window.__niimCanvas = function(t, c){ return crisp(c ? niimCustCanvas(t) : niimCanvas(t)); };
 function custStub(){ return S.settings.custStub !== false; }
+function crisp(cv){
+  // pure black/white pixels so thermal print stays sharp (no gray halos that burn into blobs)
+  try { var g = cv.getContext('2d'), im = g.getImageData(0, 0, cv.width, cv.height), d = im.data;
+    for (var i = 0; i < d.length; i += 4) { var v = (d[i] * 3 + d[i+1] * 6 + d[i+2]) / 10 < 150 && d[i+3] > 60 ? 0 : 255; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255; }
+    g.putImageData(im, 0, 0); } catch(e) {}
+  return cv;
+}
 function niimCustCanvas(t){
   var L = LABELS[S.settings.labelSize] || LABELS.niimbot5030;
   var W = Math.min(384, Math.round(L.w * 8)), H = Math.round(L.h * 8);
   var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000'; g.textBaseline = 'top';
   function fit(txt, font, tw){ g.font = font; txt = String(txt || ''); if (g.measureText(txt).width <= tw) return txt; while (txt.length > 1 && g.measureText(txt + '…').width > tw) txt = txt.slice(0, -1); return txt + '…'; }
-  // header bar
-  g.fillRect(0, 0, W, 34); g.fillStyle = '#fff';
-  g.font = 'bold 20px Arial'; g.fillText('iFixPhones', 8, 7);
-  var num = '#' + t.num; g.font = 'bold 24px Arial'; var nw = g.measureText(num).width; g.fillText(num, W - 8 - nw, 5);
-  g.font = '13px Arial'; var ph = '(210) 773-3548', pw = g.measureText(ph).width; g.fillText(ph, Math.round((116 + W - 16 - nw) / 2 - pw / 2), 11);
-  g.fillStyle = '#000';
-  // small QR (right)
-  var qs = 0, qx = W - 8, qy = 42;
+  var F = 'Arial, Helvetica, sans-serif';
+  // header: big shop name + ticket number, thick rule under
+  var num = '#' + t.num; g.font = 'bold 30px ' + F; var nw = g.measureText(num).width; g.fillText(num, W - 8 - nw, 4);
+  g.font = 'bold 24px ' + F; g.fillText(fit('iFixPhones', 'bold 24px ' + F, W - 24 - nw), 8, 8);
+  g.fillRect(8, 38, W - 16, 3);
+  // small QR on the right
+  var qs = 0, qx = W - 8, qy = 48;
   try {
     var q = qrcode(0, 'L'); q.addData(statusUrl(t)); q.make();
     var n = q.getModuleCount(), cell = 3; qs = n * cell; qx = W - 8 - qs;
     for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (q.isDark(y, x)) g.fillRect(qx + x * cell, qy + y * cell, cell, cell);
-    g.font = 'bold 11px Arial'; var st = 'Repair status', sw = g.measureText(st).width; g.fillText(st, qx + qs / 2 - sw / 2, qy + qs + 3);
+    g.font = 'bold 13px ' + F; var st = 'STATUS', sw = g.measureText(st).width; g.fillText(st, qx + qs / 2 - sw / 2, qy + qs + 4);
   } catch(e) {}
-  var tw = qx - 16;
-  var d = new Date(t.createdAt || Date.now());
-  g.font = 'bold 19px Arial'; g.fillText(fit((t.device||{}).model || 'Device', 'bold 19px Arial', tw), 8, 42);
-  g.font = '13px Arial'; g.fillText(fit('Dropped off ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + String(d.getFullYear()).slice(2), '13px Arial', tw), 8, 66);
-  g.font = '12px Arial';
-  g.fillText(fit('I agree to the iFixPhones repair', '12px Arial', tw), 8, 90);
-  g.fillText(fit('& warranty policy and approve', '12px Arial', tw), 8, 105);
-  g.fillText(fit('this repair. ifixphones.net/policy', '12px Arial', tw), 8, 120);
-  // signature + date lines
-  var ly = 208;
-  g.font = 'bold 22px Arial'; g.fillText('X', 8, ly - 24);
-  g.fillRect(28, ly, 238 - 28, 2);
-  g.fillRect(250, ly, W - 8 - 250, 2);
-  g.font = '11px Arial'; g.fillText('Customer signature', 28, ly + 6); g.fillText('Date', 250, ly + 6);
-  g.font = 'bold 11px Arial'; var k = 'Keep this ticket for pickup';
-  g.fillText(fit(k, 'bold 11px Arial', tw), 8, 142);
+  var tw = qx - 18;
+  g.font = 'bold 20px ' + F; g.fillText(fit((t.device||{}).model || 'Device', 'bold 20px ' + F, tw), 8, 48);
+  g.font = 'bold 17px ' + F; g.fillText(fit('(210) 773-3548', 'bold 17px ' + F, tw), 8, 74);
+  g.font = 'bold 16px ' + F;
+  g.fillText(fit('I agree to the repair', 'bold 16px ' + F, tw), 8, 104);
+  g.fillText(fit('& warranty policy.', 'bold 16px ' + F, tw), 8, 124);
+  g.font = 'bold 14px ' + F; g.fillText(fit('Keep for pickup', 'bold 14px ' + F, tw), 8, 150);
+  // signature + date
+  var ly = 210;
+  g.font = 'bold 24px ' + F; g.fillText('X', 8, ly - 26);
+  g.fillRect(30, ly, 236 - 30, 3);
+  g.fillRect(252, ly, W - 8 - 252, 3);
+  g.font = 'bold 13px ' + F; g.fillText('Signature', 30, ly + 7); g.fillText('Date', 252, ly + 7);
   return cv;
 }
 function niimCanvas(t){
@@ -1936,11 +1939,11 @@ function niimCanvas(t){
   function fit(txt, font){ g.font = font; txt = String(txt || ''); if (g.measureText(txt).width <= tw) return txt; while (txt.length > 1 && g.measureText(txt + '…').width > tw) txt = txt.slice(0, -1); return txt + '…'; }
   g.textBaseline = 'top';
   g.font = 'bold 40px Arial'; g.fillText(fit('#' + t.num, 'bold 40px Arial'), x0, 14);
-  g.font = '17px Arial'; g.fillText(fit(new Date(t.createdAt || Date.now()).toLocaleDateString('en-US', {month:'numeric', day:'numeric'}) + (t.type === 'mobile' ? ' · MOBILE' : ''), '17px Arial'), x0, 62);
+  g.font = 'bold 17px Arial'; g.fillText(fit(new Date(t.createdAt || Date.now()).toLocaleDateString('en-US', {month:'numeric', day:'numeric'}) + (t.type === 'mobile' ? ' · MOBILE' : ''), 'bold 17px Arial'), x0, 62);
   g.font = 'bold 24px Arial'; g.fillText(fit(c.name, 'bold 24px Arial'), x0, 96);
-  g.font = '19px Arial'; g.fillText(fit(d.model, '19px Arial'), x0, 132);
-  g.fillText(fit(repairsText(t), '19px Arial'), x0, 158);
-  g.fillText(fit(fmtPhone(c.phone) + (d.passcode ? ' · ' + d.passcode : ''), '19px Arial'), x0, 190);
+  g.font = 'bold 19px Arial'; g.fillText(fit(d.model, 'bold 19px Arial'), x0, 132);
+  g.fillText(fit(repairsText(t), 'bold 19px Arial'), x0, 158);
+  g.fillText(fit(fmtPhone(c.phone) + (d.passcode ? ' · ' + d.passcode : ''), 'bold 19px Arial'), x0, 190);
   return cv;
 }
 async function niimConnect(pick){
@@ -1963,8 +1966,8 @@ async function niimPrint(t, copies){
     var meta = client.getModelMetadata && client.getModelMetadata();
     var taskName = (client.getPrintTaskType && client.getPrintTaskType()) || 'B1';
     var pc = niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, dir = (meta && meta.printDirection) || 'top';
-    var pages = [niimbluelib.ImageEncoder.encodeCanvas(niimCanvas(t), pc, dir)];
-    if (custStub()) pages.push(niimbluelib.ImageEncoder.encodeCanvas(niimCustCanvas(t), pc, dir));
+    var pages = [niimbluelib.ImageEncoder.encodeCanvas(crisp(niimCanvas(t)), pc, dir)];
+    if (custStub()) pages.push(niimbluelib.ImageEncoder.encodeCanvas(crisp(niimCustCanvas(t)), pc, dir));
     var task = client.protocol.newPrintTask(taskName, {totalPages: pages.length * copies, density: num(S.settings.niimDensity) || 3, labelType: niimbluelib.LabelType ? niimbluelib.LabelType.WithGaps : 1});
     try {
       await task.printInit();
@@ -1992,7 +1995,7 @@ async function niimCustOnly(t){
   NIIM.busy = true;
   try {
     var client = await niimConnect(false), meta = client.getModelMetadata && client.getModelMetadata();
-    var enc = niimbluelib.ImageEncoder.encodeCanvas(niimCustCanvas(t), niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, (meta && meta.printDirection) || 'top');
+    var enc = niimbluelib.ImageEncoder.encodeCanvas(crisp(niimCustCanvas(t)), niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, (meta && meta.printDirection) || 'top');
     var task = client.protocol.newPrintTask((client.getPrintTaskType && client.getPrintTaskType()) || 'B1', {totalPages: 1, density: num(S.settings.niimDensity) || 3, labelType: niimbluelib.LabelType ? niimbluelib.LabelType.WithGaps : 1});
     try { await task.printInit(); await task.printPage(enc, 1); await task.waitForFinished(); } finally { try { await client.protocol.printEnd(); } catch(e) {} }
     toast('Customer ticket printed');
