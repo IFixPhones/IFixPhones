@@ -1127,6 +1127,7 @@ function settingsView(){
   '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
     '<div class="f" style="max-width:360px"><label for="lblsize">Label size</label><select class="in" id="lblsize" data-setting="labelSize">' + Object.keys(LABELS).map(function(k){ return '<option value="'+k+'"'+((S.settings.labelSize||'brother62')===k?' selected':'')+'>'+esc(LABELS[k].name)+'</option>'; }).join('') + '</select></div>' +
     '<label class="check" style="margin-top:12px"><input type="checkbox" data-setting="autoLabel"'+(S.settings.autoLabel?' checked':'')+'>Print a label automatically after check-in</label>' +
+    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="custStub"'+(custStub()?' checked':'')+'>Also print a customer ticket (their QR opens the repair status page)</label>' +
     (isNiimLabel() ? '<div class="match" style="margin-top:14px"><b>Niimbot B1:</b> the app prints to it directly over USB, no driver needed. Plug the B1 into this computer, <b>close the NIIMBOT app</b>, then click <b>Connect label printer</b> and pick the B1 (it may show as “USB Serial Device” or a COM port). You only do this once.<div class="acts" style="margin-top:10px"><button class="btn sm" data-act="niimsetup">Connect label printer</button><button class="btn sm ghost" data-act="niimtest">Print a test label</button></div>' +
       '<div class="f" style="max-width:220px;margin-top:10px"><label for="niimd">Darkness (1–5)</label><select class="in" id="niimd" data-setting="niimDensity">'+[1,2,3,4,5].map(function(v){ return '<option'+((num(S.settings.niimDensity)||3)===v?' selected':'')+'>'+v+'</option>'; }).join('')+'</select></div></div>' : '') +
   '</div>' +
@@ -1879,7 +1880,46 @@ function wipeDoc(b){
 /* ---------- Niimbot direct printing (USB) ---------- */
 var NIIM = {client:null, busy:false};
 function isNiimLabel(){ return /^niimbot/.test(S.settings.labelSize || ''); }
-window.__niimCanvas = function(t){ return niimCanvas(t); };
+window.__niimCanvas = function(t, c){ return c ? niimCustCanvas(t) : niimCanvas(t); };
+function custStub(){ return S.settings.custStub !== false; }
+function niimCustCanvas(t){
+  var L = LABELS[S.settings.labelSize] || LABELS.niimbot5030;
+  var W = Math.min(384, Math.round(L.w * 8)), H = Math.round(L.h * 8);
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.fillStyle = '#000'; g.textBaseline = 'top';
+  function fit(txt, font, tw){ g.font = font; txt = String(txt || ''); if (g.measureText(txt).width <= tw) return txt; while (txt.length > 1 && g.measureText(txt + '…').width > tw) txt = txt.slice(0, -1); return txt + '…'; }
+  // header bar
+  g.fillRect(0, 0, W, 34); g.fillStyle = '#fff';
+  g.font = 'bold 20px Arial'; g.fillText('iFixPhones', 8, 7);
+  var num = '#' + t.num; g.font = 'bold 24px Arial'; var nw = g.measureText(num).width; g.fillText(num, W - 8 - nw, 5);
+  g.font = '13px Arial'; var ph = '(210) 773-3548', pw = g.measureText(ph).width; g.fillText(ph, Math.round((116 + W - 16 - nw) / 2 - pw / 2), 11);
+  g.fillStyle = '#000';
+  // small QR (right)
+  var qs = 0, qx = W - 8, qy = 42;
+  try {
+    var q = qrcode(0, 'L'); q.addData(statusUrl(t)); q.make();
+    var n = q.getModuleCount(), cell = 3; qs = n * cell; qx = W - 8 - qs;
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (q.isDark(y, x)) g.fillRect(qx + x * cell, qy + y * cell, cell, cell);
+    g.font = 'bold 11px Arial'; var st = 'Repair status', sw = g.measureText(st).width; g.fillText(st, qx + qs / 2 - sw / 2, qy + qs + 3);
+  } catch(e) {}
+  var tw = qx - 16;
+  var d = new Date(t.createdAt || Date.now());
+  g.font = 'bold 19px Arial'; g.fillText(fit((t.device||{}).model || 'Device', 'bold 19px Arial', tw), 8, 42);
+  g.font = '13px Arial'; g.fillText(fit('Dropped off ' + (d.getMonth()+1) + '/' + d.getDate() + '/' + String(d.getFullYear()).slice(2), '13px Arial', tw), 8, 66);
+  g.font = '12px Arial';
+  g.fillText(fit('I agree to the iFixPhones repair', '12px Arial', tw), 8, 90);
+  g.fillText(fit('& warranty policy and approve', '12px Arial', tw), 8, 105);
+  g.fillText(fit('this repair. ifixphones.net/policy', '12px Arial', tw), 8, 120);
+  // signature + date lines
+  var ly = 208;
+  g.font = 'bold 22px Arial'; g.fillText('X', 8, ly - 24);
+  g.fillRect(28, ly, 238 - 28, 2);
+  g.fillRect(250, ly, W - 8 - 250, 2);
+  g.font = '11px Arial'; g.fillText('Customer signature', 28, ly + 6); g.fillText('Date', 250, ly + 6);
+  g.font = 'bold 11px Arial'; var k = 'Keep this ticket for pickup';
+  g.fillText(fit(k, 'bold 11px Arial', tw), 8, 142);
+  return cv;
+}
 function niimCanvas(t){
   var L = LABELS[S.settings.labelSize] || LABELS.niimbot5030;
   var W = Math.min(384, Math.round(L.w * 8)), H = Math.round(L.h * 8);
@@ -1922,14 +1962,19 @@ async function niimPrint(t, copies){
     var client = await niimConnect(false);
     var meta = client.getModelMetadata && client.getModelMetadata();
     var taskName = (client.getPrintTaskType && client.getPrintTaskType()) || 'B1';
-    var enc = niimbluelib.ImageEncoder.encodeCanvas(niimCanvas(t), niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, (meta && meta.printDirection) || 'top');
-    var task = client.protocol.newPrintTask(taskName, {totalPages: copies, density: num(S.settings.niimDensity) || 3, labelType: niimbluelib.LabelType ? niimbluelib.LabelType.WithGaps : 1});
+    var pc = niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, dir = (meta && meta.printDirection) || 'top';
+    var pages = [niimbluelib.ImageEncoder.encodeCanvas(niimCanvas(t), pc, dir)];
+    if (custStub()) pages.push(niimbluelib.ImageEncoder.encodeCanvas(niimCustCanvas(t), pc, dir));
+    var task = client.protocol.newPrintTask(taskName, {totalPages: pages.length * copies, density: num(S.settings.niimDensity) || 3, labelType: niimbluelib.LabelType ? niimbluelib.LabelType.WithGaps : 1});
     try {
       await task.printInit();
-      await task.printPage(enc, copies);
+      for (var pi = 0; pi < pages.length; pi++) {
+        await task.printPage(pages[pi], copies);
+        if (pi < pages.length - 1 && task.waitForPageFinished) await task.waitForPageFinished();
+      }
       await task.waitForFinished();
     } finally { try { await client.protocol.printEnd(); } catch(e) {} }
-    toast('Label printed');
+    toast(pages.length > 1 ? 'Printed shop label + customer ticket' : 'Label printed');
   } catch(e) {
     NIIM.client = null;
     var msg = String(e && (e.message || e) || '');
@@ -1938,6 +1983,26 @@ async function niimPrint(t, copies){
     else if (/open|busy|Failed to open|NetworkError|InvalidState/i.test(msg)) toast('Can’t reach the B1. Close the NIIMBOT app, check the USB cable, then try again.');
     else toast('Label didn’t print: ' + msg.slice(0, 80));
   } finally { NIIM.busy = false; }
+}
+async function niimCustOnly(t){
+  var keep = S.settings.custStub; S.settings.custStub = true;
+  // print only the customer ticket
+  if (!(isNiimLabel() && 'serial' in navigator)) { printHtml(custLabelDoc(t)); S.settings.custStub = keep; return; }
+  if (NIIM.busy) { toast('Label printer is busy, one moment'); S.settings.custStub = keep; return; }
+  NIIM.busy = true;
+  try {
+    var client = await niimConnect(false), meta = client.getModelMetadata && client.getModelMetadata();
+    var enc = niimbluelib.ImageEncoder.encodeCanvas(niimCustCanvas(t), niimbluelib.PageColorType ? niimbluelib.PageColorType.SingleColor : 0, (meta && meta.printDirection) || 'top');
+    var task = client.protocol.newPrintTask((client.getPrintTaskType && client.getPrintTaskType()) || 'B1', {totalPages: 1, density: num(S.settings.niimDensity) || 3, labelType: niimbluelib.LabelType ? niimbluelib.LabelType.WithGaps : 1});
+    try { await task.printInit(); await task.printPage(enc, 1); await task.waitForFinished(); } finally { try { await client.protocol.printEnd(); } catch(e) {} }
+    toast('Customer ticket printed');
+  } catch(e) { NIIM.client = null; toast('Label didn’t print: ' + String(e && (e.message || e) || '').slice(0, 80)); }
+  finally { NIIM.busy = false; S.settings.custStub = keep; }
+}
+function custLabelDoc(t){
+  var L = LABELS[S.settings.labelSize] || LABELS.brother62, d = new Date(t.createdAt || Date.now());
+  var q = Math.max(9, Math.min(13, Math.round(L.h * 0.4)));
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Customer ticket #'+esc(t.num)+'</title><style>@page{size:'+L.w+'mm '+L.h+'mm;margin:0}*{margin:0;padding:0;box-sizing:border-box}html,body{width:'+L.w+'mm;height:'+L.h+'mm;overflow:hidden}body{font-family:Arial,sans-serif;font-size:6.5pt;display:flex;flex-direction:column}.bar{background:#000;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:.6mm 1.6mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}.bar b{font-size:9pt}.mid{flex:1;display:flex;gap:1.5mm;padding:1mm 1.6mm 0}.mid>div{flex:1;min-width:0}.q{width:'+q+'mm;text-align:center;font-weight:bold;font-size:5pt}.q svg{width:'+q+'mm;height:'+q+'mm;display:block}.sig{display:flex;gap:2mm;padding:0 1.6mm 1mm;align-items:flex-end}.sig div{border-top:.3mm solid #000;font-size:5pt;padding-top:.3mm}</style></head><body><div class="bar"><b>iFixPhones</b><span>(210) 773-3548</span><b>#'+esc(t.num)+'</b></div><div class="mid"><div><b style="font-size:8pt">'+esc((t.device||{}).model||'Device')+'</b><div>Dropped off '+(d.getMonth()+1)+'/'+d.getDate()+'/'+String(d.getFullYear()).slice(2)+'</div><div style="margin-top:.8mm">I agree to the iFixPhones repair &amp; warranty policy and approve this repair. ifixphones.net/policy</div><b>Keep this ticket for pickup</b></div><div class="q">'+qrSvg(statusUrl(t), 90)+'Repair status</div></div><div class="sig"><b style="font-size:10pt">X</b><div style="flex:2.2">Customer signature</div><div style="flex:1">Date</div></div></body></html>';
 }
 async function niimSetup(){
   try {
@@ -2363,6 +2428,7 @@ function renderSheet(){
     '<div class="sfoot">' +
       '<button class="btn ghost sm" data-act="print">Print ticket</button>' +
       '<button class="btn ghost sm" data-act="label">Print label</button>' +
+      '<button class="btn ghost sm" data-act="custlabel">Customer ticket</button>' +
       '<span class="grow"></span>' +
       (ro ? '' : '<button class="link red" data-act="delete">Delete</button>') +
     '</div>';
@@ -2848,7 +2914,7 @@ function labelDoc(t){
     '<div class="s">'+esc(fmtPhone(c.phone))+(d.passcode ? ' · Code '+esc(d.passcode) : '')+(t.assigned ? ' · '+esc(t.assigned) : '')+'</div>' +
     '</div></body></html>';
 }
-function printLabel(t){ if (isNiimLabel() && 'serial' in navigator) niimPrint(t); else printHtml(labelDoc(t)); }
+function printLabel(t){ if (isNiimLabel() && 'serial' in navigator) niimPrint(t); else { printHtml(labelDoc(t)); if (custStub()) setTimeout(function(){ printHtml(custLabelDoc(t)); }, 1500); } }
 
 /* signature pad */
 function sigPad(box, onSign){
@@ -3008,6 +3074,7 @@ document.addEventListener('click', async function(e){
     case 'followups': followBox(); break;
     case 'niimsetup': niimSetup(); break;
     case 'niimtest': niimPrint({num:'1234', createdAt:Date.now(), type:'shop', customer:{name:'Test Label', phone:'2107733548'}, device:{model:'iPhone 15 Pro'}, items:[{repair:'Screen', part:'OLED', price:0}]}); break;
+    case 'custlabel': if (t) niimCustOnly(t); break;
     case 'checkinsign': printHtml('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Check in sign</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;text-align:center;color:#1d1d1f;padding:40px}h1{font-size:54px;letter-spacing:-.03em;margin:10px 0}p{font-size:22px;color:#555}svg{margin:24px auto;display:block}</style></head><body><p style="font-weight:700;color:#1d1d1f">iFixPhones</p><h1>Skip the line.</h1><p>Scan with your phone camera to check in.</p>' + qrSvg('https://ifixphones.net/checkin.html', 320) + '<p>ifixphones.net/checkin.html</p></body></html>'); break;
     case 'rma': { var rt = byId(a.getAttribute('data-tid')); if (rt) setRma(rt, a.getAttribute('data-pid'), a.getAttribute('data-v')); break; }
     case 'clock': clockToggle(a.getAttribute('data-v')); break;
