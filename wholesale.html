@@ -239,7 +239,7 @@ img{display:block}
 .feat li b{min-width:118px;color:var(--sub);font-weight:500}
 .fits{margin-top:14px;font-size:13px;color:var(--sub)}
 /* orders + states */
-.page{padding:40px 0 80px}
+.page{padding-top:40px;padding-bottom:80px}
 .page h2{font-size:clamp(32px,4.4vw,44px);letter-spacing:-.035em}
 .orders{display:grid;gap:14px;margin-top:22px}
 .ord{background:var(--bg);border-radius:var(--r);padding:20px 22px}
@@ -251,7 +251,7 @@ img{display:block}
 .st.new{color:var(--blue)}.st.confirmed{color:var(--amber)}.st.ready{color:var(--green)}.st.done{color:var(--sub)}.st.cancelled{color:var(--red)}
 .state{max-width:560px;margin:70px auto;text-align:center;padding:0 10px}
 .state .ic{font-size:40px}.state h2{font-size:clamp(30px,4vw,40px);margin-top:12px;letter-spacing:-.035em}.state p{color:var(--sub);font-size:17px;margin-top:10px;line-height:1.5}
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(29,29,31,.92);backdrop-filter:blur(10px);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;z-index:70;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:rgba(29,29,31,.92);backdrop-filter:blur(10px);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;z-index:70;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.on{opacity:1}
 /* footer */
 footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
@@ -264,10 +264,59 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
 .reveal.on{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{animation:none!important}}
-.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#86868b;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
+.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#86868b;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}
+.mnav,.mtabs{display:none!important}
+.hsearch{max-width:340px}
+.hero5{text-align:center;padding:72px 0 8px}
+.hero5 h1{font-size:clamp(40px,6vw,72px);line-height:1.04;letter-spacing:-.045em;font-weight:700;margin-top:10px}
+.hero5 h1 em{font-style:normal;background:linear-gradient(90deg,#0071e3,#7a5af8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero5 p{color:var(--sub);font-size:clamp(18px,1.8vw,21px);line-height:1.4;margin:16px auto 0;max-width:560px}
+.hero5 .cta{justify-content:center;margin-top:26px}
+.strip{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);max-width:900px;margin:56px auto 0;padding:22px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+.strip li{font-size:13px;color:var(--sub);line-height:1.4;padding:0 10px}.strip li+li{border-left:1px solid var(--line2)}
+.strip b{display:block;font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+@media (max-width:640px){.hero5{padding-top:48px}.strip{grid-template-columns:1fr 1fr;gap:18px 0;margin-top:40px}.strip li:nth-child(3){border-left:0}}
+.hello{padding:64px 0 0}
+.sheet{padding:44px 0 90px}
+.sbar{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;position:sticky;top:56px;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);padding:12px 0;margin-bottom:6px}
+.seg{display:inline-flex;background:var(--bg);border-radius:999px;padding:3px;max-width:100%;overflow-x:auto}
+.seg button{border:0;background:none;border-radius:999px;padding:8px 16px;font-size:14px;color:var(--ink);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:600}
+.snote{font-size:13px;color:var(--sub)}.inl{border:0;background:none;color:var(--link);font:inherit;padding:0}.inl:hover{text-decoration:underline}
+.fam{margin-top:38px}
+.fam h2{font-size:clamp(26px,3vw,34px);letter-spacing:-.035em;line-height:1.1}
+.mx{margin-top:12px}
+.mx{border-top:1px solid var(--line)}
+.mr{display:grid;grid-template-columns:minmax(170px,1fr) 3.4fr;gap:0 18px;align-items:center;border-bottom:1px solid var(--line2);padding:12px 0;min-height:78px}
+.parts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 28px}
+.mn{font-size:19px;font-weight:600;letter-spacing:-.025em}
+.pc{display:flex;align-items:center;gap:12px;min-width:0}
+.pc.none{color:#c7c7cc;padding-left:64px;font-size:15px}
+.pt{flex:none;width:52px;height:52px;border:0;border-radius:12px;background:var(--bg);overflow:hidden;padding:0;display:grid;place-items:center}
+.pt img{width:100%;height:100%;object-fit:cover}.pt svg{height:38px}
+.pi{flex:1;min-width:0;border:0;background:none;text-align:left;padding:0;color:var(--ink);display:grid;gap:2px}
+.pk{font-size:12px;font-weight:600;color:var(--sub)}
+.pp{font-size:17px;font-weight:600;letter-spacing:-.02em}.pp .lock{font-size:13px;font-weight:400;color:var(--sub);letter-spacing:0}
+.ps{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.ps i{font-style:normal;font-size:12px;color:var(--sub)}
+.pc.out .pt,.pc.out .pp{opacity:.45}
+.plus{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--bg);color:var(--blue);font-size:22px;line-height:1;display:grid;place-items:center;transition:background .15s,color .15s}
+.plus:hover{background:var(--blue);color:#fff}
+.soldout{flex:none;font-size:12px;color:var(--sub)}
+.pc .qty{flex:none;background:var(--blue)}.pc .qty button{color:#fff;width:30px;height:36px}.pc .qty b{color:#fff}.pc .qty button:disabled{color:rgba(255,255,255,.4)}
+.bagbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;gap:18px;border:0;border-radius:999px;background:rgba(29,29,31,.9);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);color:#fff;padding:8px 8px 8px 22px;font-size:15px;box-shadow:0 10px 34px rgba(0,0,0,.22);white-space:nowrap}
+.bagbar b{background:var(--blue);border-radius:999px;padding:10px 18px;font-weight:500}
+@media (max-width:820px){
+  .sbar{top:var(--hh,96px)}
+  .mr{display:block;padding:18px 0 8px}.parts{display:block}
+  .mn{font-size:20px;margin-bottom:6px}
+  .pc{padding:9px 0}
+  .pi{grid-template-columns:1fr auto;align-items:center;column-gap:10px}.pk{grid-column:1}.pp{grid-column:2;grid-row:1 / span 2;text-align:right}.ps{grid-column:1}
+  .snote{flex-basis:100%}
+}
+</style>
 </head>
 <body>
-<div class="ribbon"><b>B2B wholesale for repair shops.</b> Same-day pickup at 9055 Marbach Rd, San Antonio · <a href="tel:2107733548">(210) 773-3548</a></div>
+
 <header class="hdr"><div class="w">
   <a class="logo" href="wholesale.html" data-a="home">iFixPhones<span>Wholesale</span></a>
   <nav class="mnav" aria-label="Shop" id="mnav"></nav>
@@ -277,7 +326,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
 <main id="app"><div class="w"><div class="skel" style="margin-top:30px"></div></div></main>
 <footer><div class="w">
   <div class="fcols">
-    <div><h5>Shop</h5><button data-a="nav" data-v="oled">FX7 OLED screens</button><button data-a="nav" data-v="incell">FX5 Incell screens</button><button data-a="nav" data-v="batt">Batteries</button><button data-a="nav" data-v="models">Shop by model</button><button data-a="nav" data-v="quick">Quick order</button></div>
+    <div><h5>Shop</h5><button data-a="nav" data-v="oled">FX7 OLED screens</button><button data-a="nav" data-v="incell">FX5 Incell screens</button><button data-a="nav" data-v="batt">Batteries</button><button data-a="nav" data-v="all">All parts</button></div>
     <div><h5>Account</h5><button data-a="auth" data-v="apply">Apply for an account</button><button data-a="auth" data-v="signin">Sign in</button><button data-a="view" data-v="orders">My orders</button></div>
     <div><h5>Support</h5><a href="tel:2107733548">Call (210) 773-3548</a><a href="sms:+12107733548">Text us</a><a href="mailto:ifixphones9055@gmail.com">Email</a><a href="https://maps.google.com/?q=9055+Marbach+Rd+Suite+105+San+Antonio+TX" target="_blank" rel="noopener">Pickup location</a></div>
     <div><h5>Policies</h5><a href="policy.html#s20">Wholesale warranty</a><a href="policy.html#s19">Copyright and trademarks</a><a href="policy.html">Full policy</a><a href="/">Retail repairs</a></div>
@@ -367,7 +416,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
   var NAV = [['oled','FX7 OLED'],['incell','FX5 Incell'],['batt','Batteries'],['models','Shop by model'],['quick','Quick order'],['warranty','Warranty']];
   function header(){
     var navh = NAV.map(function(n){ return '<button data-a="nav" data-v="' + n[0] + '" aria-current="' + (S.navOn === n[0]) + '">' + n[1] + '</button>'; }).join('');
-    $('#mnav').innerHTML = navh; $('#mtabs').innerHTML = navh;
+    $('#mnav').innerHTML = ''; $('#mtabs').innerHTML = '';
     var h = $('#hact'), n = cartCount();
     if (S.st === 'out' || S.st === 'loading') h.innerHTML = '<button class="hbtn" data-a="auth" data-v="signin">Sign in</button><button class="hbtn solid" data-a="auth" data-v="apply">Apply</button>';
     else if (approved()) h.innerHTML = '<button class="hbtn" data-a="view" data-v="orders"><span class="t">Orders</span><svg class="s" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="12" height="15" rx="2"/><path d="M7 7h6M7 10.5h6M7 14h4"/></svg></button><button class="hbtn bagbtn" data-a="cart" aria-label="Bag, ' + n + ' items"><svg width="17" height="19" viewBox="0 0 17 19" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h13l-1 12H3z"/><path d="M5.5 6V4.5a3 3 0 016 0V6"/></svg>' + (n ? '<i>' + n + '</i>' : '') + '</button><button class="hbtn" data-a="signout" aria-label="Sign out"><span class="t">Sign out</span><svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 4H5a1 1 0 00-1 1v10a1 1 0 001 1h3M12 6l4 4-4 4M16 10H8"/></svg></button>';
@@ -378,6 +427,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
   /* ---------- views ---------- */
   function render(){
     header();
+    try { document.documentElement.style.setProperty('--hh', document.querySelector('.hdr').offsetHeight + 'px'); } catch (e) {}
     var app = $('#app');
     if (S.st === 'loading') { app.innerHTML = '<div class="w"><div class="grid" style="margin-top:30px">' + '<div class="skel"></div>'.repeat(4) + '</div></div>'; return; }
     if (S.st === 'nodb') { app.innerHTML = '<div class="w">' + state('⚠️', 'Couldn’t load', 'Check your internet connection and reload the page.') + '</div>'; return; }
@@ -399,111 +449,67 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
     var io = new IntersectionObserver(function(es){ es.forEach(function(x){ if (x.isIntersecting) { x.target.classList.add('on'); seen[x.target.getAttribute('data-r')] = 1; io.unobserve(x.target); } }); }, {threshold:.1});
     els.forEach(function(e){ if (seen[e.getAttribute('data-r')]) e.classList.add('on'); else io.observe(e); });
   }
-  function homeView(){
-    var L = list(), h = '';
+  function intro(){
     if (approved()) {
-      var hr = new Date().getHours(), hi = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-      var last = S.orders[0];
-      h += '<section class="hello"><div class="w"><h1>' + hi + ', ' + esc((S.me.name||'').split(' ')[0] || 'friend') + '.</h1><p>What are we fixing today?</p>' +
-        '<label class="bigsearch"><span class="sr">Search parts</span><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#6e6e73" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg><input id="q2" type="search" placeholder="Search a model, like 15 Pro Max" autocomplete="off"></label>' +
-        (last ? '<button class="more" style="margin-top:16px;font-size:15px" data-a="reorder" data-id="' + esc(last.id) + '">Order your last order again</button>' : '') + '</div></section>';
-    } else {
-      h += '<section class="hero"><div class="w"><div><div class="eyebrow">iFixPhones Wholesale</div><h1>iPhone screens and batteries.<br><em>Best price.</em></h1><p>Two clear screen grades, FX7 OLED and FX5 Incell, plus batteries for iPhone 11 to 17. Tested with you, in stock, ready for same-day pickup.</p><div class="cta"><button class="btn" data-a="auth" data-v="apply">Apply for an account</button><button class="more" data-a="auth" data-v="signin">Sign in</button></div></div><div class="heroimg" role="img" aria-label="Screen assembly, front and back"></div></div></section>';
+      var hr = new Date().getHours(), hi = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening', last = S.orders[0];
+      return '<section class="hello"><div class="w"><h1>' + hi + ', ' + esc((S.me.name||'').split(' ')[0] || 'friend') + '.</h1><p>What are we fixing today?</p>' +
+        (last ? '<button class="more" style="margin-top:14px;font-size:16px" data-a="reorder" data-id="' + esc(last.id) + '">Order your last order again</button>' : '') + '</div></section>';
     }
-    h += '<section class="sec"><div class="w reveal" data-r="cats"><div class="shead"><div><h2>Shop by category.</h2><p class="lead">Two screen grades. No guesswork.</p></div></div><div class="cats">' +
-      catTile('oled', 'dark', 'Top grade', 'FX7 OLED screens', 'Soft OLED from DD, RJ and JK. True blacks, original-like fit.', 'iPhone 17 Pro Max') +
-      catTile('incell', '', 'Value grade', 'FX5 Incell screens', 'Dependable Incell LCD for budget repairs.', 'iPhone 16') +
-      catTile('batt', '', 'Power', 'Batteries', 'New replacement batteries with matching connectors.', 'iPhone 15 Pro') + '</div></div></section>';
-    h += '<section class="sec" id="models"><div class="w reveal" data-r="models"><div class="shead"><div><h2>Shop by model.</h2><p class="lead">Pick the iPhone you’re fixing.</p></div><button class="more" data-a="nav" data-v="all">Browse all parts</button></div>' + modelsBlock() + '</div></section>';
-    h += '<section class="sec"><div class="w reveal" data-r="facts"><div class="shead"><div><h2>Why shops buy from us.</h2></div></div><div class="facts"><div><b>Tested with you</b><span>Every screen powered on and checked at pickup, before you pay.</span></div><div><b>3-month warranty</b><span>On every screen, for DOA and defects.</span></div><div><b>Same day</b><span>Order online, pick up today, or local delivery around San Antonio.</span></div><div><b>Tax-free</b><span>With your Texas resale certificate on file.</span></div></div></div></section>';
+    return '<section class="hero5"><div class="w"><div class="eyebrow">iFixPhones Wholesale</div><h1>iPhone screens and batteries.<br><em>Best price.</em></h1><p>For repair shops in San Antonio. Every screen tested with you at pickup.</p><div class="cta"><button class="btn" data-a="auth" data-v="apply">Apply for an account</button><button class="more" data-a="auth" data-v="signin">Sign in</button></div>' +
+      '<ul class="strip"><li><b>Same-day pickup</b>9055 Marbach Rd</li><li><b>3-month warranty</b>On every screen</li><li><b>Tested with you</b>Before you pay</li><li><b>Tax-free</b>With a resale certificate</li></ul></div></section>';
+  }
+  function homeView(){
+    var h = intro() + sheet();
     if (!approved()) h += '<div class="w"><section class="steps reveal" data-r="steps"><div><div class="n">Step 1</div><h3>Apply.</h3><p>Open a free account for your shop. It takes about a minute.</p></div><div><div class="n">Step 2</div><h3>Get approved.</h3><p>We review shops within one business day and text you when you’re in.</p></div><div><div class="n">Step 3</div><h3>Order and pick up.</h3><p>Send your order online. We text you when it’s packed. Pay with cash, Zelle or card.</p></div></section></div>';
-    else h += '<div style="height:70px"></div>';
     return h;
   }
-  function catTile(k, cls, small, title, text, model){
-    var u = photo(model, k);
-    return '<button class="cat ' + cls + '" data-a="nav" data-v="' + k + '"><small>' + small + '</small><h3>' + title + '</h3><p>' + text + '</p><span class="go">Shop ' + count(function(i){ return kind(i) === k; }) + ' parts</span>' + (u ? '<img src="' + u + '" alt="" loading="lazy">' : '') + '</button>';
+  function catalogView(){ return sheet(); }
+  /* One price sheet: a row per iPhone, a column per part. */
+  var SEG = [['all','All'],['oled','FX7 OLED'],['incell','FX5 Incell'],['batt','Batteries']];
+  function matches(i, q){
+    if (!q) return true;
+    var k = kind(i), hay = (i.model + ' ' + i.label + ' ' + KIND[k] + ' ' + sku(i) + ' ' + (i.maker||'') + ' ' + (k === 'batt' ? 'battery' : 'screen lcd display') + (k === 'oled' ? ' soft oled' : k === 'incell' ? ' incell' : '')).toLowerCase();
+    return q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; });
   }
-  function modelsBlock(){
-    var L = list(), by = {};
-    L.forEach(function(i){ by[i.model] = (by[i.model]||0) + 1; });
-    var gens = {}; MODEL_ORDER.forEach(function(m){ var g = seriesOf(m); (gens[g] = gens[g] || []).push(m); });
-    var order = ['17','16','15','14','13','12','11'];
-    return '<div class="gens">' + order.map(function(g){
-      var ms = gens[g].filter(function(m){ return by[m] || !L.length; });
-      if (!ms.length) return '';
-      return '<div class="gen"><b>iPhone ' + g + ' family</b><div class="chips">' + ms.map(function(m){ return '<button class="chip" data-a="model" data-v="' + esc(m) + '">' + esc(m.replace('iPhone ', '')) + (by[m] ? ' <i>' + by[m] + '</i>' : '') + '</button>'; }).join('') + '</div></div>';
-    }).join('') + '</div>';
+  function cell(i, locked){
+    var k = kind(i), s = stockOf(i, locked), n = S.cart[i.id] || 0, id = esc(i.id), buy;
+    if (locked) buy = '';
+    else if (s.av <= 0) buy = '<span class="soldout">Sold out</span>';
+    else if (n) buy = '<div class="qty"><button data-a="q" data-id="' + id + '" data-v="-1" aria-label="One less">−</button><b>' + n + '</b><button data-a="q" data-id="' + id + '" data-v="1" aria-label="One more"' + (n >= i.avail ? ' disabled' : '') + '>+</button></div>';
+    else buy = '<button class="plus" data-a="q" data-id="' + id + '" data-v="1" aria-label="Add ' + esc(i.model) + ' ' + KIND[k] + ' to bag">+</button>';
+    return '<div class="pc' + (s.av <= 0 ? ' out' : '') + (n ? ' has' : '') + '"><button class="pt" data-a="detail" data-id="' + id + '" aria-label="Details for ' + esc(i.model) + ' ' + KIND[k] + '">' + pic(k, i.model) + '</button>' +
+      '<button class="pi" data-a="detail" data-id="' + id + '">' + (locked ? '<span class="pk" style="font-size:15px;color:var(--ink)">' + KIND[k] + '</span>' : '<span class="pk">' + KIND[k] + '</span><b class="pp">' + money(i.price) + '</b>') +
+      '<span class="ps">' + s.html + (k === 'oled' && i.maker ? '<i>' + esc(i.maker) + ' panel</i>' : '') + '</span></button>' + buy + '</div>';
   }
-  function filtered(){
-    var q = S.q.toLowerCase().trim();
-    var r = list().filter(function(i){
-      var k = kind(i);
-      if (S.cat === 'screens' && k === 'batt') return false;
-      if (S.cat === 'batt' && k !== 'batt') return false;
-      if (S.grade !== 'all' && k !== S.grade) return false;
-      if (S.series !== 'all' && seriesOf(i.model) !== S.series) return false;
-      if (S.model && i.model !== S.model) return false;
-      if (S.stockOnly && !(approved() ? i.avail > 0 : i.inStock)) return false;
-      if (q) { var hay = (i.model + ' ' + i.label + ' ' + KIND[k] + ' ' + sku(i) + ' ' + (i.maker||'') + ' ' + (k === 'batt' ? 'battery' : 'screen lcd display') + (k === 'oled' ? ' soft oled' : k === 'incell' ? ' incell' : '')).toLowerCase(); if (!q.split(/\s+/).every(function(w){ return hay.indexOf(w) > -1; })) return false; }
-      return true;
-    });
-    r.sort(function(a, b){
-      if (approved() && S.sort === 'plh') return a.price - b.price;
-      if (approved() && S.sort === 'phl') return b.price - a.price;
-      return mrank(a.model) - mrank(b.model) || KORDER[kind(a)] - KORDER[kind(b)];
-    });
-    return r;
-  }
-  function catalogView(){
-    var L = list(), items = filtered(), locked = !approved();
-    var title = S.model ? S.model + ' parts' : S.grade === 'oled' ? 'FX7 OLED screens' : S.grade === 'incell' ? 'FX5 Incell screens' : S.grade === 'orig' ? 'Original screens' : S.cat === 'batt' ? 'Batteries' : S.cat === 'screens' ? 'All screens' : S.series !== 'all' ? 'iPhone ' + S.series + ' family' : S.q ? 'Results for “' + esc(S.q) + '”' : 'All parts';
-    var crumb = '<div class="crumb"><button data-a="home">Wholesale</button><span>›</span>' + (S.model ? '<button data-a="series" data-v="' + seriesOf(S.model) + '">iPhone ' + seriesOf(S.model) + ' family</button><span>›</span><span>' + esc(S.model) + '</span>' : '<span>' + title + '</span>') + '</div>';
-    var opt = function(a, v, label, on, n){ return '<button class="opt" data-a="' + a + '" data-v="' + v + '" aria-pressed="' + on + '">' + label + (n != null ? '<i>' + n + '</i>' : '') + '</button>'; };
-    var ser = ['all','17','16','15','14','13','12','11'].filter(function(s){ return s === 'all' || L.some(function(i){ return seriesOf(i.model) === s; }); });
-    var side = '<aside class="side" aria-label="Filters">' +
-      '<h4>Category</h4><div class="grp">' + opt('cat','all','All parts',S.cat==='all' && S.grade==='all',L.length) + opt('cat','screens','Screens',S.cat==='screens' && S.grade==='all',count(function(i){ return kind(i)!=='batt'; })) + opt('cat','batt','Batteries',S.cat==='batt',count(function(i){ return kind(i)==='batt'; })) + '</div>' +
-      '<h4>Screen grade</h4><div class="grp">' + opt('grade','oled','FX7 OLED',S.grade==='oled',count(function(i){ return kind(i)==='oled'; })) + opt('grade','incell','FX5 Incell',S.grade==='incell',count(function(i){ return kind(i)==='incell'; })) + (count(function(i){ return kind(i)==='orig'; }) ? opt('grade','orig','Original',S.grade==='orig',count(function(i){ return kind(i)==='orig'; })) : '') + '</div>' +
-      '<h4 class="grp-series">Series</h4><div class="grp grp-series">' + ser.map(function(s){ return opt('series', s, s === 'all' ? 'All models' : 'iPhone ' + s, S.series === s && !S.model); }).join('') + '</div>' +
-      '<h4>Availability</h4><label class="tog"><input type="checkbox" data-a="stockonly"' + (S.stockOnly ? ' checked' : '') + '> In stock only</label>' +
-      '</aside>';
-    var tools = '<div class="tools"><div><h2>' + title + '</h2><div class="count">' + items.length + ' part' + (items.length === 1 ? '' : 's') + (locked ? ' · sign in to see prices' : '') + '</div></div><div class="tright">' +
-      (approved() ? '<select class="sel" data-a="sort" aria-label="Sort"><option value="model"' + (S.sort==='model'?' selected':'') + '>Newest model</option><option value="plh"' + (S.sort==='plh'?' selected':'') + '>Price: low to high</option><option value="phl"' + (S.sort==='phl'?' selected':'') + '>Price: high to low</option></select>' : '') +
-      '<div class="vt" role="group" aria-label="View"><button data-a="layout" data-v="grid" aria-pressed="' + (S.layout==='grid') + '">Grid</button><button data-a="layout" data-v="list" aria-pressed="' + (S.layout==='list') + '">List</button></div></div></div>';
-    var body;
+  function sheet(){
+    var L = list(), locked = !approved(), q = S.q.toLowerCase().trim(), seg = S.seg || 'all';
+    var cols = ['oled','incell','orig','batt'].filter(function(k){ return (seg === 'all' || seg === k) && L.some(function(i){ return kind(i) === k; }); });
+    var items = L.filter(function(i){ return cols.indexOf(kind(i)) > -1 && matches(i, q); });
+    var segs = '<div class="seg" role="group" aria-label="Show">' + SEG.map(function(x){ return '<button data-a="seg" data-v="' + x[0] + '" aria-pressed="' + (seg === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>';
+    var note = items.length + ' part' + (items.length === 1 ? '' : 's') + (q ? ' for “' + esc(S.q) + '”' : '') + (locked ? (S.st === 'in' ? ' · prices show after approval' : ' · <button class="inl" data-a="auth" data-v="signin">sign in</button> to see prices') : '');
+    var body = '';
     if (!L.length) body = '<div class="empty"><h3>New stock is on the way.</h3><p>Our next shipment lands soon. ' + (approved() ? 'Check back shortly.' : 'Apply now so you’re ready when it arrives.') + '</p></div>';
-    else if (!items.length) body = '<div class="empty"><h3>No matches.</h3><p>Try another filter or a shorter search, like “14 Pro”.</p></div>';
-    else if (S.layout === 'list') body = listView(items, locked);
-    else body = '<div class="grid">' + items.map(function(i){ return card(i, locked); }).join('') + '</div>';
-    return '<div class="w" style="padding-top:22px">' + crumb + '<div class="catalog">' + side + '<div>' + tools + body + '</div></div></div>';
+    else if (!items.length) body = '<div class="empty"><h3>No matches.</h3><p>Try a shorter search, like “14 Pro”.</p></div>';
+    else {
+      var by = {}; items.forEach(function(i){ (by[i.model] = by[i.model] || {})[kind(i)] = i; });
+      var models = Object.keys(by).sort(function(a, b){ return mrank(a) - mrank(b); }), fams = {}, order = [];
+      models.forEach(function(m){ var g = seriesOf(m); if (!fams[g]) { fams[g] = []; order.push(g); } fams[g].push(m); });
+      body = order.map(function(g){
+        return '<section class="fam"><h2>iPhone ' + esc(g) + '</h2><div class="mx">' +
+          fams[g].map(function(m){ return '<div class="mr"><div class="mn">' + esc(m) + '</div><div class="parts">' + cols.map(function(k){ return by[m][k] ? cell(by[m][k], locked) : ''; }).join('') + '</div></div>'; }).join('') + '</div></section>';
+      }).join('');
+    }
+    var n = cartCount();
+    return '<div id="sheet" class="sheet"><div class="w"><div class="sbar">' + segs + '<span class="snote">' + note + '</span></div>' + body + '</div>' +
+      (!locked && n ? '<button class="bagbar" data-a="cart"><span>' + n + ' item' + (n === 1 ? '' : 's') + ' · ' + money(cartSub()) + '</span><b>Review order</b></button>' : '') + '</div>';
   }
+  function drawSheet(){ var el = document.getElementById('sheet'); if (!el || S.view === 'orders') { if (S.view === 'orders') S.view = 'home'; render(); return; } el.outerHTML = sheet(); }
   function buyBox(i, locked){
     var s = stockOf(i, locked);
     if (locked) return '<div class="buy"><button class="lockp" data-a="auth" data-v="' + (S.st === 'in' ? 'none' : 'signin') + '"' + (S.st === 'in' ? ' disabled' : '') + '>' + (S.st === 'in' ? 'Price after approval' : 'Sign in for price') + '</button></div>';
     var n = S.cart[i.id] || 0;
     return '<div class="buy">' + (n ? '<div class="qty"><button data-a="q" data-id="' + esc(i.id) + '" data-v="-1" aria-label="One less">−</button><b>' + n + '</b><button data-a="q" data-id="' + esc(i.id) + '" data-v="1" aria-label="One more"' + (n >= i.avail ? ' disabled' : '') + '>+</button></div><button class="add" style="background:var(--bg);color:var(--link)" data-a="cart">Bag ›</button>'
       : '<button class="add" data-a="q" data-id="' + esc(i.id) + '" data-v="1"' + (s.av <= 0 ? ' disabled' : '') + '>' + (s.av <= 0 ? 'Sold out' : 'Add to bag') + '</button>') + '</div>';
-  }
-  function card(i, locked){
-    var k = kind(i), s = stockOf(i, locked);
-    var pills = (k !== 'batt' ? '<span class="pill wty">3-mo warranty</span>' : '') + (k === 'oled' && i.maker ? '<span class="pill">' + esc(i.maker) + ' panel</span>' : '') + (SHARED[i.model + '|' + k] ? '<span class="pill">Fits 2 models</span>' : '');
-    return '<article class="card"><button class="thumb" data-a="detail" data-id="' + esc(i.id) + '" aria-label="Details for ' + esc(i.model) + ' ' + KIND[k] + '">' + pic(k, i.model) + '</button>' +
-      '<div class="cbody"><div class="grade ' + k + '">' + KIND[k] + '</div><h3><button class="tlink" data-a="detail" data-id="' + esc(i.id) + '">' + esc(i.model) + (k === 'batt' ? ' battery' : ' screen') + '</button></h3><div class="sku">' + sku(i) + '</div>' +
-      (pills ? '<div class="meta">' + pills + '</div>' : '') +
-      '<div class="prow"><span class="price">' + (locked ? '' : money(i.price)) + '</span>' + s.html + '</div>' + buyBox(i, locked) + '</div></article>';
-  }
-  function listView(items, locked){
-    var rows = items.map(function(i){
-      var k = kind(i), s = stockOf(i, locked), n = S.cart[i.id] || 0;
-      return '<tr><td><button class="mini" data-a="detail" data-id="' + esc(i.id) + '" aria-label="Details">' + pic(k, i.model) + '</button></td>' +
-        '<td class="nm"><b>' + esc(i.model) + (k === 'batt' ? ' battery' : ' screen') + '</b><span>' + KIND[k] + (k === 'oled' && i.maker ? ' · ' + esc(i.maker) + ' panel' : '') + '</span></td>' +
-        '<td class="hide-s sku">' + sku(i) + '</td><td>' + s.html + '</td>' +
-        '<td style="text-align:right;font-weight:600">' + (locked ? '—' : money(i.price)) + '</td>' +
-        '<td style="text-align:right">' + (locked ? '' : '<input class="qin" type="number" min="0" max="' + Math.max(0, i.avail) + '" inputmode="numeric" data-q="' + esc(i.id) + '" value="' + (n || '') + '" placeholder="0"' + (s.av <= 0 ? ' disabled' : '') + ' aria-label="Quantity for ' + esc(i.model) + '">') + '</td></tr>';
-    }).join('');
-    return '<table class="qtable"><thead><tr><th></th><th>Part</th><th class="hide-s">Part #</th><th>Stock</th><th style="text-align:right">Price</th><th style="text-align:right">Qty</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-      (locked ? '<div class="qbar"><span class="hint" style="margin:0">Sign in to see prices and order by quantity.</span><button class="btn" data-a="auth" data-v="signin">Sign in</button></div>'
-        : '<div class="qbar"><span id="qsum" class="hint" style="margin:0">' + cartCount() + ' items in bag · ' + money(cartSub()) + '</span><button class="btn" data-a="cart">Review bag</button></div>');
   }
   var ST = {new:'Sent', confirmed:'Confirmed', ready:'Ready for pickup', done:'Completed', cancelled:'Cancelled'};
   function ordersView(){
@@ -606,13 +612,10 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
     render(); if (o.top !== false) window.scrollTo(0, 0);
   }
   function nav(v){
-    var reset = {cat:'all', grade:'all', series:'all', model:'', nav:v};
-    if (v === 'oled' || v === 'incell') go(Object.assign(reset, {grade:v, cat:'screens'}));
-    else if (v === 'batt') go(Object.assign(reset, {cat:'batt'}));
-    else if (v === 'quick') go(Object.assign(reset, {layout:'list'}));
-    else if (v === 'all') go(reset);
-    else if (v === 'models') { go({view:'home', nav:v, top:false}); var m = document.getElementById('models'); if (m) m.scrollIntoView({behavior:'smooth'}); }
-    else if (v === 'warranty') location.href = 'policy.html#s20';
+    if (v === 'warranty') { location.href = 'policy.html#s20'; return; }
+    S.seg = (v === 'oled' || v === 'incell' || v === 'batt') ? v : 'all'; S.q = ''; $('#q').value = '';
+    closeDetail(); S.view = 'home'; render();
+    var el = document.getElementById('sheet'); if (el) window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70));
   }
 
   /* ---------- sign in / apply ---------- */
@@ -684,11 +687,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
     }
     else if (a === 'finish') { var o2 = appData(); if (typeof o2 === 'string') return fail(o2); b.disabled = true; writeApp(S.user, o2).catch(function(){ fail('Couldn’t send. Try again.'); }); }
     else if (a === 'signout') { if (!confirm('Sign out?')) return; stop(); stopShop(); firebase.auth().signOut(); }
-    else if (a === 'cat') go({cat:v, grade:'all', model:'', top:false});
-    else if (a === 'grade') go({grade:v, cat:'screens', model:'', top:false});
-    else if (a === 'series') go({series:v, model:'', top:false});
-    else if (a === 'model') go({model:v, series:seriesOf(v), cat:'all', grade:'all'});
-    else if (a === 'layout') go({layout:v, top:false});
+    else if (a === 'seg') { S.seg = v; drawSheet(); }
     else if (a === 'view') { if (v === 'orders' && !approved()) { authBox('signin'); return; } closeDrawer(); go({view:v}); }
     else if (a === 'cart') openCart();
     else if (a === 'q') bump(b.getAttribute('data-id'), Number(v));
@@ -696,7 +695,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
     else if (a === 'reorder') {
       var ro = S.orders.filter(function(x){ return x.id === b.getAttribute('data-id'); })[0]; if (!ro) return;
       var added = 0; (ro.items||[]).forEach(function(l){ var it = S.items.filter(function(x){ return x.id === l.id; })[0]; if (it && it.avail > 0) { S.cart[l.id] = Math.min(it.avail, (S.cart[l.id] || 0) + l.qty); added++; } });
-      saveCart(); go({view:'catalog'}); if (added) openCart(); else toast('Those parts are out of stock right now');
+      saveCart(); go({view:'home', top:false}); if (added) openCart(); else toast('Those parts are out of stock right now');
     }
     else if (a === 'cancel') {
       if (!confirm('Cancel this order?')) return;
@@ -714,9 +713,7 @@ footer{background:var(--bg);color:var(--sub);font-size:12px;margin-top:20px}
       header();   // update the bag count without rebuilding the list (keeps your place while typing)
     }
   });
-  var qT; $('#q').addEventListener('input', function(e){ S.q = e.target.value; clearTimeout(qT); qT = setTimeout(function(){ go({cat:'all', grade:'all', series:'all', model:'', top:false}); }, 140); });
-  document.addEventListener('keydown', function(e){ if (e.target.id === 'q2' && e.key === 'Enter') { S.q = e.target.value; $('#q').value = S.q; go({cat:'all', grade:'all', series:'all', model:''}); } });
-  document.addEventListener('input', function(e){ if (e.target.id === 'q2') { clearTimeout(qT); var v = e.target.value; qT = setTimeout(function(){ if (v.trim().length >= 2) { S.q = v; $('#q').value = v; go({cat:'all', grade:'all', series:'all', model:''}); } }, 600); } });
+  var qT; $('#q').addEventListener('input', function(e){ S.q = e.target.value; clearTimeout(qT); qT = setTimeout(function(){ drawSheet(); var el = document.getElementById('sheet'); if (el && el.getBoundingClientRect().top > innerHeight * 0.6) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); }, 140); });
   document.addEventListener('keydown', function(e){
     if (e.key === 'Enter' && dlg && e.target.matches && e.target.matches('.dlg input')) { var bt = dlg.querySelector('.btn.full'); if (bt) bt.click(); }
     if (e.key === 'Escape') { closeDlg(); closeDrawer(); closeDetail(); }
