@@ -1462,7 +1462,7 @@ var WS_MAP = {}; WS_ST.forEach(function(x){ WS_MAP[x[0]] = x[1]; });
 var WS_PILL = {new:'background:#e8f1fd;color:#0058b0', confirmed:'background:#fff4dd;color:#8a5a00', ready:'background:#e6f4ea;color:#1a7f37', done:'background:#f0f0f2;color:#3a3a3c', cancelled:'background:#fbeceb;color:#9b2c27'};
 function wsPill(s){ return '<span class="tagk" style="'+(WS_PILL[s]||'')+'">'+esc(WS_MAP[s]||s)+'</span>'; }
 function wsParts(brand, model){ return partTypes(brand, model).filter(function(p){ return /screen|lcd|battery/i.test(p); }); }
-function wsDefaultLabel(part){ if (/Incell/.test(part)) return 'FX5 Incell'; if (/OLED/.test(part)) return 'FX7 OLED'; if (/Original/.test(part)) return 'Original'; return part; }
+function wsDefaultLabel(part){ if (/Incell/.test(part)) return 'IX5 Incell'; if (/OLED/.test(part)) return 'IX7 OLED'; if (/Original/.test(part)) return 'Original'; return part; }
 function wsCat(part){ return /battery/i.test(part) ? 'Batteries' : 'Screens'; }
 function wsP(id){ return (S.wsp||{})[id] || null; }
 function wsAvail(id){ var i = invById(id), p = wsP(id) || {}; return Math.max(0, (i ? num(i.qty) : 0) - Math.round(num(p.keep))); }
