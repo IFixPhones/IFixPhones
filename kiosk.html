@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Check-in">
+<meta name="theme-color" content="#ffffff">
+<meta name="format-detection" content="telephone=no">
+<title>Check in | iFixPhones</title>
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--mist:#f5f5f7;--ink:#1d1d1f;--graphite:#6e6e73;--blue:#0071e3;--blue-d:#0062c4;--green:#1a7f37;--red:#c9302c;--line:#d2d2d7;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit;cursor:pointer}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.screen{min-height:100vh;min-height:100dvh;padding:calc(env(safe-area-inset-top) + 28px) 40px calc(env(safe-area-inset-bottom) + 48px)}
+.wrap{max-width:700px;margin:0 auto}
+.screen.in{animation:rise .38s cubic-bezier(.2,.7,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.in{animation:none}}
+
+/* welcome + locked */
+.welcome,.lock{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(#fff,#f5f5f7)}
+.wm{font-weight:600;font-size:22px;letter-spacing:-.02em}
+.phoneart{width:120px;height:120px;margin:0 auto 6px}
+.welcome h1{font-size:clamp(56px,9vw,84px);letter-spacing:-.045em;line-height:1;margin-top:26px}
+.welcome .lede,.lock .lede{font-size:24px;color:var(--graphite);margin-top:16px;line-height:1.35;max-width:560px}
+.welcome .btn{margin-top:44px;min-width:340px;width:auto}
+.welcome .rcnote{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 18px)}
+.langbtn{position:absolute;top:calc(env(safe-area-inset-top) + 22px);right:28px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:10px 20px;font-size:18px;font-weight:500}
+.lock h1{font-size:clamp(44px,7vw,64px);letter-spacing:-.04em;line-height:1.05;margin-top:22px}
+.lock .alt{font-size:20px;color:var(--graphite);margin-top:8px}
+.lock .staff{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);border:0;background:none;color:#6e6e73;font-size:15px;padding:12px;margin:0 auto;width:max-content}
+.codebox{width:100%;max-width:420px;margin:34px auto 0}
+.codebox input{width:100%;font:inherit;font-size:40px;font-weight:600;letter-spacing:.14em;text-align:center;text-transform:uppercase;border:1.5px solid #86868b;border-radius:18px;height:88px;outline:none;-webkit-appearance:none;appearance:none;color:var(--ink);font-variant-numeric:tabular-nums}
+.codebox input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,113,227,.18)}
+.codebox .btn{margin-top:20px}
+.codebox .btn.ghost{margin-top:12px}
+.okc{width:84px;height:84px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto}
+.okc svg{width:40px;height:40px;stroke:#fff;stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.9);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.06);padding-top:env(safe-area-inset-top)}
+.bar .in{max-width:780px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;padding:0 24px}
+.bar .lnk{border:0;background:none;color:var(--blue);font-size:19px;padding:12px 4px;display:flex;align-items:center;gap:6px}
+.bar .lnk svg{width:12px;height:20px}
+.bar .left{justify-self:start}
+.bar .right{justify-self:end;display:flex;align-items:center;gap:14px}
+.bar .lang{border:1px solid var(--line);background:#fff;border-radius:999px;font-size:15px;padding:7px 14px;color:var(--ink)}
+.steps{display:flex;flex-direction:column;align-items:center;gap:7px}
+.steps .t{font-size:14px;color:var(--graphite);font-weight:500}
+.dots{display:flex;gap:6px}
+.dots i{width:30px;height:4px;border-radius:4px;background:#e5e5ea;transition:background .3s}
+.dots i.on{background:var(--ink)}
+.step{padding-top:40px}
+
+h2{font-size:clamp(40px,6vw,52px);letter-spacing:-.035em;line-height:1.05;outline:none}
+.sub{font-size:21px;color:var(--graphite);margin-top:10px;line-height:1.4}
+
+/* fields */
+.fields{display:grid;gap:18px;margin-top:34px}
+.field label,.glabel{display:block;font-size:17px;font-weight:600;margin:0 0 8px 4px}
+.opt{font-weight:400;color:var(--graphite)}
+.field input,.field textarea,.search input{width:100%;font:inherit;font-size:24px;background:#fff;border:1.5px solid #86868b;border-radius:16px;padding:0 20px;height:72px;outline:none;-webkit-appearance:none;appearance:none;color:var(--ink)}
+.field textarea{height:120px;padding:16px 20px;resize:none;font-size:21px;line-height:1.35}
+.field input:focus,.field textarea:focus,.search input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,113,227,.18)}
+.field.bad input,.field.bad textarea{border-color:var(--red)}
+.help{font-size:16px;color:var(--graphite);margin:8px 0 0 4px}
+.field.bad .help,.help.bad{color:var(--red)}
+::placeholder{color:#a1a1a6}
+.group{margin-top:30px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;min-height:52px;padding:0 22px;font-size:18px;font-weight:500}
+.chip[aria-pressed="true"]{border-color:var(--blue);background:#f0f6fe;color:var(--blue-d);box-shadow:inset 0 0 0 1px var(--blue)}
+
+/* model picker */
+.brands{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.brands .chip{border-radius:16px;min-height:60px;padding:0 8px}
+.search{position:relative;margin-top:14px}
+.search svg{position:absolute;left:20px;top:26px;width:20px;height:20px;stroke:#86868b;fill:none;stroke-width:2;stroke-linecap:round}
+.search input{padding-left:52px;height:68px;font-size:21px}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.mbtn{border:1.5px solid var(--line);background:#fff;border-radius:14px;min-height:60px;padding:8px 12px;font-size:17px;font-weight:500;line-height:1.2}
+.mbtn:active{background:var(--mist)}
+.more{margin-top:12px;border:0;background:none;color:var(--blue);font-size:18px;font-weight:500;padding:8px 4px}
+.picked{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;border:1.5px solid var(--blue);background:#f0f6fe;border-radius:16px;padding:14px 18px 14px 22px}
+.picked b{font-size:24px;letter-spacing:-.02em}
+.picked button{border:0;background:#fff;border-radius:999px;padding:10px 18px;color:var(--blue);font-size:17px;font-weight:500}
+.nomatch{font-size:17px;color:var(--graphite);margin:14px 4px 0}
+
+/* repair tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tile{border:1.5px solid var(--line);background:#fff;border-radius:18px;min-height:112px;padding:16px 10px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:500;text-align:center;line-height:1.2;transition:border-color .15s,background .15s,transform .1s}
+.tile svg{width:34px;height:34px;stroke:var(--ink);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tile:active{transform:scale(.97)}
+.tile[aria-pressed="true"]{border-color:var(--blue);background:#f0f6fe;box-shadow:inset 0 0 0 1px var(--blue)}
+.tile[aria-pressed="true"] svg{stroke:var(--blue)}
+.tiles.bad .tile{border-color:#e5a3a1}
+
+/* screen options */
+.tiers{display:grid;gap:14px;margin-top:30px}
+.tier{position:relative;display:grid;grid-template-columns:1.15fr 1fr;gap:10px 28px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:22px;padding:24px 26px;transition:border-color .15s,background .15s}
+.tier[aria-checked="true"]{border-color:var(--blue);background:#f7fbff;box-shadow:inset 0 0 0 1.5px var(--blue)}
+.tier .top{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tier .nm{font-size:28px;font-weight:700;letter-spacing:-.025em}
+.pill{font-size:14px;font-weight:600;border-radius:999px;padding:5px 11px;background:var(--mist);color:#424245}
+.pill.stock{background:#e8f5ec;color:#1a6b30}
+.pill.star{background:#1d1d1f;color:#fff}
+.tier .radio{margin-left:auto;width:30px;height:30px;border-radius:50%;border:2px solid #86868b;display:flex;align-items:center;justify-content:center;flex:none}
+.tier[aria-checked="true"] .radio{border-color:var(--blue);background:var(--blue)}
+.tier .radio svg{width:16px;height:16px;stroke:#fff;stroke-width:3;fill:none;opacity:0}
+.tier[aria-checked="true"] .radio svg{opacity:1}
+.tier .ds{font-size:17px;line-height:1.45;color:#424245}
+.tier .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:16px;color:var(--graphite)}
+.tier .meta b{color:var(--ink);font-weight:600}
+.rates{display:grid;gap:9px;align-content:start}
+.rate{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;color:#424245}
+.rate .d{display:flex;gap:4px}
+.rate .d i{width:22px;height:8px;border-radius:4px;background:#e5e5ea}
+.rate .d i.on{background:var(--ink)}
+.thick{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:16px;color:#424245}
+.thick .edge{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--graphite)}
+.thick .edge span{display:block;width:118px;border-radius:3px;background:linear-gradient(#3a3a3c,#1d1d1f)}
+.tier.unsure{grid-template-columns:1fr;padding:20px 26px}
+.tier.unsure .nm{font-size:22px}
+@media (min-width:1000px){.tiers{grid-template-columns:repeat(3,1fr)}.tier{grid-template-columns:1fr}.tier.unsure{grid-column:1/-1}.wrap.wide{max-width:1060px}}
+
+/* review */
+.card{background:var(--mist);border-radius:22px;padding:26px 28px;margin-top:30px}
+.card h3{font-size:20px;letter-spacing:-.01em}
+.card ul{list-style:none;margin-top:14px;display:grid;gap:12px}
+.card li{font-size:18px;line-height:1.42;padding-left:26px;position:relative;color:#333336}
+.card li::before{content:"";position:absolute;left:4px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.card li b{color:var(--ink)}
+.readall{margin-top:18px;border:0;background:none;color:#0058b0;font-size:18px;font-weight:500;padding:6px 0;display:inline-flex;align-items:center;gap:6px}
+.you{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.you span{background:var(--mist);border-radius:999px;padding:8px 16px;font-size:17px;font-weight:500}
+.tip{font-size:17px;color:#424245;background:#fff8e6;border-radius:14px;padding:14px 18px;margin-top:12px;line-height:1.4}
+
+.check{display:flex;gap:16px;align-items:flex-start;margin-top:28px;padding:20px 22px;border:1.5px solid var(--line);border-radius:18px;cursor:pointer;font-size:19px;line-height:1.42}
+.check input{position:absolute;opacity:0;pointer-events:none}
+.check .box{flex:none;width:32px;height:32px;border-radius:9px;border:2px solid #86868b;display:flex;align-items:center;justify-content:center;margin-top:-1px;transition:background .15s,border-color .15s}
+.check .box svg{width:18px;height:18px;stroke:#fff;stroke-width:3;fill:none;opacity:0}
+.check input:checked + .box{background:var(--blue);border-color:var(--blue)}
+.check input:checked + .box svg{opacity:1}
+.check input:focus-visible + .box{box-shadow:0 0 0 4px rgba(0,113,227,.3)}
+.check.bad{border-color:var(--red)}
+
+.siglabel{display:flex;justify-content:space-between;align-items:baseline;margin:30px 4px 10px}
+.siglabel span{font-size:17px;font-weight:600}
+.siglabel button{border:0;background:none;color:var(--blue);font-size:17px;padding:6px 0}
+.sigpad{position:relative;height:230px;border:1.5px solid #86868b;border-radius:18px;background:#fff;touch-action:none;overflow:hidden}
+.sigpad canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.sigpad .ln{position:absolute;left:44px;right:44px;bottom:62px;border-top:1.5px solid #d2d2d7;pointer-events:none}
+.sigpad .x{position:absolute;left:22px;bottom:66px;font-size:24px;color:#a1a1a6;pointer-events:none}
+.sigpad .ph{position:absolute;left:0;right:0;bottom:24px;text-align:center;color:#8e8e93;font-size:17px;pointer-events:none}
+.sigpad.has .ph{visibility:hidden}
+.sigpad.bad{border-color:var(--red)}
+.signote{font-size:15px;color:var(--graphite);margin:10px 4px 0}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--blue);color:#fff;border-radius:999px;height:72px;padding:0 40px;font-size:22px;font-weight:600;letter-spacing:-.01em;width:100%;margin-top:36px;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.985);background:var(--blue-d)}
+.btn:disabled{opacity:.55}
+.btn.ghost{background:var(--mist);color:var(--ink)}
+.err{color:var(--red);font-size:18px;margin-top:18px;text-align:center}
+
+/* done */
+.done{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.done .okc{width:96px;height:96px}
+.done .okc svg{width:46px;height:46px;stroke-dasharray:60;stroke-dashoffset:60;animation:tick .5s .15s ease forwards}
+@keyframes tick{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.done .okc svg{animation:none;stroke-dashoffset:0}}
+.done h2{margin-top:30px;max-width:760px}
+.done .sub{max-width:560px;margin-left:auto;margin-right:auto}
+.done .summary{margin-top:28px;background:var(--mist);border-radius:18px;padding:18px 26px;font-size:21px;font-weight:600;max-width:640px}
+.done .btn{max-width:340px;margin-top:40px}
+.done .count{font-size:16px;color:var(--graphite);margin-top:16px}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:20;background:rgba(245,245,247,.55);-webkit-backdrop-filter:blur(22px) saturate(140%);backdrop-filter:blur(22px) saturate(140%);display:flex;align-items:center;justify-content:center;padding:30px}
+.ov .box{background:#fff;border-radius:26px;padding:38px 36px 30px;max-width:460px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.ov h2{font-size:34px}
+.ov p{font-size:19px;color:var(--graphite);margin-top:10px;line-height:1.4}
+.ov .btn{margin-top:28px}
+.ov .btn.ghost{margin-top:12px}
+.sheet{position:fixed;inset:0;z-index:30;background:#fff;display:flex;flex-direction:column}
+.sheet .hd{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 14px) 28px 14px;border-bottom:1px solid rgba(0,0,0,.08)}
+.sheet .hd h2{font-size:22px;letter-spacing:-.02em}
+.sheet .hd button{border:0;background:var(--blue);color:#fff;border-radius:999px;font-size:18px;font-weight:600;padding:12px 26px}
+.sheet .bd{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 28px 60px;-webkit-user-select:text;user-select:text}
+.pol{max-width:720px;margin:0 auto;font-size:18px;line-height:1.55;color:#333336}
+.pol h1{font-size:34px;letter-spacing:-.03em;color:var(--ink);margin-top:20px}
+.pol h2{font-size:24px;letter-spacing:-.02em;margin-top:30px;color:var(--ink)}
+.pol h3{font-size:19px;margin-top:20px;color:var(--ink)}
+.pol p,.pol ul,.pol table{margin-top:10px}
+.pol ul{padding-left:22px}
+.pol li{margin-top:6px}
+.pol table{border-collapse:collapse;width:100%;font-size:16px}
+.pol th,.pol td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.pol .meta{color:var(--graphite);font-size:15px}
+.pol .short,.pol .caps{background:var(--mist);border-radius:16px;padding:16px 20px;margin-top:16px}
+.esnote{max-width:720px;margin:20px auto 0;background:#fff8e6;border-radius:14px;padding:14px 18px;font-size:17px;line-height:1.4}
+
+.rcnote{font-size:12px;color:#6e6e73;line-height:1.4;text-align:center}
+.grecaptcha-badge{visibility:hidden!important}
+
+@media (max-width:700px){
+  .screen{padding-left:22px;padding-right:22px}
+  .tiles,.mgrid{grid-template-columns:repeat(2,1fr)}
+  .brands{grid-template-columns:repeat(3,1fr)}
+  .tier{grid-template-columns:1fr}
+  .welcome .btn{min-width:0;width:100%}
+}
+</style>
+</head>
+<body>
+<main>
+<!-- Not set up: only the store's own iPad can check people in -->
+<section class="screen lock hidden" id="sL" aria-labelledby="hL">
+  <svg class="phoneart" viewBox="0 0 120 120" aria-hidden="true"><rect x="38" y="14" width="44" height="92" rx="11" fill="#fff" stroke="#1d1d1f" stroke-width="2.4"/><rect x="52" y="20" width="16" height="5" rx="2.5" fill="#1d1d1f"/><rect x="50" y="58" width="20" height="16" rx="3" fill="none" stroke="#1d1d1f" stroke-width="2.4"/><path d="M54 58v-4a6 6 0 0 1 12 0v4" fill="none" stroke="#1d1d1f" stroke-width="2.4"/></svg>
+  <div class="wm">iFixPhones</div>
+  <h1 id="hL" tabindex="-1">Please check in at the counter.</h1>
+  <p class="alt" lang="es">Por favor regístrese en el mostrador.</p>
+  <p class="lede">This screen is only for the iFixPhones front desk.</p>
+  <button class="staff" type="button" id="staff">Set up this iPad</button>
+</section>
+
+<section class="screen lock hidden" id="sP" aria-labelledby="hP">
+  <div class="wm">iFixPhones</div>
+  <h1 id="hP" tabindex="-1">Set up this iPad.</h1>
+  <p class="lede">In your shop app, go to Settings → Front desk iPad → Set up an iPad, then type the code here.</p>
+  <div class="codebox">
+    <label class="sr" for="code">Setup code</label>
+    <input id="code" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="9" placeholder="XXXX-XXXX" enterkeyhint="go">
+    <p class="err" id="perr" role="alert"></p>
+    <button class="btn" type="button" id="pairgo">Set up</button>
+    <button class="btn ghost" type="button" id="paircancel">Cancel</button>
+  </div>
+</section>
+
+<section class="screen lock hidden" id="sD" aria-labelledby="hD">
+  <div class="okc"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 25l8 8 16-18"/></svg></div>
+  <h1 id="hD" tabindex="-1">This iPad is set up.</h1>
+  <p class="lede">Customers can check in here now. Lock it with Guided Access when you’re ready.</p>
+  <div class="codebox"><button class="btn" type="button" id="pairdone">Open check-in</button></div>
+</section>
+
+<!-- Welcome -->
+<section class="screen welcome hidden" id="s0" aria-labelledby="h0">
+  <button class="langbtn" type="button" data-lang lang="es">Español</button>
+  <svg class="phoneart" viewBox="0 0 120 120" aria-hidden="true"><rect x="38" y="14" width="44" height="92" rx="11" fill="#fff" stroke="#1d1d1f" stroke-width="2.4"/><rect x="52" y="20" width="16" height="5" rx="2.5" fill="#1d1d1f"/><path d="M50 62l8 8 14-16" fill="none" stroke="#0071e3" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="wm">iFixPhones</div>
+  <h1 id="h0" data-t="w_h">Welcome in.</h1>
+  <p class="lede" data-t="w_p">Check in here. It takes about a minute.</p>
+  <button class="btn" id="start" type="button" data-t="w_btn">Start check-in</button>
+  <p class="rcnote">This site is protected by reCAPTCHA. Google’s Privacy Policy (policies.google.com/privacy)<br>and Terms of Service (policies.google.com/terms) apply.</p>
+</section>
+
+<!-- Steps -->
+<div id="flow" class="hidden">
+  <header class="bar">
+    <div class="in">
+      <button class="lnk left" type="button" id="back"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2L2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="back">Back</span></button>
+      <div class="steps" aria-hidden="true"><span class="t" id="stept"></span><span class="dots" id="dots"></span></div>
+      <div class="right"><button class="lang" type="button" data-lang lang="es">Español</button><button class="lnk" type="button" id="over" data-t="over">Start over</button></div>
+    </div>
+  </header>
+
+  <!-- You -->
+  <section class="screen step hidden" id="s1" aria-labelledby="h1t">
+    <div class="wrap">
+      <h2 id="h1t" tabindex="-1" data-t="you_h">First, a little about you.</h2>
+      <p class="sub" data-t="you_p">We’ll text you when your phone is ready.</p>
+      <div class="fields">
+        <div class="field" id="f-name"><label for="name" data-t="name_l">Full name</label><input id="name" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" maxlength="80" enterkeyhint="next"><p class="help hidden" id="name-h" data-t="name_e">Please enter your name.</p></div>
+        <div class="field" id="f-phone"><label for="phone" data-t="phone_l">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="(210) 555-0123" enterkeyhint="next"><p class="help hidden" id="phone-h" data-t="phone_e">Please enter a 10-digit number.</p></div>
+        <div class="field" id="f-email"><label for="email"><span data-t="email_l">Email</span> <span class="opt" data-t="email_o">(optional, for your receipt)</span></label><input id="email" type="email" inputmode="email" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="100" enterkeyhint="done"><p class="help hidden" id="email-h" data-t="email_e">That email doesn’t look right.</p></div>
+      </div>
+      <div class="group"><p class="glabel" id="heard-l"><span data-t="heard_l">How did you hear about us?</span> <span class="opt" data-t="optional">(optional)</span></p><div class="chips" id="heard" role="group" aria-labelledby="heard-l"></div></div>
+      <button class="btn" type="button" data-next data-t="continue">Continue</button>
+    </div>
+  </section>
+
+  <!-- Device -->
+  <section class="screen step hidden" id="s2" aria-labelledby="h2t">
+    <div class="wrap">
+      <h2 id="h2t" tabindex="-1" data-t="dev_h">What are we fixing?</h2>
+      <div class="group" style="margin-top:34px">
+        <p class="glabel" id="brand-l" data-t="brand_l">Your device</p>
+        <div class="brands" id="brands" role="group" aria-labelledby="brand-l"></div>
+        <div id="mpick" class="hidden">
+          <div class="search" id="msearchw"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><label class="sr" for="msearch" data-t="model_s">Search your model</label><input id="msearch" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-tp="model_ph" placeholder="Search your model, e.g. 15 Pro" enterkeyhint="search"></div>
+          <div class="mgrid" id="mgrid"></div>
+          <p class="nomatch hidden" id="nomatch" data-t="nomatch">No match. Check the spelling, or pick “Other” and type it.</p>
+          <button class="more hidden" type="button" id="mmore" data-t="mmore">Show all models</button>
+        </div>
+        <div class="field hidden" id="f-mfree" style="margin-top:14px"><label for="mfree" data-t="mfree_l">Type your device</label><input id="mfree" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" maxlength="80" placeholder="Moto G Power" enterkeyhint="done"></div>
+        <div class="picked hidden" id="picked"><b id="pickedm"></b><button type="button" id="mchange" data-t="change">Change</button></div>
+        <p class="help" id="model-h" data-t="model_help">Not sure? Settings → General → About.</p>
+      </div>
+      <div class="group">
+        <p class="glabel" id="rep-l"><span data-t="rep_l">What needs fixing?</span> <span class="opt" data-t="rep_o">Pick all that apply.</span></p>
+        <div class="tiles" id="tiles" role="group" aria-labelledby="rep-l"></div>
+        <p class="help bad hidden" id="rep-h" data-t="rep_e">Pick at least one.</p>
+      </div>
+      <div class="group">
+        <p class="glabel" id="sp-l"><span data-t="sp_l">Add a screen protector?</span> <span class="opt" data-t="optional">(optional)</span></p>
+        <div class="chips" id="prot" role="group" aria-labelledby="sp-l"></div>
+        <p class="help" data-t="sp_help">We install it for you. Privacy means people next to you can’t see your screen.</p>
+      </div>
+      <div class="fields" style="margin-top:26px">
+        <div class="field"><label for="notes"><span data-t="notes_l">Anything else we should know?</span> <span class="opt" data-t="optional">(optional)</span></label><textarea id="notes" maxlength="500" data-tp="notes_ph" placeholder="Dropped it yesterday. Screen has lines, touch still works."></textarea></div>
+      </div>
+      <button class="btn" type="button" data-next data-t="continue">Continue</button>
+    </div>
+  </section>
+
+  <!-- Screen choice (only when Screen is picked on an iPhone) -->
+  <section class="screen step hidden" id="sS" aria-labelledby="hSt">
+    <div class="wrap wide">
+      <h2 id="hSt" tabindex="-1" data-t="scr_h">Choose your screen.</h2>
+      <p class="sub" data-t="scr_p">Here’s how they compare. Your technician confirms the price before we start.</p>
+      <div class="tiers" id="tiers" role="radiogroup" aria-labelledby="hSt"></div>
+      <p class="help bad hidden" id="scr-h" data-t="scr_e">Pick a screen, or choose “Help me choose at the counter.”</p>
+      <div class="wrap" style="padding:0"><button class="btn" type="button" data-next data-t="continue">Continue</button></div>
+    </div>
+  </section>
+
+  <!-- Review and sign -->
+  <section class="screen step hidden" id="s3" aria-labelledby="h3t">
+    <div class="wrap">
+      <h2 id="h3t" tabindex="-1" data-t="sign_h">Review and sign.</h2>
+      <div class="you" id="you"></div>
+      <div class="card">
+        <h3 data-t="pol_h">The short version of our policy</h3>
+        <ul>
+          <li data-th="p1"><b>Back up your phone</b> before any repair. We aren’t responsible for lost data.</li>
+          <li data-th="p2"><b>Soft OLED screens:</b> 30-day warranty for glitches only. Drops, pressure, bending or liquid aren’t covered.</li>
+          <li data-th="p3"><b>Incell screens:</b> no warranty. We test every screen with you before you pay.</li>
+          <li data-th="p4"><b>New damage</b> isn’t covered and voids the warranty.</li>
+          <li data-th="p5"><b>Opening a phone has real risks,</b> even when done right. We’ll explain them first.</li>
+          <li data-th="p6"><b>We quote before we start,</b> and payment is due when the repair is done.</li>
+        </ul>
+        <button class="readall" type="button" id="readall"><span data-t="readall">Read the full policy</span> <svg width="8" height="13" viewBox="0 0 8 13" aria-hidden="true"><path d="M1.5 1.5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+
+      <div class="group"><p class="glabel" id="bk-l" data-t="bk_l">Is your phone backed up?</p><div class="chips" id="backup" role="group" aria-labelledby="bk-l"></div><p class="tip hidden" id="bk-tip" data-t="bk_tip">No problem. If your phone still turns on, ask us and we’ll help you back it up first.</p></div>
+
+      <label class="check" id="agree-w"><input type="checkbox" id="agree"><span class="box" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg></span><span data-t="agree">I’ve read and agree to the iFixPhones Warranty and Repair Policy, I’ll back up my data, and iFixPhones may text me about this repair.</span></label>
+
+      <div class="siglabel"><span id="sig-l" data-t="sig_l">Sign with your finger</span><button type="button" id="sigclear" data-t="clear">Clear</button></div>
+      <div class="sigpad" id="sig" role="img" aria-labelledby="sig-l"><span class="x" aria-hidden="true">×</span><div class="ln"></div><canvas></canvas><div class="ph" data-t="sig_ph">Sign here</div></div>
+      <p class="signote" data-t="signote">Can’t sign here? Just let us know at the counter.</p>
+
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn" type="button" id="go" data-t="go">Check me in</button>
+    </div>
+  </section>
+</div>
+
+<!-- Done -->
+<section class="screen done hidden" id="s4" aria-labelledby="h4t">
+  <div class="okc"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 25l8 8 16-18"/></svg></div>
+  <h2 id="h4t" tabindex="-1"></h2>
+  <p class="sub" id="dmsg"></p>
+  <div class="summary" id="dsum"></div>
+  <button class="btn" type="button" id="finish" data-t="finish">Done</button>
+  <p class="count" id="count" aria-hidden="true"></p>
+</section>
+</main>
+
+<div class="ov hidden" id="idle" role="alertdialog" aria-modal="true" aria-labelledby="idle-t" aria-describedby="idle-p">
+  <div class="box">
+    <h2 id="idle-t" data-t="idle_h">Still there?</h2>
+    <p id="idle-p"></p>
+    <button class="btn" type="button" id="keep" data-t="keep">Keep going</button>
+    <button class="btn ghost" type="button" id="clearnow" data-t="over">Start over</button>
+  </div>
+</div>
+
+<div class="ov hidden" id="ask" role="alertdialog" aria-modal="true" aria-labelledby="ask-t">
+  <div class="box">
+    <h2 id="ask-t" data-t="ask_h">Start over?</h2>
+    <p data-t="ask_p">This clears everything you’ve entered.</p>
+    <button class="btn" type="button" id="askyes" data-t="over">Start over</button>
+    <button class="btn ghost" type="button" id="askno" data-t="keep">Keep going</button>
+  </div>
+</div>
+
+<div class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+  <div class="hd"><h2 id="sheet-t">Warranty and Repair Policy</h2><button type="button" id="sheetdone" data-t="finish">Done</button></div>
+  <div class="bd" id="sheetbd"><p class="esnote hidden" id="esnote" lang="es">La política completa está en inglés. Si tiene preguntas, con gusto le ayudamos en el mostrador.</p><div class="pol" id="pol" lang="en"><p style="margin-top:30px;color:#6e6e73">Loading…</p></div></div>
+</div>
+
+<script src="fb-app.js"></script>
+<script>((e,t)=>{"object"==typeof exports&&"undefined"!=typeof module?t(require("@firebase/app-compat"),require("@firebase/app")):"function"==typeof define&&define.amd?define(["@firebase/app-compat","@firebase/app"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).firebase,e.firebase.INTERNAL.modularAPIs)})(this,function(_e,ye){try{!(function(){let r={byteToCharMap_:null,charToByteMap_:null,byteToCharMapWebSafe_:null,charToByteMapWebSafe_:null,ENCODED_VALS_BASE:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",get ENCODED_VALS(){return this.ENCODED_VALS_BASE+"+/="},get ENCODED_VALS_WEBSAFE(){return this.ENCODED_VALS_BASE+"-_."},HAS_NATIVE_SUPPORT:"function"==typeof atob,encodeByteArray(r,e){if(!Array.isArray(r))throw Error("encodeByteArray takes an array as a parameter");this.init_();var a=e?this.byteToCharMapWebSafe_:this.byteToCharMap_,o=[];for(let l=0;l<r.length;l+=3){var i=r[l],n=l+1<r.length,s=n?r[l+1]:0,h=l+2<r.length,c=h?r[l+2]:0;let e=(15&s)<<2|c>>6,t=63&c;h||(t=64,n)||(e=64),o.push(a[i>>2],a[(3&i)<<4|s>>4],a[e],a[t])}return o.join("")},encodeString(e,t){return this.HAS_NATIVE_SUPPORT&&!t?btoa(e):this.encodeByteArray((t=>{var r=[];let a=0;for(let o=0;o<t.length;o++){let e=t.charCodeAt(o);e<128?r[a++]=e:(e<2048?r[a++]=e>>6|192:(55296==(64512&e)&&o+1<t.length&&56320==(64512&t.charCodeAt(o+1))?(e=65536+((1023&e)<<10)+(1023&t.charCodeAt(++o)),r[a++]=e>>18|240,r[a++]=e>>12&63|128):r[a++]=e>>12|224,r[a++]=e>>6&63|128),r[a++]=63&e|128)}return r})(e),t)},decodeString(r,a){if(this.HAS_NATIVE_SUPPORT&&!a)return atob(r);{var o=this.decodeStringToByteArray(r,a);var i=[];let e=0,t=0;for(;e<o.length;){var n,s,h,c=o[e++];c<128?i[t++]=String.fromCharCode(c):191<c&&c<224?(n=o[e++],i[t++]=String.fromCharCode((31&c)<<6|63&n)):239<c&&c<365?(n=((7&c)<<18|(63&o[e++])<<12|(63&o[e++])<<6|63&o[e++])-65536,i[t++]=String.fromCharCode(55296+(n>>10)),i[t++]=String.fromCharCode(56320+(1023&n))):(s=o[e++],h=o[e++],i[t++]=String.fromCharCode((15&c)<<12|(63&s)<<6|63&h))}return i.join("");return}},decodeStringToByteArray(e,t){this.init_();var r=t?this.charToByteMapWebSafe_:this.charToByteMap_,a=[];for(let h=0;h<e.length;){var o=r[e.charAt(h++)],i=h<e.length?r[e.charAt(h)]:0,n=++h<e.length?r[e.charAt(h)]:64,s=++h<e.length?r[e.charAt(h)]:64;if(++h,null==o||null==i||null==n||null==s)throw new B;a.push(o<<2|i>>4),64!==n&&(a.push(i<<4&240|n>>2),64!==s)&&a.push(n<<6&192|s)}return a},init_(){if(!this.byteToCharMap_){this.byteToCharMap_={},this.charToByteMap_={},this.byteToCharMapWebSafe_={},this.charToByteMapWebSafe_={};for(let e=0;e<this.ENCODED_VALS.length;e++)this.byteToCharMap_[e]=this.ENCODED_VALS.charAt(e),this.charToByteMap_[this.byteToCharMap_[e]]=e,this.byteToCharMapWebSafe_[e]=this.ENCODED_VALS_WEBSAFE.charAt(e),(this.charToByteMapWebSafe_[this.byteToCharMapWebSafe_[e]]=e)>=this.ENCODED_VALS_BASE.length&&(this.charToByteMap_[this.ENCODED_VALS_WEBSAFE.charAt(e)]=e,this.charToByteMapWebSafe_[this.ENCODED_VALS.charAt(e)]=e)}}};class B extends Error{constructor(){super(...arguments),this.name="DecodeBase64StringError"}}let n=function(e){try{return r.decodeString(e,!0)}catch(e){console.error("base64Decode failed: ",e)}return null};class s{constructor(){this.reject=()=>{},this.resolve=()=>{},this.promise=new Promise((e,t)=>{this.resolve=e,this.reject=t})}wrapCallback(r){return(e,t)=>{e?this.reject(e):this.resolve(t),"function"==typeof r&&(this.promise.catch(()=>{}),1===r.length?r(e):r(e,t))}}}function a(){try{return"object"==typeof indexedDB}catch(e){}}class i extends Error{constructor(e,t,r){super(t),this.code=e,this.customData=r,this.name="FirebaseError",Object.setPrototypeOf(this,i.prototype),Error.captureStackTrace&&Error.captureStackTrace(this,o.prototype.create)}}class o{constructor(e,t,r){this.service=e,this.serviceName=t,this.errors=r}create(e,...t){var r=t[0]||{},a=this.service+"/"+e,o=this.errors[e],o=o?((r,a)=>{try{let e=0,t="";for(;e<r.length;){var o=r.indexOf("{$",e);if(-1===o){t+=r.substring(e);break}var i=r.indexOf("}",o+2);if(-1===i){t+=r.substring(e);break}var n=r.substring(o+2,i),s=a[n];t+=r.substring(e,o)+(null!=s?String(s):`<${n}?>`),e=i+1}return t}catch(e){return r}})(o,r):"Error",o=this.serviceName+`: ${o} (${a}).`;return new i(a,o,r)}}function h(e){return JSON.parse(e)}function H(e){var t=(e=>{let t={},r={},a={},o="";try{var i=e.split(".");t=h(n(i[0])||""),r=h(n(i[1])||""),o=i[2],a=r.d||{},delete r.d}catch(e){}return{header:t,claims:r,data:a,signature:o}})(e).claims;return"object"==typeof t&&t.hasOwnProperty("iat")?t.iat:null}let x=144e5,F=.5;class e{constructor(e,t,r){this.name=e,this.instanceFactory=t,this.type=r,this.multipleInstances=!1,this.serviceProps={},this.instantiationMode="LAZY",this.onInstanceCreated=null}setInstantiationMode(e){return this.instantiationMode=e,this}setMultipleInstances(e){return this.multipleInstances=e,this}setServiceProps(e){return this.serviceProps=e,this}setInstanceCreatedCallback(e){return this.onInstanceCreated=e,this}}var t,c;(c=t=t||{})[c.DEBUG=0]="DEBUG",c[c.VERBOSE=1]="VERBOSE",c[c.INFO=2]="INFO",c[c.WARN=3]="WARN",c[c.ERROR=4]="ERROR",c[c.SILENT=5]="SILENT";let $={debug:t.DEBUG,verbose:t.VERBOSE,info:t.INFO,warn:t.WARN,error:t.ERROR,silent:t.SILENT},W=t.INFO,j={[t.DEBUG]:"log",[t.VERBOSE]:"log",[t.INFO]:"info",[t.WARN]:"warn",[t.ERROR]:"error"},V=(e,t,...r)=>{if(!(t<e.logLevel)){var a=(new Date).toISOString(),o=j[t];if(!o)throw new Error(`Attempted to log a message with an invalid logType (value: ${t})`);console[o](`[${a}]  ${e.name}:`,...r)}};let l=new Map,p={activated:!1,tokenObservers:[]},u={initialized:!1,enabled:!1};function d(e){return l.get(e)||{...p}}let g="https://content-firebaseappcheck.googleapis.com/v1",z="exchangeDebugToken",K={RETRIAL_MIN_WAIT:3e4,RETRIAL_MAX_WAIT:96e4};class U{constructor(e,t,r,a,o){if(this.operation=e,this.retryPolicy=t,this.getWaitDuration=r,this.lowerBound=a,this.upperBound=o,this.pending=null,o<(this.nextErrorWaitInterval=a))throw new Error("Proactive refresh lower bound greater than upper bound!")}start(){this.nextErrorWaitInterval=this.lowerBound,this.process(!0).catch(()=>{})}stop(){this.pending&&(this.pending.reject("cancelled"),this.pending=null)}isRunning(){return!!this.pending}async process(e){this.stop();try{this.pending=new s,this.pending.promise.catch(e=>{}),t=this.getNextRun(e),await new Promise(e=>{setTimeout(e,t)}),this.pending.resolve(),await this.pending.promise,this.pending=new s,this.pending.promise.catch(e=>{}),await this.operation(),this.pending.resolve(),await this.pending.promise,this.process(!0).catch(()=>{})}catch(e){this.retryPolicy(e)?this.process(!1).catch(()=>{}):this.stop()}var t}getNextRun(e){var t;return e?(this.nextErrorWaitInterval=this.lowerBound,this.getWaitDuration()):(t=this.nextErrorWaitInterval,this.nextErrorWaitInterval*=2,this.nextErrorWaitInterval>this.upperBound&&(this.nextErrorWaitInterval=this.upperBound),t)}}let f=new o("appCheck","AppCheck",{"already-initialized":"You have already called initializeAppCheck() for FirebaseApp {$appName} with different options. To avoid this error, call initializeAppCheck() with the same options as when it was originally called. This will return the already initialized instance.","use-before-activation":"App Check is being used before initializeAppCheck() is called for FirebaseApp {$appName}. Call initializeAppCheck() before instantiating other Firebase services.","fetch-network-error":"Fetch failed to connect to a network. Check Internet connection. Original error: {$originalErrorMessage}.","fetch-parse-error":"Fetch client could not parse response. Original error: {$originalErrorMessage}.","fetch-status-error":"Fetch server returned an HTTP error status. HTTP status: {$httpStatus}.","storage-open":"Error thrown when opening storage. Original error: {$originalErrorMessage}.","storage-get":"Error thrown when reading from storage. Original error: {$originalErrorMessage}.","storage-set":"Error thrown when writing to storage. Original error: {$originalErrorMessage}.","recaptcha-error":"ReCAPTCHA error.","initial-throttle":"{$httpStatus} error. Attempts allowed again after {$time}",throttled:"Requests throttled due to previous {$httpStatus} error. Attempts allowed again after {$time}"});function v(e=!1){return e?self.grecaptcha?.enterprise:self.grecaptcha}function b(e){if(!d(e).activated)throw f.create("use-before-activation",{appName:e.name})}function k(e){var t=Math.round(e/1e3),r=Math.floor(t/86400),a=Math.floor((t-3600*r*24)/3600),o=Math.floor((t-3600*r*24-3600*a)/60),t=t-3600*r*24-3600*a-60*o;let i="";return r&&(i+=w(r)+"d:"),a&&(i+=w(a)+"h:"),i+=w(o)+"m:"+w(t)+"s"}function w(e){return 0===e?"00":10<=e?e.toString():"0"+e}async function E({url:e,body:t},r){var a={"Content-Type":"application/json"},o=r.getImmediate({optional:!0}),o=(o&&(o=await o.getHeartbeatsHeader())&&(a["X-Firebase-Client"]=o),{method:"POST",body:JSON.stringify(t),headers:a});let i;try{i=await fetch(e,o)}catch(e){throw f.create("fetch-network-error",{originalErrorMessage:e?.message})}if(200!==i.status)throw f.create("fetch-status-error",{httpStatus:i.status});let n;try{n=await i.json()}catch(e){throw f.create("fetch-parse-error",{originalErrorMessage:e?.message})}var a=n.ttl.match(/^([\d.]+)(s)$/);if(a&&a[2]&&!isNaN(Number(a[1])))return o=1e3*Number(a[1]),a=Date.now(),{token:n.token,expireTimeMillis:a+o,issuedAtTimeMillis:a};throw f.create("fetch-parse-error",{originalErrorMessage:"ttl field (timeToLive) is not in standard Protobuf Duration format: "+n.ttl})}function q(e,t){var{projectId:r,appId:a,apiKey:o}=e.options;return{url:`${g}/projects/${r}/apps/${a}:${z}?key=`+o,body:{debug_token:t}}}let G="firebase-app-check-database",X=1,m="firebase-app-check-store",Y="debug-token",J=null;function Z(){return J=J||new Promise((t,r)=>{try{var e=indexedDB.open(G,X);e.onsuccess=e=>{t(e.target.result)},e.onerror=e=>{r(f.create("storage-open",{originalErrorMessage:e.target.error?.message}))},e.onupgradeneeded=e=>{var t=e.target.result;0===e.oldVersion&&t.createObjectStore(m,{keyPath:"compositeKey"})}}catch(e){r(f.create("storage-open",{originalErrorMessage:e?.message}))}})}async function Q(e,t){let a=(await Z()).transaction(m,"readwrite"),o=a.objectStore(m).put({compositeKey:e,value:t});return new Promise((t,r)=>{o.onsuccess=e=>{t()},a.onerror=e=>{r(f.create("storage-set",{originalErrorMessage:e.target.error?.message}))}})}async function ee(e){let a=(await Z()).transaction(m,"readonly"),o=a.objectStore(m).get(e);return new Promise((r,t)=>{o.onsuccess=e=>{var t=e.target.result;r(t?t.value:void 0)},a.onerror=e=>{t(f.create("storage-get",{originalErrorMessage:e.target.error?.message}))}})}function te(e){return e.options.appId+"-"+e.name}let _=new class{constructor(e){this.name=e,this._logLevel=W,this._logHandler=V,this._userLogHandler=null}get logLevel(){return this._logLevel}set logLevel(e){if(!(e in t))throw new TypeError(`Invalid value "${e}" assigned to \`logLevel\``);this._logLevel=e}setLogLevel(e){this._logLevel="string"==typeof e?$[e]:e}get logHandler(){return this._logHandler}set logHandler(e){if("function"!=typeof e)throw new TypeError("Value assigned to `logHandler` must be a function");this._logHandler=e}get userLogHandler(){return this._userLogHandler}set userLogHandler(e){this._userLogHandler=e}debug(...e){this._userLogHandler&&this._userLogHandler(this,t.DEBUG,...e),this._logHandler(this,t.DEBUG,...e)}log(...e){this._userLogHandler&&this._userLogHandler(this,t.VERBOSE,...e),this._logHandler(this,t.VERBOSE,...e)}info(...e){this._userLogHandler&&this._userLogHandler(this,t.INFO,...e),this._logHandler(this,t.INFO,...e)}warn(...e){this._userLogHandler&&this._userLogHandler(this,t.WARN,...e),this._logHandler(this,t.WARN,...e)}error(...e){this._userLogHandler&&this._userLogHandler(this,t.ERROR,...e),this._logHandler(this,t.ERROR,...e)}}("@firebase/app-check");async function re(t){if(a()){let e=void 0;try{e=await ee(te(t))}catch(e){_.warn("Failed to read token from IndexedDB. Error: "+e)}return e}}function y(e,t){return a()?Q(te(e),t).catch(e=>{_.warn("Failed to write token to IndexedDB. Error: "+e)}):Promise.resolve()}async function ae(t){let e=void 0;try{e=await ee(Y)}catch(e){}if(e)return e;{var r=crypto.randomUUID();let e=`To use this token for app debugging, register it with your project.
+
+`+`Firebase App Check debug token: ${r}
+
+`;var a=t?.options.appId,o=t?.options.projectId;return e=e+(o&&a?`You can do so in the Firebase Console:
+`+`https://console.firebase.google.com/project/${o}/appcheck/apps?selectedAppId=${a}
+
+`+`Or using the Firebase CLI:
+`+`firebase appcheck:debugtokens:create ${r} --project ${o} --app ${a}
+
+`:`You will need to add it to your app's App Check settings in the Firebase Console for it to work.
+
+`)+"Note: To keep your project secure, please revoke and delete this token using the\nFirebase Console or the CLI (`firebase appcheck:debugtokens:delete`) when you finish debugging.\n\nWarning: This debug token is a secret and should not be shared or uploaded to source code.\n\nDebug Token Guide: https://firebase.google.com/docs/app-check/web/debug-provider\nFirebase CLI install instructions: https://firebase.google.com/docs/cli\n",console.log(e),t=r,Q(Y,t).catch(e=>_.warn("Failed to persist debug token to IndexedDB. Error: "+e)),r}}function A(){return u.enabled}async function T(){var e=u;if(e.enabled&&e.token)return e.token.promise;throw Error(`
+            Can't get debug token in production mode.
+        `)}function oe(e){var t,r=(()=>{if("undefined"!=typeof self)return self;if("undefined"!=typeof window)return window;if("undefined"!=typeof global)return global;throw new Error("Unable to locate global object.")})(),a=u;a.initialized=!0,"string"!=typeof r.FIREBASE_APPCHECK_DEBUG_TOKEN&&!0!==r.FIREBASE_APPCHECK_DEBUG_TOKEN||(a.enabled=!0,t=new s,a.token=t,"string"==typeof r.FIREBASE_APPCHECK_DEBUG_TOKEN?t.resolve(r.FIREBASE_APPCHECK_DEBUG_TOKEN):t.resolve(ae(e)))}let ie={error:"UNKNOWN_ERROR"};async function C(e,t=!1,r=!1){var a,o=e.app;b(o);let i=d(o),n=i.token,s=void 0;if(n&&!P(n)&&(i.token=void 0,n=void 0),n||(a=await i.cachedTokenPromise)&&(P(a)?n=a:await y(o,void 0)),!t&&n&&P(n))return{token:n.token};let h=!1;if(A())try{var c=await T(),l=(i.exchangeTokenPromise||(i.exchangeTokenPromise=E(q(o,c),e.heartbeatServiceProvider).finally(()=>{i.exchangeTokenPromise=void 0}),h=!0),await i.exchangeTokenPromise);return await y(o,l),{token:(i.token=l).token}}catch(e){return"appCheck/throttled"===e.code||"appCheck/initial-throttle"===e.code?_.warn(e.message):r&&_.error(e),I(e)}try{i.exchangeTokenPromise||(i.exchangeTokenPromise=i.provider.getToken().finally(()=>{i.exchangeTokenPromise=void 0}),h=!0),n=await d(o).exchangeTokenPromise}catch(e){"appCheck/throttled"===e.code||"appCheck/initial-throttle"===e.code?_.warn(e.message):r&&_.error(e),s=e}let p;return n?s?p=P(n)?{token:n.token,internalError:s}:I(s):(p={token:n.token},await y(o,i.token=n)):p=I(s),h&&se(o,p),p}function S(t,e,r,a){var o=t.app,o=d(o),i={next:r,error:a,type:e};if(o.tokenObservers=[...o.tokenObservers,i],o.token&&P(o.token)){let e=o.token;Promise.resolve().then(()=>{r({token:e.token}),ne(t)}).catch(()=>{})}o.cachedTokenPromise.then(()=>ne(t))}function R(e,t){var r=d(e),a=r.tokenObservers.filter(e=>e.next!==t);0===a.length&&r.tokenRefresher&&r.tokenRefresher.isRunning()&&r.tokenRefresher.stop(),r.tokenObservers=a}function ne(e){var t=e.app,t=d(t);let r=t.tokenRefresher;r||(r=(r=>{let a=r.app;return new U(async()=>{var e=d(a);let t;if((t=e.token?await C(r,!0):await C(r)).error)throw t.error;if(t.internalError)throw t.internalError},()=>!0,()=>{var e,t=d(a);return t.token?(e=t.token.issuedAtTimeMillis+.5*(t.token.expireTimeMillis-t.token.issuedAtTimeMillis)+3e5,t=t.token.expireTimeMillis-3e5,e=Math.min(e,t),Math.max(0,e-Date.now())):0},K.RETRIAL_MIN_WAIT,K.RETRIAL_MAX_WAIT)})(e),t.tokenRefresher=r),!r.isRunning()&&t.isTokenAutoRefreshEnabled&&r.start()}function se(e,t){var r;for(r of d(e).tokenObservers)try{"EXTERNAL"===r.type&&null!=t.error?r.error(t.error):r.next(t)}catch(e){}}function P(e){return 0<e.expireTimeMillis-Date.now()}function I(e){return{token:(t=ie,r.encodeString(JSON.stringify(t),!1)),error:e};var t}let he=class{constructor(e,t){this.app=e,this.heartbeatServiceProvider=t}_delete(){var e,t=d(this.app).tokenObservers;for(e of t)R(this.app,e.next);return Promise.resolve()}};function ce(t){return{getToken:e=>C(t,e),getLimitedUseToken:()=>(async e=>{var t=e.app,r=(b(t),d(t)).provider;return A()?{token:t=((t=q(t,await T())).body.limited_use=!0,await E(t,e.heartbeatServiceProvider)).token}:{token:t=(await r.getToken(!0)).token}})(t),addTokenListener:e=>S(t,"INTERNAL",e),removeTokenListener:e=>R(t.app,e)}}let le="https://www.google.com/recaptcha/api.js",pe="https://www.google.com/recaptcha/enterprise.js";function ue(t,r){let a=new s;d(t).reCAPTCHAState={initialized:a};let o=ge(t);var e,i=v(!1);return i?D(t,r,i,o,a):(e=()=>{var e=v(!1);if(!e)throw new Error("no recaptcha");D(t,r,e,o,a)},(i=document.createElement("script")).src=le,i.onload=e,document.head.appendChild(i)),a.promise}function de(t,r){let a=new s;d(t).reCAPTCHAState={initialized:a};let o=ge(t);var e,i=v(!0);return i?D(t,r,i,o,a):(e=()=>{var e=v(!0);if(!e)throw new Error("no recaptcha");D(t,r,e,o,a)},(i=document.createElement("script")).src=pe+"?render=explicit",i.onload=e,document.head.appendChild(i)),a.promise}function D(a,o,i,n,s){i.ready(()=>{var e,t,r;e=a,t=i.render(n,{sitekey:o,size:"invisible",callback:()=>{d(e).reCAPTCHAState.succeeded=!0},"error-callback":()=>{d(e).reCAPTCHAState.succeeded=!1}}),(r=d(e)).reCAPTCHAState={...r.reCAPTCHAState,widgetId:t},s.resolve(i)})}function ge(e){var t="fire_app_check_"+e.name,r=document.createElement("div");return r.id=t,r.style.display="none",document.body.appendChild(r),t}async function fe(a){b(a);let o=await d(a).reCAPTCHAState.initialized.promise;return new Promise((e,t)=>{let r=d(a).reCAPTCHAState;o.ready(()=>{e(o.execute(r.widgetId,{action:"fire_app_check"}))})})}class N{constructor(e){this._siteKey=e,this._throttleData=null}async getToken(e=!1){be(this._throttleData);var t=await fe(this._app).catch(e=>{throw f.create("recaptcha-error")});if(!d(this._app).reCAPTCHAState?.succeeded)throw f.create("recaptcha-error");let r;try{var a=((e,t)=>{var{projectId:r,appId:a,apiKey:o}=e.options;return{url:g+`/projects/${r}/apps/${a}:exchangeRecaptchaV3Token?key=`+o,body:{recaptcha_v3_token:t}}})(this._app,t);e&&(a.body.limited_use=!0),r=await E(a,this._heartbeatServiceProvider)}catch(e){throw e.code?.includes("fetch-status-error")?(this._throttleData=ve(Number(e.customData?.httpStatus),this._throttleData),f.create("initial-throttle",{time:k(this._throttleData.allowRequestsAfter-Date.now()),httpStatus:this._throttleData.httpStatus})):e}return this._throttleData=null,r}initialize(e){this._app=e,this._heartbeatServiceProvider=ye._getProvider(e,"heartbeat"),ue(e,this._siteKey).catch(()=>{})}isEqual(e){return e instanceof N&&this._siteKey===e._siteKey}}class O{constructor(e){this._siteKey=e,this._throttleData=null}async getToken(e=!1){be(this._throttleData);var t=await fe(this._app).catch(e=>{throw f.create("recaptcha-error")});if(!d(this._app).reCAPTCHAState?.succeeded)throw f.create("recaptcha-error");let r;try{var a=((e,t)=>{var{projectId:r,appId:a,apiKey:o}=e.options;return{url:g+`/projects/${r}/apps/${a}:exchangeRecaptchaEnterpriseToken?key=`+o,body:{recaptcha_enterprise_token:t}}})(this._app,t);e&&(a.body.limited_use=!0),r=await E(a,this._heartbeatServiceProvider)}catch(e){throw e.code?.includes("fetch-status-error")?(this._throttleData=ve(Number(e.customData?.httpStatus),this._throttleData),f.create("initial-throttle",{time:k(this._throttleData.allowRequestsAfter-Date.now()),httpStatus:this._throttleData.httpStatus})):e}return this._throttleData=null,r}initialize(e){this._app=e,this._heartbeatServiceProvider=ye._getProvider(e,"heartbeat"),de(e,this._siteKey).catch(()=>{})}isEqual(e){return e instanceof O&&this._siteKey===e._siteKey}}class L{constructor(e){this._customProviderOptions=e}async getToken(){var e=await this._customProviderOptions.getToken(),t=H(e.token),t=null!==t&&t<Date.now()&&0<t?1e3*t:Date.now();return{...e,issuedAtTimeMillis:t}}initialize(e){this._app=e}isEqual(e){return e instanceof L&&this._customProviderOptions.getToken.toString()===e._customProviderOptions.getToken.toString()}}function ve(e,t){var r,a,o;return 404===e||403===e?{backoffCount:1,allowRequestsAfter:Date.now()+864e5,httpStatus:e}:(r=t?t.backoffCount:0,t=2,a=1e3*Math.pow(t,r),o=Math.round(F*a*(Math.random()-.5)*2),a=Math.min(x,a+o),{backoffCount:r+1,allowRequestsAfter:Date.now()+a,httpStatus:e})}function be(e){if(e&&Date.now()-e.allowRequestsAfter<=0)throw f.create("throttled",{time:k(e.allowRequestsAfter-Date.now()),httpStatus:e.httpStatus})}function ke(e=ye.getApp(),r){e=(n=e)&&n._delegate?n._delegate:n;var t=ye._getProvider(e,"app-check");if(u.initialized||oe(e),A()&&T().then(e=>{console.log("Firebase App Check debug token: "+e)}),t.isInitialized()){var a=t.getImmediate(),o=t.getOptions();if(o&&!!o.isTokenAutoRefreshEnabled==!!r.isTokenAutoRefreshEnabled&&o.provider?.isEqual(r.provider))return a;throw f.create("already-initialized",{appName:e.name})}o=t.initialize({options:r});{var[i,n,r=!1]=[e,r.provider,r.isTokenAutoRefreshEnabled];let t=((e,t)=>(l.set(e,t),l.get(e)))(i,{...p});t.activated=!0,t.provider=n,t.cachedTokenPromise=re(i).then(e=>(e&&P(e)&&(t.token=e,se(i,{token:e.token})),e)),t.isTokenAutoRefreshEnabled=r&&i.automaticDataCollectionEnabled,!i.automaticDataCollectionEnabled&&r&&_.warn("`isTokenAutoRefreshEnabled` is true but `automaticDataCollectionEnabled` was set to false during `initializeApp()`. This blocks automatic token refresh."),t.provider.initialize(i)}return d(e).isTokenAutoRefreshEnabled&&S(o,"INTERNAL",()=>{}),o}let we="app-check-internal";ye._registerComponent(new e("app-check",e=>{var t,r=e.getProvider("app").getImmediate(),a=e.getProvider("heartbeat");return e=r,t=a,new he(e,t)},"PUBLIC").setInstantiationMode("EXPLICIT").setInstanceCreatedCallback((e,t,r)=>{e.getProvider(we).initialize()})),ye._registerComponent(new e(we,e=>ce(e.getProvider("app-check").getImmediate()),"PUBLIC").setInstantiationMode("EXPLICIT")),ye.registerVersion("@firebase/app-check","0.13.1");let M=new o("appCheck","AppCheck",{"use-before-activation":"App Check is being used before activate() is called for FirebaseApp {$appName}. Call activate() before instantiating other Firebase services."});class Ee{constructor(e){this.app=e}activate(e,t){let r;r="string"==typeof e?new N(e):e instanceof O||e instanceof N||e instanceof L?e:new L({getToken:e.getToken}),this._delegate=ke(this.app,{provider:r,isTokenAutoRefreshEnabled:t})}setTokenAutoRefreshEnabled(e){if(!this._delegate)throw M.create("use-before-activation",{appName:this.app.name});var t,r;t=this._delegate,e=e,(r=d(t.app)).tokenRefresher&&(!0===e?r.tokenRefresher.start():r.tokenRefresher.stop()),r.isTokenAutoRefreshEnabled=e}getToken(e){if(this._delegate)return(async(e,t)=>{var r=await C(e,t);if(r.error)throw r.error;if(r.internalError)throw r.internalError;return{token:r.token}})(this._delegate,e);throw M.create("use-before-activation",{appName:this.app.name})}onTokenChanged(r,a,e){if(this._delegate){var o=this._delegate;let e=()=>{},t=()=>{};return e=null!=r.next?r.next.bind(r):r,null!=r.error?t=r.error.bind(r):a&&(t=a),S(o,"EXTERNAL",e,t),()=>R(o.app,e)}throw M.create("use-before-activation",{appName:this.app.name})}}let me=e=>{var t=e.getProvider("app-compat").getImmediate();return new Ee(t)};_e.INTERNAL.registerComponent(new e("appCheck-compat",me,"PUBLIC").setServiceProps({ReCaptchaEnterpriseProvider:O,ReCaptchaV3Provider:N,CustomProvider:L})),_e.registerVersion("@firebase/app-check-compat","0.4.7")}).apply(this,arguments)}catch(e){throw console.error(e),new Error("Cannot instantiate firebase-app-check-compat.js - be sure to load firebase-app.js first.")}});
+
+</script>
+<script>
+/* Bot protection: Firebase App Check with Google Fraud Defense (invisible). Adds a token to database requests. */
+(function(){
+  try {
+    if (!window.firebase || !firebase.appCheck) return;
+    if (!firebase.apps.length) firebase.initializeApp({apiKey:"AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI",authDomain:"ifixphones-ca10e.firebaseapp.com",projectId:"ifixphones-ca10e",storageBucket:"ifixphones-ca10e.firebasestorage.app",messagingSenderId:"230387153893",appId:"1:230387153893:web:ddbdac71ff0b1c56284d0c"});
+    var ac = firebase.appCheck();
+    ac.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider("6LdHexcuAAAAADCVpbaYhNkujz-cz2o-S3rcdp7C"), true);
+    var raw = window.fetch.bind(window);
+    window.fetch = function(u, o){
+      if (String(u && u.url || u).indexOf('firestore.googleapis.com') < 0) return raw(u, o);
+      var tok = Promise.race([ac.getToken(false).then(function(r){ return r && r.token; }), new Promise(function(r){ setTimeout(function(){ r(''); }, 2500); })]).catch(function(){ return ''; });
+      return tok.then(function(t){ o = Object.assign({}, o || {}); var h = new Headers(o.headers || {}); if (t) h.set('X-Firebase-AppCheck', t); o.headers = h; return raw(u, o); });
+    };
+  } catch (e) {}
+})();
+</script>
+<script>
+(function(){
+  'use strict';
+  var CATALOG = {
+  'Apple iPhone': ['iPhone 18 Pro Max','iPhone 18 Pro','iPhone Duo','iPhone 17 Pro Max','iPhone 17 Pro','iPhone Air','iPhone 17','iPhone 17e','iPhone 16 Pro Max','iPhone 16 Pro','iPhone 16 Plus','iPhone 16','iPhone 16e','iPhone 15 Pro Max','iPhone 15 Pro','iPhone 15 Plus','iPhone 15','iPhone 14 Pro Max','iPhone 14 Pro','iPhone 14 Plus','iPhone 14','iPhone 13 Pro Max','iPhone 13 Pro','iPhone 13','iPhone 13 mini','iPhone 12 Pro Max','iPhone 12 Pro','iPhone 12','iPhone 12 mini','iPhone 11 Pro Max','iPhone 11 Pro','iPhone 11','iPhone SE (3rd gen)','iPhone SE (2nd gen)','iPhone XS Max','iPhone XS','iPhone XR','iPhone X','iPhone 8 Plus','iPhone 8','iPhone 7 Plus','iPhone 7'],
+  'Apple iPad': ['iPad Pro 13" (M5)','iPad Pro 11" (M5)','iPad Pro 13" (M4)','iPad Pro 11" (M4)','iPad Pro 12.9" (6th gen)','iPad Pro 11" (4th gen)','iPad Air 13" (M3)','iPad Air 11" (M3)','iPad Air 13" (M2)','iPad Air 11" (M2)','iPad Air (5th gen)','iPad Air (4th gen)','iPad (A16)','iPad (10th gen)','iPad (9th gen)','iPad (8th gen)','iPad (7th gen)','iPad mini (A17 Pro)','iPad mini (6th gen)','iPad mini (5th gen)'],
+  'Samsung': ['Galaxy S26 Ultra','Galaxy S26+','Galaxy S26','Galaxy S25 Ultra','Galaxy S25+','Galaxy S25','Galaxy S25 Edge','Galaxy S25 FE','Galaxy S24 Ultra','Galaxy S24+','Galaxy S24','Galaxy S24 FE','Galaxy S23 Ultra','Galaxy S23+','Galaxy S23','Galaxy S23 FE','Galaxy S22 Ultra','Galaxy S22+','Galaxy S22','Galaxy S21 Ultra','Galaxy S21','Galaxy Z Fold 8 Ultra','Galaxy Z Fold 8','Galaxy Z Flip 8','Galaxy Z Fold 7','Galaxy Z Flip 7','Galaxy Z Flip 7 FE','Galaxy Z Fold 6','Galaxy Z Flip 6','Galaxy Z Fold 5','Galaxy Z Flip 5','Galaxy A57','Galaxy A37','Galaxy A27','Galaxy A17','Galaxy A56','Galaxy A36','Galaxy A26','Galaxy A16','Galaxy A55','Galaxy A35','Galaxy A25','Galaxy A15','Galaxy A54','Galaxy A14','Galaxy Tab S10','Galaxy Tab S9','Galaxy Tab A9'],
+  'Google Pixel': ['Pixel 11 Pro XL','Pixel 11 Pro','Pixel 11','Pixel 11 Pro Fold','Pixel 10a','Pixel 10 Pro XL','Pixel 10 Pro','Pixel 10','Pixel 10 Pro Fold','Pixel 9a','Pixel 9 Pro XL','Pixel 9 Pro','Pixel 9','Pixel 9 Pro Fold','Pixel 8a','Pixel 8 Pro','Pixel 8','Pixel 7a','Pixel 7 Pro','Pixel 7','Pixel 6a','Pixel 6 Pro','Pixel 6'],
+  'Motorola': ['Moto G Stylus','Moto G Power','Moto G','Moto G Play','Edge','Razr','Razr+'],
+  'OnePlus': ['OnePlus 13','OnePlus 13R','OnePlus 12','OnePlus 12R','OnePlus 11','OnePlus Nord N30'],
+  'Other': []
+};
+function partTypes(brand, model){
+  var m = String(model||'');
+  if (brand === 'Apple iPhone') {
+    var oledOnly = /iPhone (1[7-9]|2\d)|iPhone Air|iPhone Duo/.test(m) && !/\d+e\b/.test(m);
+    var oled = oledOnly || /(1[3-9]|2\d) Pro/.test(m);
+    return (oledOnly ? [] : ['Screen · Incell']).concat(oled ? ['Screen · OLED'] : []).concat(['Screen · Original','Battery','Charging port']).concat(/iPhone [78]\b|iPhone 7 Plus/.test(m) ? [] : ['Back glass']).concat(['Rear camera']);
+  }
+  if (brand === 'Apple iPad' || /Tab/.test(m)) return ['Screen / digitizer','LCD','Battery','Charging port'];
+  if (/Fold/.test(m)) return ['Inner screen','Outer screen','Battery','Charging port','Back glass'];
+  return ['Screen','Battery','Charging port','Back glass','Rear camera'];
+}
+function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 140); }
+
+
+  var API_KEY = 'AIzaSyADty-4Af9uDsTSY5MDUr0pfDlSF3HS9DI';
+  var BASE = 'https://firestore.googleapis.com/v1/projects/ifixphones-ca10e/databases/(default)/documents/';
+  var IDLE_MS = 90000, IDLE_COUNT = 20, DONE_COUNT = 12;
+  function api(path){ return BASE + path + '?key=' + API_KEY; }
+  var $ = function(id){ return document.getElementById(id); };
+  var $$ = function(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+  /* ---------- words (English / Español) ---------- */
+  var STR = {
+    en: {
+      w_h:'Welcome in.', w_p:'Check in here. It takes about a minute.', w_btn:'Start check-in',
+      back:'Back', over:'Start over', stepof:'Step {n} of {t}', continue:'Continue', optional:'(optional)',
+      you_h:'First, a little about you.', you_p:'We’ll text you when your phone is ready.',
+      name_l:'Full name', name_e:'Please enter your name.', phone_l:'Mobile number', phone_e:'Please enter a 10-digit number.',
+      email_l:'Email', email_o:'(optional, for your receipt)', email_e:'That email doesn’t look right.',
+      heard_l:'How did you hear about us?',
+      dev_h:'What are we fixing?', brand_l:'Your device', other:'Other', model_s:'Search your model', model_ph:'Search your model, e.g. 15 Pro',
+      nomatch:'No match. Check the spelling, or pick “Other” and type it.', mmore:'Show all models', mfree_l:'Type your device', change:'Change',
+      model_help:'Not sure? Settings → General → About.', model_e:'Please pick your model.',
+      rep_l:'What needs fixing?', rep_o:'Pick all that apply.', rep_e:'Pick at least one.',
+      notes_l:'Anything else we should know?', notes_ph:'Dropped it yesterday. Screen has lines, touch still works.',
+      scr_h:'Choose your screen.', scr_p:'Here’s how they compare. Your technician confirms the price before we start.',
+      scr_e:'Pick a screen, or choose “Help me choose at the counter.”', instock:'In stock',
+      r_black:'Deep blacks', r_color:'Color', r_bright:'Brightness', r_touch:'Touch', thick:'Thickness', warr:'Warranty', price:'Price',
+      unsure_n:'Help me choose at the counter', unsure_d:'We’ll show you the options in person.',
+      sign_h:'Review and sign.', pol_h:'The short version of our policy', readall:'Read the full policy',
+      bk_l:'Is your phone backed up?', bk_tip:'No problem. If your phone still turns on, ask us and we’ll help you back it up first.',
+      agree:'I’ve read and agree to the iFixPhones Warranty and Repair Policy, I’ll back up my data, and iFixPhones may text me about this repair.',
+      sig_l:'Sign with your finger', clear:'Clear', sig_ph:'Sign here', signote:'Can’t sign here? Just let us know at the counter.',
+      need_both:'Please check the box and sign to finish.', need_box:'Please check the box to finish.', need_sig:'Please sign to finish.',
+      go:'Check me in', sending:'Checking you in…', retry:'Try again', send_e:'That didn’t go through. Try again, or let us know at the counter.',
+      done_h:'You’re checked in, {name}.', done_p:'Have a seat. We’ll call your name in a moment. We’ll text {phone} when it’s ready.',
+      finish:'Done', count:'This screen resets in {n} seconds.', count1:'This screen resets in 1 second.',
+      idle_h:'Still there?', idle_p:'For your privacy, this check-in will clear in {n} seconds.', keep:'Keep going',
+      ask_h:'Start over?', ask_p:'This clears everything you’ve entered.',
+      p1:'<b>Back up your phone</b> before any repair. We aren’t responsible for lost data.',
+      p2:'<b>Soft OLED screens:</b> 30-day warranty for glitches only. Drops, pressure, bending or liquid aren’t covered.',
+      p3:'<b>Incell screens:</b> no warranty. We test every screen with you before you pay.',
+      p4:'<b>New damage</b> isn’t covered and voids the warranty.',
+      p5:'<b>Opening a phone has real risks,</b> even when done right. We’ll explain them first.',
+      p6:'<b>We quote before we start,</b> and payment is due when the repair is done.',
+      sp_l:'Add a screen protector?', sp_help:'We install it for you. Privacy means people next to you can’t see your screen.', sp_no:'No thanks', tax:'+ tax',
+      langbtn:'Español'
+    },
+    es: {
+      w_h:'Bienvenido.', w_p:'Regístrese aquí. Toma como un minuto.', w_btn:'Comenzar registro',
+      back:'Atrás', over:'Empezar de nuevo', stepof:'Paso {n} de {t}', continue:'Continuar', optional:'(opcional)',
+      you_h:'Primero, cuéntenos sobre usted.', you_p:'Le enviaremos un mensaje cuando su teléfono esté listo.',
+      name_l:'Nombre completo', name_e:'Escriba su nombre.', phone_l:'Número de celular', phone_e:'Escriba un número de 10 dígitos.',
+      email_l:'Correo electrónico', email_o:'(opcional, para su recibo)', email_e:'Ese correo no parece correcto.',
+      heard_l:'¿Cómo supo de nosotros?',
+      dev_h:'¿Qué vamos a reparar?', brand_l:'Su dispositivo', other:'Otro', model_s:'Busque su modelo', model_ph:'Busque su modelo, ej. 15 Pro',
+      nomatch:'No lo encontramos. Revise cómo lo escribió, o elija “Otro” y escríbalo.', mmore:'Ver todos los modelos', mfree_l:'Escriba su dispositivo', change:'Cambiar',
+      model_help:'¿No sabe? Ajustes → General → Información.', model_e:'Elija su modelo.',
+      rep_l:'¿Qué necesita reparación?', rep_o:'Elija todo lo que aplique.', rep_e:'Elija al menos una opción.',
+      notes_l:'¿Algo más que debamos saber?', notes_ph:'Se me cayó ayer. La pantalla tiene líneas, pero el táctil funciona.',
+      scr_h:'Elija su pantalla.', scr_p:'Así se comparan. Su técnico le confirma el precio antes de empezar.',
+      scr_e:'Elija una pantalla, o “Ayúdenme a elegir en el mostrador”.', instock:'En existencia',
+      r_black:'Negros profundos', r_color:'Color', r_bright:'Brillo', r_touch:'Táctil', thick:'Grosor', warr:'Garantía', price:'Precio',
+      unsure_n:'Ayúdenme a elegir en el mostrador', unsure_d:'Le mostramos las opciones en persona.',
+      sign_h:'Revise y firme.', pol_h:'Nuestra política, en resumen', readall:'Leer la política completa',
+      bk_l:'¿Tiene respaldo de su teléfono?', bk_tip:'No hay problema. Si su teléfono todavía prende, pídanos ayuda y lo respaldamos primero.',
+      agree:'Leí y acepto la Política de Garantía y Reparación de iFixPhones, respaldaré mis datos, y iFixPhones puede enviarme mensajes de texto sobre esta reparación.',
+      sig_l:'Firme con su dedo', clear:'Borrar', sig_ph:'Firme aquí', signote:'¿No puede firmar aquí? Avísenos en el mostrador.',
+      need_both:'Marque la casilla y firme para terminar.', need_box:'Marque la casilla para terminar.', need_sig:'Firme para terminar.',
+      go:'Registrarme', sending:'Registrando…', retry:'Intentar de nuevo', send_e:'No se pudo enviar. Intente de nuevo o avísenos en el mostrador.',
+      done_h:'¡Listo, {name}! Ya está registrado.', done_p:'Tome asiento. En un momento le llamamos. Le enviaremos un mensaje al {phone} cuando esté listo.',
+      finish:'Listo', count:'Esta pantalla se reinicia en {n} segundos.', count1:'Esta pantalla se reinicia en 1 segundo.',
+      idle_h:'¿Sigue ahí?', idle_p:'Por su privacidad, este registro se borrará en {n} segundos.', keep:'Continuar',
+      ask_h:'¿Empezar de nuevo?', ask_p:'Esto borra todo lo que escribió.',
+      p1:'<b>Respalde su teléfono</b> antes de cualquier reparación. No somos responsables por datos perdidos.',
+      p2:'<b>Pantallas Soft OLED:</b> garantía de 30 días solo por fallas de la pantalla. No cubre caídas, presión, dobleces ni líquidos.',
+      p3:'<b>Pantallas Incell:</b> sin garantía. Probamos cada pantalla con usted antes de que pague.',
+      p4:'<b>Daños nuevos</b> no están cubiertos y anulan la garantía.',
+      p5:'<b>Abrir un teléfono tiene riesgos reales,</b> aun cuando se hace bien. Se los explicamos primero.',
+      p6:'<b>Le damos el precio antes de empezar,</b> y el pago se hace cuando la reparación esté lista.',
+      sp_l:'¿Agregar un protector de pantalla?', sp_help:'Se lo instalamos. El de privacidad evita que las personas a su lado vean su pantalla.', sp_no:'No, gracias', tax:'+ impuesto',
+      langbtn:'English'
+    }
+  };
+  var LANG = 'en';
+  function t(k, v){ var s = (STR[LANG][k] != null ? STR[LANG][k] : STR.en[k]) || ''; if (v) Object.keys(v).forEach(function(x){ s = s.split('{' + x + '}').join(v[x]); }); return s; }
+
+  /* repairs, sources and screen options. Values sent to the shop are always in English. */
+  var REPAIRS = [
+    ['Screen','Pantalla','<rect x="9" y="3" width="16" height="28" rx="3.5"/><path d="M13 12l4 4-2 3 4 4"/>'],
+    ['Battery','Batería','<rect x="5" y="11" width="22" height="12" rx="3"/><path d="M30 15v4M10 15v4M14 15v4"/>'],
+    ['Charging port','Puerto de carga','<path d="M19 4l-8 15h7l-3 11 9-16h-7z"/>'],
+    ['Back glass','Vidrio trasero','<rect x="9" y="3" width="16" height="28" rx="3.5"/><rect x="12" y="6" width="7" height="7" rx="2"/>'],
+    ['Camera','Cámara','<rect x="4" y="9" width="26" height="19" rx="4"/><circle cx="17" cy="18.5" r="5"/><path d="M12 9l2-3h6l2 3"/>'],
+    ['Water damage','Daño por agua','<path d="M17 4c5 7 8 11 8 15a8 8 0 0 1-16 0c0-4 3-8 8-15z"/>'],
+    ['Speaker or mic','Bocina o micrófono','<path d="M5 14v6h5l7 6V8l-7 6z"/><path d="M22 13c1.5 1.3 1.5 6.7 0 8M26 10c3 3 3 11 0 14"/>'],
+    ['Buttons','Botones','<rect x="8" y="3" width="16" height="28" rx="3.5"/><path d="M27 9v6M27 18v3"/>'],
+    ['Not sure','No estoy seguro','<circle cx="17" cy="17" r="13"/><path d="M13.5 13.5a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3v.5"/><path d="M17 24h.01"/>']
+  ];
+  var HEARD = [['Google','Google'],['Google Maps','Google Maps'],['TikTok','TikTok'],['Instagram','Instagram'],['Friend or family','Un amigo o familiar'],['Drove by','Pasé por aquí'],['Been here before','Ya he venido antes']];
+  var BACKUP = [['Yes','Sí'],['No','No'],['Not sure','No estoy seguro']];
+  /* screen protectors: names match the shop app's accessories; prices come from the shop app (Settings → Accessory prices) */
+  var PROT = [['spReg','Screen protector · Regular','Regular','Regular','Protector regular'],['spPriv','Screen protector · Privacy','Privacy','Privacidad','Protector de privacidad']];
+  var BRANDS = [['Apple iPhone','iPhone','iPhone'],['Samsung','Samsung','Samsung'],['Apple iPad','iPad','iPad'],['Google Pixel','Pixel','Pixel'],['Other','Other','Otro']];
+  var TIERS = {
+    incell:{part:'Screen · Incell', send:'Incell', name:'Incell', tag:['Best price','Mejor precio'], r:{black:2,color:3,bright:3,touch:3}, th:15, thl:['Thicker','Más gruesa'], price:'$', warr:['None','Ninguna'],
+      d:['An LCD-style replacement at the lowest price. Blacks look a little gray, colors are softer, and it can use a bit more battery. Not recommended for long-term use.',
+         'Una pantalla tipo LCD al precio más bajo. Los negros se ven un poco grises, los colores son más suaves y puede gastar un poco más de batería. No la recomendamos para uso a largo plazo.']},
+    oled:{part:'Screen · OLED', send:'OLED', name:'Soft OLED', tag:['Our best aftermarket screen','Nuestra mejor pantalla de reemplazo'], star:true, r:{black:5,color:4,bright:4,touch:4}, th:9, thl:['Thin','Delgada'], price:'$$', warr:['30 days, glitches only','30 días, solo fallas de pantalla'],
+      d:['True deep blacks and bright, sharp color like the original, for a lot less.',
+         'Negros profundos de verdad y colores brillantes y nítidos como la original, por mucho menos.']},
+    original:{part:'Screen · Original', send:'Original', name:'Original', tag:['Closest to factory','Lo más parecido a la de fábrica'], r:{black:5,color:5,bright:5,touch:5}, th:8, thl:['Thinnest','La más delgada'], price:'$$$', warr:['Select phones','Algunos modelos'],
+      d:['A refurbished original screen, or a brand-new genuine Apple part for a higher price. Factory color, brightness and touch.',
+         'Una pantalla original reacondicionada, o una pieza nueva genuina de Apple a un precio más alto. Color, brillo y táctil de fábrica.']}
+  };
+  function L(pair){ return LANG === 'es' ? pair[1] : pair[0]; }
+
+  /* ---------- state ---------- */
+  var step = -1, flowAt = 0, chosen = [], brand = '', model = '', showAll = false, tier = '', heard = '', backup = '';
+  var idleT = 0, idleTick = 0, doneTick = 0, sending = false, STOCK = {}, ACC = {}, prot = '';
+
+  /* ---------- this iPad's key (set up from the shop app) ---------- */
+  var KEY = ''; try { KEY = localStorage.getItem('ifx_kiosk_key') || ''; } catch(e) {}
+  function saveKey(k){ KEY = k || ''; try { if (KEY) localStorage.setItem('ifx_kiosk_key', KEY); else localStorage.removeItem('ifx_kiosk_key'); } catch(e) {} }
+  function verify(){
+    if (!/^[A-Za-z0-9]{32}$/.test(KEY)) return Promise.resolve(false);
+    return fetch(api('kiosks/' + KEY), {cache:'no-store'}).then(function(r){
+      if (r.status === 403 || r.status === 404) return false;
+      if (!r.ok) return true;
+      return r.json().then(function(j){
+        var f = j && j.fields && j.fields.stock && j.fields.stock.mapValue && j.fields.stock.mapValue.fields || {};
+        STOCK = {}; Object.keys(f).forEach(function(k){ if (f[k] && f[k].booleanValue) STOCK[k] = 1; });
+        var a = j.fields.acc && j.fields.acc.mapValue && j.fields.acc.mapValue.fields || {};
+        ACC = {}; Object.keys(a).forEach(function(k){ var v = a[k].integerValue != null ? +a[k].integerValue : a[k].doubleValue; if (v > 0) ACC[k] = v; });
+        paintProt();
+        return true;
+      }).catch(function(){ return true; });
+    }).catch(function(){ return true; });
+  }
+  function recheck(){ verify().then(function(ok){ if (!ok) { saveKey(''); lock(); } }); }
+
+  /* ---------- static text ---------- */
+  function applyLang(){
+    document.documentElement.lang = LANG;
+    $$('[data-t]').forEach(function(el){ el.textContent = t(el.getAttribute('data-t')); });
+    $$('[data-tp]').forEach(function(el){ el.setAttribute('placeholder', t(el.getAttribute('data-tp'))); });
+    $$('[data-th]').forEach(function(el){ el.innerHTML = t(el.getAttribute('data-th')); });
+    $$('[data-lang]').forEach(function(b){ b.textContent = t('langbtn'); b.setAttribute('lang', LANG === 'en' ? 'es' : 'en'); });
+    $('esnote').classList.toggle('hidden', LANG !== 'es');
+    if (!$('s3').classList.contains('hidden')) fillYou();
+    paintTiles(); paintProt(); paintChips('heard', HEARD, heard); paintChips('backup', BACKUP, backup); paintBrands(); paintModels(); paintTiers(); stepHeader();
+    if (!$('err').textContent) {} else recheckErr();
+    if ($('go').textContent && !sending) $('go').textContent = t('go');
+  }
+  $$('[data-lang]').forEach(function(b){ b.addEventListener('click', function(){ LANG = LANG === 'en' ? 'es' : 'en'; applyLang(); }); });
+
+  /* ---------- chips & tiles ---------- */
+  function paintChips(id, list, val){
+    $(id).innerHTML = list.map(function(o){ return '<button type="button" class="chip" aria-pressed="'+(o[0]===val)+'" data-v="'+o[0]+'">'+L(o)+'</button>'; }).join('');
+  }
+  $('heard').addEventListener('click', function(e){ var b = e.target.closest('.chip'); if (!b) return; var v = b.getAttribute('data-v'); heard = heard === v ? '' : v; paintChips('heard', HEARD, heard); });
+  $('backup').addEventListener('click', function(e){ var b = e.target.closest('.chip'); if (!b) return; var v = b.getAttribute('data-v'); backup = backup === v ? '' : v; paintChips('backup', BACKUP, backup); $('bk-tip').classList.toggle('hidden', !(backup === 'No' || backup === 'Not sure')); });
+
+  function money(v){ return '$' + (Math.round(v) === v ? v : v.toFixed(2)); }
+  function paintProt(){
+    $('prot').innerHTML = PROT.map(function(o){
+      var pr = ACC[o[0]] ? ' · ' + money(ACC[o[0]]) + ' <span class="opt">' + t('tax') + '</span>' : '';
+      return '<button type="button" class="chip" aria-pressed="'+(prot===o[0])+'" data-v="'+o[0]+'">'+(LANG==='es'?o[3]:o[2])+pr+'</button>';
+    }).join('') + '<button type="button" class="chip" aria-pressed="'+(prot==='none')+'" data-v="none">'+t('sp_no')+'</button>';
+  }
+  $('prot').addEventListener('click', function(e){ var b = e.target.closest('.chip'); if (!b) return; var v = b.getAttribute('data-v'); prot = prot === v ? '' : v; paintProt(); });
+  function protName(){ var o = PROT.filter(function(x){ return x[0] === prot; })[0]; return o ? o[1] : ''; }
+
+  function paintTiles(){
+    $('tiles').innerHTML = REPAIRS.map(function(r){
+      return '<button type="button" class="tile" aria-pressed="'+(chosen.indexOf(r[0])>-1)+'" data-r="'+r[0]+'"><svg viewBox="0 0 34 34" aria-hidden="true">'+r[2]+'</svg>'+(LANG==='es'?r[1]:r[0])+'</button>';
+    }).join('');
+  }
+  $('tiles').addEventListener('click', function(e){
+    var b = e.target.closest('.tile'); if (!b) return;
+    var r = b.getAttribute('data-r'), i = chosen.indexOf(r);
+    if (i > -1) chosen.splice(i, 1);
+    else if (r === 'Not sure') chosen = ['Not sure'];
+    else { chosen = chosen.filter(function(x){ return x !== 'Not sure'; }); chosen.push(r); }
+    if (chosen.indexOf('Screen') < 0) tier = '';
+    paintTiles(); $('tiles').classList.remove('bad'); $('rep-h').classList.add('hidden'); stepHeader();
+  });
+
+  /* ---------- device picker ---------- */
+  function paintBrands(){
+    $('brands').innerHTML = BRANDS.map(function(b){ return '<button type="button" class="chip" aria-pressed="'+(b[0]===brand)+'" data-b="'+b[0]+'">'+(LANG==='es'?b[2]:b[1])+'</button>'; }).join('');
+  }
+  $('brands').addEventListener('click', function(e){
+    var b = e.target.closest('.chip'); if (!b) return;
+    var nb = b.getAttribute('data-b'); if (nb === brand && !model) return;
+    brand = nb; model = ''; tier = ''; showAll = false; $('msearch').value = ''; $('mfree').value = '';
+    paintBrands(); paintModels(); modelOk(true);
+    if (brand === 'Other') $('mfree').focus();
+  });
+  function catalogFor(b){ return b === 'Other' ? [] : (CATALOG[b] || []); }
+  function matches(list, q){
+    var w = q.toLowerCase().replace(/iphone|galaxy|pixel|ipad/g, ' ').split(/\s+/).filter(Boolean);
+    if (!w.length) return list;
+    return list.filter(function(m){ var s = m.toLowerCase(); return w.every(function(x){ return s.indexOf(x) > -1; }); });
+  }
+  function paintModels(){
+    var has = !!brand, free = brand === 'Other';
+    $('mpick').classList.toggle('hidden', !has || free || !!model);
+    $('f-mfree').classList.toggle('hidden', !free);
+    $('picked').classList.toggle('hidden', !model || free);
+    $('pickedm').textContent = model;
+    if (!has || free || model) { $('mmore').classList.add('hidden'); $('nomatch').classList.add('hidden'); return; }
+    var q = $('msearch').value.trim(), list = matches(catalogFor(brand), q);
+    var cut = !q && !showAll && list.length > 12, shown = cut ? list.slice(0, 12) : list;
+    $('mgrid').innerHTML = shown.map(function(m){ return '<button type="button" class="mbtn" data-m="'+m.replace(/"/g,'&quot;')+'">'+m+'</button>'; }).join('');
+    $('mmore').classList.toggle('hidden', !cut);
+    $('nomatch').classList.toggle('hidden', list.length > 0);
+  }
+  $('msearch').addEventListener('input', function(){ paintModels(); modelOk(true); });
+  $('mmore').addEventListener('click', function(){ showAll = true; paintModels(); });
+  $('mgrid').addEventListener('click', function(e){ var b = e.target.closest('.mbtn'); if (!b) return; model = b.getAttribute('data-m'); tier = ''; paintModels(); modelOk(true); stepHeader(); });
+  $('mchange').addEventListener('click', function(){ model = ''; tier = ''; paintModels(); stepHeader(); $('msearch').focus(); });
+  $('mfree').addEventListener('input', function(){ modelOk(true); });
+  function deviceName(){
+    if (brand === 'Other') {
+      var typed = $('mfree').value.trim(), all = [];
+      Object.keys(CATALOG).forEach(function(b){ all = all.concat(CATALOG[b]); });
+      var exact = all.filter(function(m){ return m.toLowerCase() === typed.toLowerCase(); })[0];
+      return exact || typed;
+    }
+    return model;
+  }
+  function modelOk(quiet){
+    var ok = !!deviceName();
+    if (!quiet || ok) { $('model-h').textContent = ok || quiet ? t('model_help') : t('model_e'); $('model-h').classList.toggle('bad', !ok && !quiet); $('f-mfree').classList.toggle('bad', !ok && !quiet && brand === 'Other'); }
+    return ok;
+  }
+
+  /* ---------- screen options ---------- */
+  function tierKeys(){
+    if (brand !== 'Apple iPhone' || !model) return [];
+    return partTypes(brand, model).filter(function(p){ return /^Screen · /.test(p); }).map(function(p){ return p === 'Screen · Incell' ? 'incell' : p === 'Screen · OLED' ? 'oled' : 'original'; });
+  }
+  function needScreen(){ return chosen.indexOf('Screen') > -1 && tierKeys().length > 1; }
+  function dots(n){ var s = ''; for (var i = 0; i < 5; i++) s += '<i'+(i < n ? ' class="on"' : '')+'></i>'; return '<span class="d" aria-hidden="true">'+s+'</span>'; }
+  function paintTiers(){
+    var keys = tierKeys();
+    var html = keys.map(function(k){
+      var d = TIERS[k], inStock = !!STOCK[stockId(brand, model, d.part)];
+      var rate = function(key, lab){ return '<div class="rate"><span>'+lab+'</span>'+dots(d.r[key])+'<span class="sr">'+d.r[key]+' / 5</span></div>'; };
+      return '<button type="button" class="tier" role="radio" aria-checked="'+(tier===k)+'" data-k="'+k+'">' +
+        '<span class="top"><span class="nm">'+d.name+'</span><span class="pill'+(d.star?' star':'')+'">'+L(d.tag)+'</span>'+(inStock?'<span class="pill stock">✓ '+t('instock')+'</span>':'')+'<span class="radio" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></span>' +
+        '<span><span class="ds">'+L(d.d)+'</span><span class="meta"><span>'+t('warr')+': <b>'+L(d.warr)+'</b></span><span>'+t('price')+': <b>'+d.price+'</b></span></span></span>' +
+        '<span class="rates">'+rate('black', t('r_black'))+rate('color', t('r_color'))+rate('bright', t('r_bright'))+rate('touch', t('r_touch')) +
+          '<span class="thick"><span>'+t('thick')+'</span><span class="edge"><span style="height:'+d.th+'px"></span>'+L(d.thl)+'</span></span></span>' +
+      '</button>';
+    }).join('');
+    html += '<button type="button" class="tier unsure" role="radio" aria-checked="'+(tier==='unsure')+'" data-k="unsure"><span class="top"><span class="nm">'+t('unsure_n')+'</span><span class="radio" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></span><span class="ds">'+t('unsure_d')+'</span></button>';
+    $('tiers').innerHTML = keys.length ? html : '';
+  }
+  $('tiers').addEventListener('click', function(e){ var b = e.target.closest('.tier'); if (!b) return; tier = b.getAttribute('data-k'); paintTiers(); $('scr-h').classList.add('hidden'); });
+
+  /* ---------- phone number ---------- */
+  function digits(v){ return String(v||'').replace(/\D/g,''); }
+  function fmtPhone(v){ var d = digits(v); if (d.length === 11 && d[0] === '1') d = d.slice(1); d = d.slice(0,10); if (d.length < 4) return d; if (d.length < 7) return '(' + d.slice(0,3) + ') ' + d.slice(3); return '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6); }
+  $('phone').addEventListener('input', function(){ var p = this.selectionStart === this.value.length; this.value = fmtPhone(this.value); if (p) this.setSelectionRange(this.value.length, this.value.length); });
+
+  /* ---------- signature ---------- */
+  var SIG = (function(box){
+    var cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), drawing = false, has = false, last = null;
+    function size(){
+      var r = box.getBoundingClientRect(); if (!r.width) return;
+      var dpr = window.devicePixelRatio || 1, img = has ? cv.toDataURL() : null;
+      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineWidth = 2.8; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1d1d1f'; ctx.fillStyle = '#1d1d1f';
+      if (img) { var im = new Image(); im.onload = function(){ ctx.drawImage(im, 0, 0, r.width, r.height); }; im.src = img; }
+    }
+    function pt(e){ var r = cv.getBoundingClientRect(); return {x:e.clientX - r.left, y:e.clientY - r.top}; }
+    cv.addEventListener('pointerdown', function(e){ e.preventDefault(); drawing = true; last = pt(e); try { cv.setPointerCapture(e.pointerId); } catch(x) {} ctx.beginPath(); ctx.arc(last.x, last.y, 1.3, 0, Math.PI*2); ctx.fill(); if (!has) { has = true; box.classList.add('has'); box.classList.remove('bad'); recheckErr(); } });
+    cv.addEventListener('pointermove', function(e){ if (!drawing) return; var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e]; if (!evs.length) evs = [e]; ctx.beginPath(); ctx.moveTo(last.x, last.y); evs.forEach(function(ev){ var p = pt(ev); ctx.lineTo(p.x, p.y); last = p; }); ctx.stroke(); });
+    ['pointerup','pointercancel'].forEach(function(ev){ cv.addEventListener(ev, function(){ drawing = false; }); });
+    window.addEventListener('resize', function(){ requestAnimationFrame(size); });
+    return {
+      size: size,
+      has: function(){ return has; },
+      clear: function(){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.restore(); has = false; box.classList.remove('has'); },
+      data: function(){
+        function out(w, type, q){ var h = Math.round(w * cv.height / cv.width), o = document.createElement('canvas'); o.width = w; o.height = h; var c2 = o.getContext('2d'); c2.fillStyle = '#fff'; c2.fillRect(0,0,w,h); c2.drawImage(cv, 0, 0, w, h); return o.toDataURL(type, q); }
+        var d = out(480, 'image/png'); if (d.length > 58000) d = out(360, 'image/png'); if (d.length > 58000) d = out(360, 'image/jpeg', 0.7);
+        return d.length > 58000 ? '' : d;
+      }
+    };
+  })($('sig'));
+  $('sigclear').addEventListener('click', function(){ SIG.clear(); });
+
+  /* ---------- screens and steps ---------- */
+  var ALL = ['sL','sP','sD','s0','s1','s2','sS','s3','s4'];
+  function steps(){ var a = ['s1','s2']; if (needScreen()) a.push('sS'); a.push('s3'); return a; }
+  function stepHeader(){
+    var a = steps(), n = Math.min(flowAt, a.length - 1) + 1;
+    $('stept').textContent = t('stepof', {n:n, t:a.length});
+    $('dots').innerHTML = a.map(function(_, i){ return '<i'+(i < n ? ' class="on"' : '')+'></i>'; }).join('');
+    $('back').style.visibility = n === 1 ? 'hidden' : '';
+  }
+  function showId(id){
+    ALL.forEach(function(x){ var el = $(x); el.classList.toggle('hidden', x !== id); el.classList.remove('in'); });
+    $('flow').classList.toggle('hidden', ['s1','s2','sS','s3'].indexOf(id) < 0);
+    var cur = $(id); void cur.offsetWidth; cur.classList.add('in');
+    window.scrollTo(0, 0);
+    return cur;
+  }
+  function focusHead(cur){ var h = cur.querySelector('h1,h2'); if (h) { h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); } }
+  function lock(){
+    clearInterval(doneTick); clearInterval(idleTick); clearTimeout(idleT);
+    ['idle','ask','sheet'].forEach(close_); wipe(); step = -1;
+    focusHead(showId('sL'));
+  }
+  function welcome(){ if (!KEY) { lock(); return; } step = 0; showId('s0'); armIdle(); }
+  function goStep(i){
+    if (!KEY) { lock(); return; }
+    var a = steps(); flowAt = Math.max(0, Math.min(i, a.length - 1)); step = 1;
+    var id = a[flowAt], cur = showId(id);
+    stepHeader();
+    if (id === 's3') { fillYou(); requestAnimationFrame(SIG.size); }
+    if (id === 'sS') paintTiers();
+    focusHead(cur); armIdle();
+  }
+  function bad(id, on){ $('f-' + id).classList.toggle('bad', on); var h = $(id + '-h'); if (h) h.classList.toggle('hidden', !on); }
+  function checkYou(){
+    var first = null;
+    if ($('name').value.trim().length < 2) { bad('name', true); first = first || $('name'); } else bad('name', false);
+    var d = digits($('phone').value); if (d.length === 11 && d[0] === '1') d = d.slice(1);
+    if (d.length !== 10) { bad('phone', true); first = first || $('phone'); } else bad('phone', false);
+    var e = $('email').value.trim(); if (e && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { bad('email', true); first = first || $('email'); } else bad('email', false);
+    if (first) first.focus();
+    return !first;
+  }
+  function checkDevice(){
+    var ok = true;
+    if (!modelOk(false)) { ok = false; if (brand === 'Other') $('mfree').focus(); else if (!brand) $('brands').querySelector('.chip').focus(); else $('msearch').focus(); }
+    if (!chosen.length) { $('tiles').classList.add('bad'); $('rep-h').classList.remove('hidden'); if (ok) $('tiles').querySelector('.tile').focus(); ok = false; }
+    return ok;
+  }
+  function checkScreen(){ if (tier) return true; $('scr-h').classList.remove('hidden'); return false; }
+  $$('[data-next]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = steps()[flowAt];
+      if (id === 's1' && !checkYou()) return;
+      if (id === 's2' && !checkDevice()) return;
+      if (id === 'sS' && !checkScreen()) return;
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      goStep(flowAt + 1);
+    });
+  });
+  ['name','phone','email'].forEach(function(id){ $(id).addEventListener('input', function(){ bad(id, false); }); });
+  $('name').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('phone').focus(); } });
+  $('phone').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('email').focus(); } });
+  ['email','mfree','msearch'].forEach(function(id){ $(id).addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); this.blur(); } }); });
+  $('back').addEventListener('click', function(){ if (flowAt > 0) goStep(flowAt - 1); });
+  $('start').addEventListener('click', function(){ wake(); goStep(0); });
+  $('over').addEventListener('click', function(){ if (dirty()) open_('ask'); else reset(); });
+  $('askyes').addEventListener('click', function(){ close_('ask'); reset(); });
+  $('askno').addEventListener('click', function(){ close_('ask'); });
+  $('agree').addEventListener('change', function(){ $('agree-w').classList.remove('bad'); recheckErr(); });
+
+  function repairLabel(r){ var x = REPAIRS.filter(function(y){ return y[0] === r; })[0]; return x ? (LANG === 'es' ? x[1] : x[0]) : r; }
+  function repairsText(lang){
+    var a = chosen.map(function(r){ var lab = lang === 'en' ? r : repairLabel(r); return r === 'Screen' && TIERS[tier] ? lab + ' (' + TIERS[tier].name + ')' : lab; });
+    var o = PROT.filter(function(x){ return x[0] === prot; })[0];
+    if (o) a.push(lang === 'es' ? o[4] : o[2] + ' screen protector');
+    return a.join(', ');
+  }
+  function fillYou(){
+    var you = $('you'); you.textContent = '';
+    [$('name').value.trim(), fmtPhone($('phone').value), deviceName(), repairsText(LANG)].forEach(function(v){ if (!v) return; var s = document.createElement('span'); s.textContent = v; you.appendChild(s); });
+  }
+  function dirty(){ return !!($('name').value || $('phone').value || $('email').value || brand || $('notes').value || chosen.length || SIG.has() || $('agree').checked || heard || backup || prot); }
+
+  var MAIN = document.querySelector('main');
+  function open_(id){ $(id).classList.remove('hidden'); MAIN.inert = true; var b = $(id).querySelector('button'); if (b) b.focus(); }
+  function close_(id){ $(id).classList.add('hidden'); if (['idle','ask','sheet'].every(function(x){ return $(x).classList.contains('hidden'); })) MAIN.inert = false; }
+
+  /* ---------- full policy, shown inside this page with links removed ---------- */
+  var polLoaded = false;
+  $('readall').addEventListener('click', function(){
+    open_('sheet'); $('sheetbd').scrollTop = 0;
+    if (polLoaded) return;
+    fetch('policy.html', {cache:'no-cache'}).then(function(r){ if (!r.ok) throw 0; return r.text(); }).then(function(html){
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var main = doc.querySelector('main') || doc.body;
+      main.querySelectorAll('script,style,nav,iframe,form,button,img,video,svg').forEach(function(x){ x.remove(); });
+      main.querySelectorAll('a').forEach(function(a){ var s = doc.createElement('span'); s.textContent = a.textContent; a.replaceWith(s); });
+      main.querySelectorAll('*').forEach(function(el){ Array.prototype.slice.call(el.attributes).forEach(function(at){ if (!/^(class|colspan|rowspan)$/.test(at.name)) el.removeAttribute(at.name); }); });
+      var pol = $('pol'); pol.textContent = '';
+      Array.prototype.forEach.call(main.childNodes, function(n){ pol.appendChild(document.importNode(n, true)); });
+      polLoaded = true;
+    }).catch(function(){ $('pol').innerHTML = '<p style="margin-top:30px">The full policy couldn’t load right now. Please ask us at the counter for a printed copy.</p>'; });
+  });
+  $('sheetdone').addEventListener('click', function(){ close_('sheet'); $('readall').focus(); });
+
+  /* ---------- send ---------- */
+  function recheckErr(){
+    if (!$('err').textContent) return;
+    var box = $('agree').checked, sig = SIG.has();
+    $('err').textContent = box && sig ? '' : !box && !sig ? t('need_both') : !box ? t('need_box') : t('need_sig');
+  }
+  $('go').addEventListener('click', function(){
+    if (sending) return;
+    var err = $('err'), box = $('agree').checked, signed = SIG.has();
+    if (!box) $('agree-w').classList.add('bad');
+    if (!signed) $('sig').classList.add('bad');
+    if (!box || !signed) { err.textContent = !box && !signed ? t('need_both') : !box ? t('need_box') : t('need_sig'); return; }
+    err.textContent = '';
+    var ph = digits($('phone').value); if (ph.length === 11) ph = ph.slice(1);
+    var reps = [], extra = [];
+    chosen.forEach(function(r){ if ((reps.concat([r])).join(', ').length <= 80) reps.push(r); else extra.push(r); });
+    var notes = $('notes').value.trim(); if (extra.length) notes = ('Also: ' + extra.join(', ') + '. ' + notes).trim();
+    var d = {kind:'checkin', status:'new', where:'shop', name:$('name').value.trim().slice(0,80), phone:fmtPhone(ph), device:deviceName().slice(0,80),
+      repair:reps.join(', '), screen: tier === 'unsure' ? 'Not sure' : TIERS[tier] ? TIERS[tier].send : '', day:'', time:'', whenText:'Front desk iPad', apptAt:0, address:'',
+      notes:notes.slice(0,500), createdAt:Date.now(), email:$('email').value.trim().slice(0,100), org:'',
+      agreed:true, textOk:true, sig:SIG.data(), kioskKey:KEY, heard:heard, backup:backup, lang:LANG, addons:protName()};
+    var f = {}; Object.keys(d).forEach(function(k){ var v = d[k]; f[k] = typeof v === 'boolean' ? {booleanValue:v} : typeof v === 'number' ? {integerValue:String(Math.round(v))} : {stringValue:String(v)}; });
+    sending = true; var b = $('go'); b.disabled = true; b.textContent = t('sending');
+    fetch(BASE + 'requests?key=' + API_KEY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:f})}).then(function(r){
+      if (!r.ok) throw new Error('send ' + r.status);
+      fetch(api('kiosks/' + KEY) + '&updateMask.fieldPaths=lastUsed&currentDocument.exists=true', {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:{lastUsed:{integerValue:String(Date.now())}}})}).catch(function(){});
+      sending = false; b.disabled = false; b.textContent = t('go');
+      var first = d.name.split(/\s+/)[0], masked = '(•••) •••-' + ph.slice(6);
+      $('h4t').textContent = t('done_h', {name:first});
+      $('dmsg').textContent = t('done_p', {phone:masked});
+      $('dsum').textContent = d.device + ' · ' + repairsText(LANG);
+      wipe(); step = 4; focusHead(showId('s4')); doneCountdown();
+    }).catch(function(){
+      sending = false; b.disabled = false; b.textContent = t('retry');
+      err.textContent = t('send_e');
+      recheck();
+    });
+  });
+
+  /* ---------- done, reset ---------- */
+  function doneCountdown(){
+    clearInterval(doneTick); var n = DONE_COUNT;
+    $('count').textContent = t('count', {n:n});
+    doneTick = setInterval(function(){ n--; if (n <= 0) { reset(); return; } $('count').textContent = n === 1 ? t('count1') : t('count', {n:n}); }, 1000);
+  }
+  $('finish').addEventListener('click', function(){ reset(); });
+  function wipe(){
+    ['name','phone','email','notes','msearch','mfree'].forEach(function(id){ $(id).value = ''; });
+    ['name','phone','email'].forEach(function(id){ bad(id, false); });
+    chosen = []; brand = ''; model = ''; tier = ''; heard = ''; backup = ''; prot = ''; showAll = false; flowAt = 0;
+    $('tiles').classList.remove('bad'); $('rep-h').classList.add('hidden'); $('scr-h').classList.add('hidden'); $('bk-tip').classList.add('hidden');
+    $('model-h').classList.remove('bad'); $('f-mfree').classList.remove('bad');
+    $('agree').checked = false; $('agree-w').classList.remove('bad');
+    SIG.clear(); $('sig').classList.remove('bad');
+    $('err').textContent = ''; $('you').textContent = ''; $('go').disabled = false;
+    LANG = 'en'; applyLang();
+  }
+  function reset(){
+    clearInterval(doneTick); clearInterval(idleTick); clearTimeout(idleT);
+    ['idle','ask','sheet'].forEach(close_);
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    try { window.getSelection().removeAllRanges(); } catch(e) {}
+    wipe(); $('count').textContent = ''; $('dsum').textContent = '';
+    welcome(); recheck();
+  }
+
+  /* ---------- privacy timeout ---------- */
+  function armIdle(){
+    clearTimeout(idleT);
+    if (step !== 1 || !$('idle').classList.contains('hidden')) return;
+    idleT = setTimeout(function(){
+      if (!dirty()) { reset(); return; }
+      var n = IDLE_COUNT; $('idle-p').textContent = t('idle_p', {n:n}); open_('idle');
+      clearInterval(idleTick);
+      idleTick = setInterval(function(){ n--; $('idle-p').textContent = t('idle_p', {n:n}); if (n <= 0) reset(); }, 1000);
+    }, IDLE_MS);
+  }
+  ['pointerdown','keydown','input'].forEach(function(ev){ document.addEventListener(ev, function(){ if ($('idle').classList.contains('hidden')) armIdle(); }, true); });
+  $('keep').addEventListener('click', function(){ clearInterval(idleTick); close_('idle'); armIdle(); });
+  $('clearnow').addEventListener('click', function(){ reset(); });
+
+  /* ---------- set up this iPad ---------- */
+  $('staff').addEventListener('click', function(){ $('code').value = ''; $('perr').textContent = ''; step = -1; showId('sP'); $('code').focus(); });
+  $('paircancel').addEventListener('click', function(){ lock(); });
+  $('pairdone').addEventListener('click', function(){ welcome(); });
+  $('code').addEventListener('input', function(){ var v = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); this.value = v.length > 4 ? v.slice(0,4) + '-' + v.slice(4) : v; $('perr').textContent = ''; });
+  $('code').addEventListener('keydown', function(e){ if (e.key === 'Enter') { e.preventDefault(); $('pairgo').click(); } });
+  $('pairgo').addEventListener('click', function(){
+    var code = $('code').value.replace(/[^A-Z0-9]/g, ''), b = this, key = '';
+    if (code.length !== 8) { $('perr').textContent = 'Enter the 8-character code.'; return; }
+    b.disabled = true; b.textContent = 'Setting up…';
+    fetch(api('kioskPair/' + code), {cache:'no-store'}).then(function(r){ if (!r.ok) throw 0; return r.json(); }).then(function(j){
+      key = j && j.fields && j.fields.key && j.fields.key.stringValue || '';
+      if (!/^[A-Za-z0-9]{32}$/.test(key)) throw 0;
+      return fetch(api('kiosks/' + key) + '&updateMask.fieldPaths=pairedAt&currentDocument.exists=true', {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:{pairedAt:{integerValue:String(Date.now())}}})});
+    }).then(function(r){
+      if (!r.ok) throw 0;
+      fetch(api('kioskPair/' + code), {method:'DELETE'}).catch(function(){});
+      saveKey(key); b.disabled = false; b.textContent = 'Set up';
+      focusHead(showId('sD')); recheck();
+    }).catch(function(){
+      b.disabled = false; b.textContent = 'Set up';
+      $('perr').textContent = 'That code didn’t work. Codes work once, for 10 minutes. Make a new one in the shop app.';
+    });
+  });
+
+  /* keep the screen on while the page is open (newer iPads) */
+  var wakeLock = null;
+  function wake(){ try { if (navigator.wakeLock && !wakeLock) navigator.wakeLock.request('screen').then(function(l){ wakeLock = l; l.addEventListener('release', function(){ wakeLock = null; }); }).catch(function(){}); } catch(e) {} }
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') wake(); });
+
+  /* no long-press menus or pinch-to-zoom surprises on the kiosk */
+  document.addEventListener('contextmenu', function(e){ if (!e.target.closest('input,textarea')) e.preventDefault(); });
+  document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+
+  /* start: locked unless this iPad was set up; re-check every 30 minutes (stock + still set up) */
+  applyLang();
+  if (KEY) { welcome(); recheck(); } else lock();
+  setInterval(function(){ if (step === 0) recheck(); }, 30 * 60e3);
+})();
+</script>
+</body>
+</html>

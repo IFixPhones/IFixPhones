@@ -326,6 +326,23 @@ select.in{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:14px}
 .seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.trbtn{font-size:15px}
+.trout{margin-top:12px;background:#f5f5f7;border-radius:12px;padding:14px 16px}
+.trres{font-size:22px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
+.trmic.on{background:#c9302c}
+.phr{display:grid;gap:8px;margin-top:8px}
+.phrow{display:flex;gap:8px;align-items:stretch}
+.phbig{flex:1;text-align:left;border:1px solid #d2d2d7;background:#fff;border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer;color:inherit}
+.phbig b{display:block;font-size:15px}
+.phbig span{display:block;font-size:13px;color:#6e6e73;margin-top:2px}
+.phsay{border:1px solid #d2d2d7;background:#fff;border-radius:12px;width:48px;font-size:18px;cursor:pointer}
+.bigtr{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.bigtr .b{font-size:clamp(34px,7vw,76px);font-weight:700;letter-spacing:-.025em;line-height:1.12;max-width:1000px;color:#1d1d1f}
+.bigtr .s{font-size:18px;color:#6e6e73;margin-top:20px;max-width:760px}
+.bigtr .acts{margin-top:34px;justify-content:center}
+.stocksug{margin-top:14px;background:#eef7f1;border-radius:12px;padding:12px 14px}
+.stocksug>b{display:block;font-size:14px;margin-bottom:2px}
+.stocksug .check{margin-top:8px}
 .sigwrap{margin-top:14px}
 .sigpad{position:relative;border:1.5px dashed var(--line);border-radius:12px;background:#fff;height:150px;touch-action:none}
 .sigpad canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:12px;cursor:crosshair}
@@ -741,7 +758,7 @@ function startData(){
         if (ch.type !== 'added' || seenReqs[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
         var r = ch.doc.data() || {};
         if (r.kind === 'sell') alertNew('Someone wants to sell a phone', (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
-        else if (r.kind === 'checkin') alertNew('Online check-in · ' + (r.whenText||''), (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
+        else if (r.kind === 'checkin') alertNew(isKiosk(r) ? 'iPad check-in' : 'Online check-in · ' + (r.whenText||''), (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'business') alertNew('New school / business request', (r.org||'') + ' · ' + (r.name||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
         else alertNew(r.where === 'mobile' ? 'New MOBILE booking' : 'New shop booking', (r.whenText||'') + '\n' + (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
@@ -750,7 +767,7 @@ function startData(){
     if (!snap.metadata.fromCache) { seenReqs = {}; S.reqs.forEach(function(r){ seenReqs[r.id] = 1; }); }
     render();
   }, function(){ S.reqsErr = true; render(); }));
-  unsubs.push(db.collection('inventory').onSnapshot({includeMetadataChanges:true}, function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); S.invLoaded = !snap.metadata.fromCache || S.invLoaded; render(); }, function(){}));
+  unsubs.push(db.collection('inventory').onSnapshot({includeMetadataChanges:true}, function(snap){ S.inv = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); S.invLoaded = !snap.metadata.fromCache || S.invLoaded; render(); kioskPublishSoon(); }, function(){}));
   unsubs.push(db.collection('buybacks').orderBy('createdAt','desc').limit(500).onSnapshot(function(snap){ S.bb = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
   var seenApv = null;
   unsubs.push(db.collection('approvals').orderBy('createdAt','desc').limit(200).onSnapshot(function(snap){
@@ -776,7 +793,7 @@ function startData(){
       snap.docChanges().forEach(function(ch){
         if (ch.type !== 'added' || seenTickets[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
         var t = ch.doc.data() || {};
-        if ((t.createdAt||0) < BOOT) return;
+        if ((t.createdAt||0) < BOOT || S.settings.pushNewTickets !== true) return;
         alertNew('New ticket #' + t.num, (t.customer && t.customer.name || '') + ' · ' + (t.device && t.device.model || '') + (t.createdBy ? ' · by ' + t.createdBy : ''), function(){ openTicket(ch.doc.id); });
       });
     }
@@ -797,8 +814,13 @@ function startData(){
       S.settings = Object.assign({techs:DEFAULT_TECHS.slice()}, clone(d));
       if (!Array.isArray(S.settings.techs)) S.settings.techs = DEFAULT_TECHS.slice();
     }
-    render();
+    render(); kioskPublishSoon();
   }, function(){}));
+  unsubs.push(db.collection('kiosks').onSnapshot(function(snap){
+    S.kiosks = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
+    kioskPairWatch(); kioskPublishSoon();
+    if (S.view === 'settings') render();
+  }, function(){ S.kiosks = []; }));
 }
 
 (function(){
@@ -856,6 +878,7 @@ function topbar(){
     '<div class="brand">iFixPhones<span>Tickets</span></div>' +
     '<nav class="tabs" aria-label="Sections">' + tabs + '</nav>' +
     '<div class="grow"></div>' +
+    (S.status==='ready' ? '<button class="btn ghost trbtn" data-act="translate" aria-label="Translator, English and Spanish">🌐<span class="newtxt"> Translate</span></button>' : '') +
     '<button class="me" data-act="who" aria-label="Working as '+esc(who())+'. Change"><span class="av">'+esc(S.me ? initials(S.me) : '?')+'</span><span class="nm">'+esc(S.me ? S.me : 'Who’s working?')+'</span></button>' +
     (S.status==='ready' && S.canWrite ? '<button class="btn" data-act="new">+ <span class="newtxt">New ticket</span></button>' : '') +
   '</div></header>';
@@ -1134,10 +1157,10 @@ function settingsView(){
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
     comm +
   '</div>' + backupPanel() +
-  siteSettingsPanel() +
+  siteSettingsPanel() + kioskPanel() +
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
-    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushTickets"'+(S.settings.pushTickets!==false?' checked':'')+'>Also send a phone alert when a ticket is checked in</label>' +
+    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushNewTickets"'+(S.settings.pushNewTickets===true?' checked':'')+'>Also alert me when a ticket is checked in (off by default)</label>' +
     '<div class="match" style="margin-top:14px"><b>Phone alerts</b> go to the <b>Pushover</b> app. Install it and sign in with the shop’s Pushover account on any phone that should get alerts.</div>' +
     '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div>' +
   '</div>' +
@@ -1199,6 +1222,194 @@ function savePublic(patch){
   S.pub = Object.assign({}, S.pub||{}, patch); render();
   return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
 }
+/* ---------- translator (English ⇄ Spanish) ---------- */
+var PHRASES = [
+  ['Hi! How can I help you?','¡Hola! ¿En qué le puedo ayudar?'],
+  ['What’s wrong with your phone?','¿Qué problema tiene su teléfono?'],
+  ['Can I see your phone?','¿Me permite ver su teléfono?'],
+  ['What’s your passcode? We only use it to test the phone.','¿Cuál es su código de desbloqueo? Solo lo usamos para probar el teléfono.'],
+  ['Which screen do you want: Incell or OLED?','¿Qué pantalla prefiere: Incell u OLED?'],
+  ['The OLED screen has a 30-day warranty for glitches only, not drops or breaks.','La pantalla OLED tiene 30 días de garantía solo por fallas, no por caídas ni golpes.'],
+  ['Incell screens have no warranty.','Las pantallas Incell no tienen garantía.'],
+  ['This is the price, plus tax.','Este es el precio, más impuesto.'],
+  ['We have the part in stock.','Tenemos la pieza en existencia.'],
+  ['We need to order the part. It usually takes 1 to 2 days.','Necesitamos pedir la pieza. Normalmente tarda de 1 a 2 días.'],
+  ['The repair takes about 1 hour.','La reparación tarda como 1 hora.'],
+  ['Please back up your phone before the repair.','Por favor respalde su teléfono antes de la reparación.'],
+  ['Your phone has water damage. We can’t guarantee the repair.','Su teléfono tiene daño por agua. No podemos garantizar la reparación.'],
+  ['We’ll text you when it’s ready.','Le enviaremos un mensaje cuando esté listo.'],
+  ['Please wait a moment.','Un momento, por favor.'],
+  ['Your phone is ready.','Su teléfono está listo.'],
+  ['Please test your phone before you pay.','Por favor pruebe su teléfono antes de pagar.'],
+  ['Cash or card?','¿Efectivo o tarjeta?'],
+  ['If the screen doesn’t respond to touch, force restart: volume up, volume down, then hold the side button.','Si la pantalla no responde, haga un reinicio forzado: suba el volumen, baje el volumen y mantenga presionado el botón lateral.'],
+  ['Thank you! Have a great day.','¡Gracias! Que tenga un buen día.']
+];
+function speak(text, lang){
+  try {
+    if (!window.speechSynthesis) throw 0;
+    var u = new SpeechSynthesisUtterance(text), want = lang === 'es' ? 'es' : 'en';
+    var vs = speechSynthesis.getVoices().filter(function(v){ return String(v.lang||'').toLowerCase().indexOf(want) === 0; });
+    var pick = vs.filter(function(v){ return /US|MX/i.test(v.lang); })[0] || vs[0];
+    u.lang = lang === 'es' ? 'es-US' : 'en-US'; if (pick) u.voice = pick; u.rate = 0.95;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch(e) { toast('This device can’t read text out loud.'); }
+}
+function decodeHtml(x){ var ta = document.createElement('textarea'); ta.innerHTML = x; return ta.value; }
+async function translateText(text, from, to){
+  text = String(text||'').trim(); if (!text) return '';
+  // 1) built into the browser (Chrome on a computer): private and works offline
+  try {
+    if (self.Translator && Translator.availability) {
+      var av = await Translator.availability({sourceLanguage:from, targetLanguage:to});
+      if (av && av !== 'unavailable') { var tr = await Translator.create({sourceLanguage:from, targetLanguage:to}); return await tr.translate(text); }
+    }
+  } catch(e) {}
+  // 2) free MyMemory service (iPhone, iPad, other browsers), in pieces of about 400 characters
+  var parts = [], cur = '';
+  (text.match(/[^.!?\n]+[.!?\n]*\s*/g) || [text]).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(sn){ if ((cur + ' ' + sn).length > 400 && cur) { parts.push(cur); cur = sn; } else cur = cur ? cur + ' ' + sn : sn; });
+  if (cur) parts.push(cur);
+  var out = [];
+  for (var i = 0; i < parts.length; i++) {
+    var r = await fetch('https://api.mymemory.translated.net/get?' + new URLSearchParams({q: parts[i].slice(0, 450), langpair: from + '|' + to}));
+    var j = await r.json();
+    if (!j || !j.responseData || String(j.responseStatus) !== '200') throw new Error('translate');
+    out.push(decodeHtml(j.responseData.translatedText || ''));
+  }
+  return out.join(' ');
+}
+function googleTr(text, from, to){ return 'https://translate.google.com/?sl=' + from + '&tl=' + to + '&op=translate&text=' + encodeURIComponent(text||''); }
+function showBig(text, sub, lang){
+  var o = document.createElement('div'); o.className = 'bigtr'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true'); o.setAttribute('aria-label','Translation');
+  o.innerHTML = '<p class="b" lang="'+(lang==='es'?'es':'en')+'">'+esc(text)+'</p>' + (sub ? '<p class="s">'+esc(sub)+'</p>' : '') +
+    '<div class="acts"><button class="btn" data-big="say">🔊 '+(lang==='es'?'Escuchar':'Play')+'</button><button class="btn ghost" data-big="close">Close</button></div>';
+  document.body.appendChild(o);
+  var close = function(){ try { speechSynthesis.cancel(); } catch(e) {} o.remove(); document.removeEventListener('keydown', k, true); };
+  var k = function(e){ if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+  document.addEventListener('keydown', k, true);
+  o.addEventListener('click', function(e){ var b = e.target.closest('[data-big]'); if (!b) return; if (b.getAttribute('data-big') === 'say') speak(text, lang); else close(); });
+  o.querySelector('[data-big="close"]').focus();
+}
+function translateBox(opts){
+  opts = opts || {};
+  var from = opts.from === 'es' ? 'es' : 'en', last = null, rec = null, listening = false;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var phr = PHRASES.map(function(p, i){ return '<div class="phrow"><button type="button" class="phbig" data-ph="'+i+'"><b lang="es">'+esc(p[1])+'</b><span>'+esc(p[0])+'</span></button><button type="button" class="phsay" data-phsay="'+i+'" aria-label="Say it in Spanish: '+esc(p[0])+'">🔊</button></div>'; }).join('');
+  var m = modalShell('tr', 'Translator',
+    '<div class="seg" role="group" aria-label="Who is talking"><button type="button" data-trdir="en">You speak English</button><button type="button" data-trdir="es">Cliente habla español</button></div>' +
+    '<div class="f" style="margin-top:12px"><label for="tr-in" id="tr-inl"></label><textarea class="in" id="tr-in" rows="3"></textarea></div>' +
+    '<div class="acts"><button type="button" class="btn trmic" id="tr-mic">🎤 <span id="tr-micl"></span></button><button type="button" class="btn dark" id="tr-go">Translate</button></div>' +
+    '<p class="hint" id="tr-note" role="status"></p>' +
+    '<div class="trout hidden" id="tr-out"><div class="trres" id="tr-res"></div><div class="acts" style="margin-top:10px"><button type="button" class="btn sm" id="tr-say">🔊 Play</button><button type="button" class="btn sm ghost" id="tr-big">Show big</button><a class="btn sm ghost" id="tr-g" target="_blank" rel="noopener">Open in Google Translate</a></div></div>' +
+    '<h3 style="margin-top:20px;font-size:15px">Quick phrases <span class="muted" style="font-weight:400">· tap to show it big and play it in Spanish</span></h3><div class="phr">' + phr + '</div>' +
+    '<p class="hint" style="margin-top:14px">Typed or spoken words are sent to a free translation service (MyMemory). Chrome on a computer translates on the device instead. Don’t use it for passcodes or card numbers.</p>',
+    '<button class="btn" data-mclose>Done</button>', true);
+  function setDir(d){
+    from = d; stopMic();
+    $$('[data-trdir]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-trdir') === d)); });
+    $('#tr-inl', m).textContent = d === 'en' ? 'What you want to say (English)' : 'Lo que el cliente quiere decir (español)';
+    $('#tr-in', m).setAttribute('placeholder', d === 'en' ? 'Type it, or tap Talk and speak…' : 'Escriba aquí, o toque Hablar…');
+    $('#tr-in', m).setAttribute('lang', d);
+    $('#tr-micl', m).textContent = d === 'en' ? 'Talk' : 'Hablar';
+  }
+  async function run(auto){
+    var txt = $('#tr-in', m).value.trim(); if (!txt) { $('#tr-in', m).focus(); return; }
+    var to = from === 'en' ? 'es' : 'en', note = $('#tr-note', m);
+    note.textContent = 'Translating…';
+    $('#tr-g', m).href = googleTr(txt, from, to);
+    try {
+      var res = await translateText(txt, from, to);
+      last = {text: res, src: txt, lang: to};
+      $('#tr-res', m).textContent = res; $('#tr-res', m).setAttribute('lang', to);
+      $('#tr-say', m).textContent = '🔊 ' + (to === 'es' ? 'Escuchar' : 'Play');
+      $('#tr-out', m).classList.remove('hidden'); note.textContent = '';
+      if (auto) speak(res, to);
+    } catch(e) {
+      $('#tr-out', m).classList.add('hidden');
+      note.innerHTML = 'Couldn’t translate right now (no internet, or today’s free limit is used up). <a href="'+esc(googleTr(txt, from, to))+'" target="_blank" rel="noopener">Open it in Google Translate</a>.';
+    }
+  }
+  function stopMic(){ if (rec && listening) { try { rec.stop(); } catch(e) {} } listening = false; var b = $('#tr-mic', m); if (b) b.classList.remove('on'); }
+  $('#tr-mic', m).addEventListener('click', function(){
+    if (!SR) { $('#tr-note', m).textContent = 'Voice isn’t available in this browser. Tap the text box and use the microphone on your keyboard instead.'; $('#tr-in', m).focus(); return; }
+    if (listening) { stopMic(); return; }
+    try {
+      rec = new SR(); rec.lang = from === 'en' ? 'en-US' : 'es-US'; rec.interimResults = true; rec.continuous = false;
+      var finalText = '';
+      rec.onresult = function(ev){ var t2 = ''; for (var i = 0; i < ev.results.length; i++) t2 += ev.results[i][0].transcript; finalText = t2; $('#tr-in', m).value = t2; };
+      rec.onerror = function(ev){ listening = false; $('#tr-mic', m).classList.remove('on'); $('#tr-note', m).textContent = ev.error === 'not-allowed' ? 'Allow the microphone for this site, then try again.' : 'Didn’t catch that. Try again, or type it.'; };
+      rec.onend = function(){ var was = listening; listening = false; $('#tr-mic', m).classList.remove('on'); $('#tr-micl', m).textContent = from === 'en' ? 'Talk' : 'Hablar'; if (was && finalText.trim()) run(true); };
+      rec.start(); listening = true; $('#tr-mic', m).classList.add('on'); $('#tr-micl', m).textContent = from === 'en' ? 'Listening… tap to stop' : 'Escuchando… toque para parar';
+      $('#tr-note', m).textContent = '';
+    } catch(e) { $('#tr-note', m).textContent = 'Voice isn’t available here. Use the microphone on your keyboard instead.'; }
+  });
+  m.addEventListener('click', function(e){
+    var d = e.target.closest('[data-trdir]'); if (d) { setDir(d.getAttribute('data-trdir')); $('#tr-out', m).classList.add('hidden'); $('#tr-in', m).value = ''; return; }
+    if (e.target.closest('#tr-go')) { run(false); return; }
+    if (e.target.closest('#tr-say') && last) { speak(last.text, last.lang); return; }
+    if (e.target.closest('#tr-big') && last) { showBig(last.text, last.src, last.lang); return; }
+    var ph = e.target.closest('[data-ph]'); if (ph) { var p = PHRASES[+ph.getAttribute('data-ph')]; showBig(p[1], p[0], 'es'); speak(p[1], 'es'); return; }
+    var ps = e.target.closest('[data-phsay]'); if (ps) { speak(PHRASES[+ps.getAttribute('data-phsay')][1], 'es'); return; }
+    if (e.target.closest('[data-mclose]')) { stopMic(); try { speechSynthesis.cancel(); } catch(x) {} }
+  });
+  $('#tr-in', m).addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); run(false); } });
+  setDir(from);
+  if (opts.text) { $('#tr-in', m).value = opts.text; run(false); }
+  try { speechSynthesis.getVoices(); } catch(e) {}
+}
+
+/* ---------- front desk iPad (kiosk.html) ---------- */
+function kioskPanel(){
+  var now = Date.now();
+  var ks = (S.kiosks||[]).slice().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
+  var rows = ks.map(function(k){
+    var st = k.pairedAt ? 'Set up '+esc(dt(k.pairedAt)) + (k.lastUsed ? ' · last check-in '+esc(rel(k.lastUsed)) : '') : (k.expiresAt > now ? 'Waiting for the iPad · code <b>'+esc(fmtCode(k.code))+'</b>' : 'Code expired, not set up');
+    return '<tr><td><b>'+esc(k.name||'Front desk iPad')+'</b></td><td class="muted">'+st+'</td><td class="right">'+(S.canWrite?'<button class="link red" data-act="kioskdel" data-id="'+esc(k.id)+'">Remove</button>':'')+'</td></tr>';
+  }).join('');
+  return '<div class="panel"><h2>Front desk iPad</h2><p class="d">Customers check in and sign at <b>ifixphones.net/kiosk.html</b>. Only iPads you set up here can use it. Any other phone or computer just sees “Please check in at the counter.”</p>' +
+    (rows ? '<table class="rtable"><tbody>'+rows+'</tbody></table>' : '<p class="muted">No iPad set up yet.</p>') +
+    (S.canWrite ? '<div class="acts" style="margin-top:12px"><button class="btn sm" data-act="kioskpair">Set up an iPad</button></div>' : '') +
+  '</div>';
+}
+function fmtCode(c){ c = String(c||''); return c.length === 8 ? c.slice(0,4) + '-' + c.slice(4) : c; }
+function randStr(n, abc){ var a = new Uint32Array(n), out = ''; crypto.getRandomValues(a); for (var i = 0; i < n; i++) out += abc[a[i] % abc.length]; return out; }
+function kioskPair(){
+  var key = randStr(32, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789');
+  var code = randStr(8, 'ABCDEFGHJKMNPQRSTUVWXYZ23456789');
+  var now = Date.now(), exp = now + 10*60e3;
+  var b = S.db.batch();
+  // clear out older setups that were never finished
+  (S.kiosks||[]).forEach(function(k){ if (!k.pairedAt && !(k.expiresAt > now)) { b.delete(S.db.doc('kiosks/'+k.id)); if (k.code) b.delete(S.db.doc('kioskPair/'+k.code)); } });
+  b.set(S.db.doc('kiosks/'+key), {name:'Front desk iPad', createdAt:now, createdBy:who(), code:code, expiresAt:exp});
+  b.set(S.db.doc('kioskPair/'+code), {key:key, expiresAt:exp, createdAt:now});
+  S.pairWait = key;
+  var m = modalShell('kp', 'Set up the front desk iPad',
+    '<ol style="padding-left:20px;line-height:1.6;font-size:15px"><li>On the store iPad, open <b>ifixphones.net/kiosk.html</b> (or its Home Screen icon).</li><li>Tap <b>Set up this iPad</b> at the bottom of the screen.</li><li>Type this code:</li></ol>' +
+    '<div style="font-size:40px;font-weight:700;letter-spacing:.12em;text-align:center;background:var(--mist,#f5f5f7);border-radius:14px;padding:18px 10px;margin:14px 0;font-variant-numeric:tabular-nums">'+esc(fmtCode(code))+'</div>' +
+    '<p class="hint" id="kp-status" role="status">Works once, for 10 minutes. Waiting for the iPad…</p>',
+    '<button class="btn" data-mclose>Close</button>');
+  retryOnce(function(){ return b.commit(); }).catch(function(e){ m.remove(); S.pairWait = null; writeErr(e); });
+}
+var kioskPubT = 0;
+function kioskPublishSoon(){ clearTimeout(kioskPubT); kioskPubT = setTimeout(kioskPublish, 2500); }
+function normFeed(st, acc){ return Object.keys(st||{}).filter(function(k){ return st[k]; }).sort().join(',') + '|' + Object.keys(acc||{}).sort().map(function(k){ return k + ':' + num(acc[k]); }).join(','); }
+function kioskPublish(){
+  if (!S.db || !S.canWrite || !S.invLoaded || !S.settingsLoaded) return;
+  var stock = {}, acc = {};
+  (S.inv||[]).forEach(function(i){ if (i.brand && i.model && i.part && num(i.qty) > 0) stock[i.id] = true; });
+  ACCS.forEach(function(a){ if (/^sp/.test(a.k)) acc[a.k] = accPrice(a.k); });
+  var want = normFeed(stock, acc);
+  (S.kiosks||[]).forEach(function(k){
+    if (!k.pairedAt || normFeed(k.stock, k.acc) === want) return;
+    S.db.doc('kiosks/' + k.id).update({stock:stock, acc:acc, feedAt:Date.now()}).catch(function(){});
+  });
+}
+function kioskPairWatch(){
+  if (!S.pairWait) return;
+  var k = (S.kiosks||[]).filter(function(x){ return x.id === S.pairWait; })[0];
+  var el = document.getElementById('kp-status');
+  if (k && k.pairedAt && el) { el.innerHTML = '<b style="color:var(--green,#1a7f37)">✓ The iPad is set up.</b> You can close this.'; S.pairWait = null; toast('Front desk iPad is set up'); }
+}
 function siteSettingsPanel(){
   var pub = S.pub || {}, prices = pub.prices || [];
   var rows = prices.map(function(r, i){
@@ -1215,12 +1426,27 @@ function siteSettingsPanel(){
 }
 
 /* ---------- follow-ups ---------- */
-function reviewMsg(t){
+function isEs(t, lang){ return (lang || (t && t.lang) || 'en') === 'es'; }
+function dueTextEs(ts){
+  var d = new Date(ts), now = new Date(), time = d.toLocaleTimeString('es-US',{hour:'numeric',minute:'2-digit'});
+  if (sameDay(ts, now)) return 'hoy a las ' + time;
+  var tm = new Date(now); tm.setDate(tm.getDate()+1);
+  if (sameDay(ts, tm)) return 'mañana a las ' + time;
+  return 'el ' + d.toLocaleDateString('es-US',{weekday:'long',day:'numeric',month:'short'}) + ' a las ' + time;
+}
+var WARR_ES = {'None':'Ninguna','30 days':'30 días','90 days':'90 días','6 months':'6 meses','1 year':'1 año'};
+function reviewMsg(t, lang){
   var first = String((t.customer||{}).name||'').split(' ')[0] || 'there', url = (S.pub||{}).reviewUrl;
+  if (isEs(t, lang)) return 'Hola' + (first === 'there' ? '' : ' ' + first) + ', ¡gracias por elegir iFixPhones! Si cuidamos bien su ' + ((t.device||{}).model||'equipo') + ', ¿nos dejaría una reseña rápida en Google? Ayuda mucho a un negocio local pequeño.' + (url ? ' ' + url : '');
   return 'Hi ' + first + ', thanks for choosing iFixPhones! If we took good care of your ' + ((t.device||{}).model||'device') + ', would you leave us a quick Google review? It really helps a small local shop.' + (url ? ' ' + url : '');
 }
-function pickupMsg(t){
+function pickupMsg(t, lang){
   var first = String((t.customer||{}).name||'').split(' ')[0] || 'there', d = daysSince(readyAt(t));
+  if (isEs(t, lang)) {
+    var dv = (t.device||{}).model||'equipo', nm = first === 'there' ? '' : ' ' + first;
+    if (d >= 30) return 'Hola' + nm + ', le escribe iFixPhones. Su ' + dv + ' lleva ' + d + ' días listo. Según nuestra política de reparación, se cobra almacenamiento después de 30 días y los equipos que se dejan 90 días se consideran abandonados. Por favor recójalo en 9055 Marbach Rd, Suite 105 (lun–sáb 10–8, dom 12–6).';
+    return 'Hola' + nm + ', le recordamos que su ' + dv + ' está listo en iFixPhones, 9055 Marbach Rd, Suite 105. Abierto lun–sáb 10–8, dom 12–6.' + (!t.paid && balance(t) ? ' Saldo pendiente: ' + money(balance(t)) + '.' : '');
+  }
   if (d >= 30) return 'Hi ' + first + ', this is iFixPhones. Your ' + ((t.device||{}).model||'device') + ' has been ready for ' + d + ' days. Per our repair policy, storage fees apply after 30 days and devices left 90 days are considered abandoned. Please pick it up at 9055 Marbach Rd, Suite 105 (Mon–Sat 10–8, Sun 12–6).';
   return 'Hi ' + first + ', a friendly reminder that your ' + ((t.device||{}).model||'device') + ' is ready at iFixPhones, 9055 Marbach Rd, Suite 105. Open Mon–Sat 10–8, Sun 12–6.' + (!t.paid && balance(t) ? ' Balance due: ' + money(balance(t)) + '.' : '');
 }
@@ -1724,7 +1950,19 @@ function payBox(t){
   });
 }
 function receiptText(t){
-  var c = t.customer || {}, lines = ['iFixPhones receipt · Ticket #' + t.num, ((t.device||{}).model||'') + ': ' + repairsText(t)];
+  var c = t.customer || {};
+  if (isEs(t)) {
+    var ln = ['Recibo de iFixPhones · Ticket #' + t.num, ((t.device||{}).model||'') + ': ' + repairsText(t)];
+    if (discountAmt(t)) ln.push('Descuento: -' + money(discountAmt(t)));
+    if (taxAmt(t)) ln.push('Impuesto: ' + money(taxAmt(t)));
+    if (cardFees(t)) ln.push('Cargo por tarjeta: ' + money(cardFees(t)));
+    ln.push('Total pagado: ' + money(collected(t)) + (payLabel(t) ? ' (' + payLabel(t) + ')' : ''));
+    ln.push('Garantía: ' + (WARR_ES[t.warranty || 'None'] || t.warranty) + '. Política: ifixphones.net/policy.html');
+    if (/screen|oled|incell|lcd|display/i.test(repairsText(t))) ln.push('¿La pantalla no responde al tacto? Reinicio forzado: presione subir volumen, luego bajar volumen, y mantenga presionado el botón lateral hasta ver el logo de Apple. ifixphones.net/#after');
+    ln.push('¡Gracias' + (String(c.name||'').split(' ')[0] ? ', ' + String(c.name).split(' ')[0] : '') + '!');
+    return ln.join('\n');
+  }
+  var lines = ['iFixPhones receipt · Ticket #' + t.num, ((t.device||{}).model||'') + ': ' + repairsText(t)];
   if (discountAmt(t)) lines.push('Discount: -' + money(discountAmt(t)));
   if (taxAmt(t)) lines.push('Sales tax: ' + money(taxAmt(t)));
   if (cardFees(t)) lines.push('Credit card fee: ' + money(cardFees(t)));
@@ -2086,14 +2324,14 @@ function holdsSlot(r){ return isBooking(r) && r.status !== 'cancel'; }
 
 function reqBox(r){
   var isQ = r.kind !== 'booking';
-  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : r.kind === 'checkin' ? '<span class="tagk" style="background:#e6f0fc;color:#0058b0">Online check-in</span>' : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
+  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : r.kind === 'checkin' ? '<span class="tagk" style="background:#e6f0fc;color:#0058b0">'+(isKiosk(r)?'iPad check-in':'Online check-in')+'</span>'+(r.sig?'<span class="tagk ok">Signed</span>':'') : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
   var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
   var first = String(r.name||'').split(' ')[0];
   var place = r.where === 'mobile' ? '' : ' at 9055 Marbach Rd, Suite 105';
   var msg = r.kind === 'sell' ? 'Hi ' + (first||'there') + ', this is iFixPhones about the ' + (r.device||'phone') + ' you want to sell. We can offer $' : r.kind === 'business' ? 'Hi ' + (first||'there') + ', this is iFixPhones following up on your repair request' + (r.org ? ' for ' + r.org : '') + '. ' : isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
     : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + place + '.' + (r.where==='mobile' ? ' We’ll text you when we’re on the way.' : '') + ' Reply here if anything changes.';
   var rem = 'Hi ' + (first||'there') + ', reminder from iFixPhones: your ' + (r.repair||'repair') + ' appointment is ' + (sameDay(r.apptAt, Date.now()) ? 'today' : 'tomorrow') + ' at ' + (r.time||'') + place + '. Reply here if you need to change it.';
-  var when = r.kind === 'checkin' ? esc('Checked in online · ' + (r.whenText||'')) : r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
+  var when = r.kind === 'checkin' ? esc(isKiosk(r) ? 'Checked in on the front desk iPad' : 'Checked in online · ' + (r.whenText||'')) : r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
   var open = r.status === 'new' || r.status === 'confirmed';
   var late = !isQ && r.apptAt && r.apptAt < Date.now() - 3600e3 && open;
   var soon = !isQ && open && r.apptAt && r.apptAt > Date.now() && r.apptAt - Date.now() < 36*3600e3;
@@ -2102,7 +2340,8 @@ function reqBox(r){
       '<div class="who">'+(r.name ? '<b>'+esc(r.name)+'</b> · ' : '')+'<a href="tel:'+esc(e164(r.phone))+'">'+esc(fmtPhone(r.phone))+'</a></div>' +
       '<div class="meta">'+esc(r.device||'')+(r.repair ? ' · '+esc(r.repair) : '')+(r.screen && !/not sure/i.test(r.screen) ? ' · '+esc(String(r.screen).replace(/\s*\(.*$/,'')) : '')+(r.source==='shop' ? ' · added by '+esc(r.createdBy||'staff') : '')+'</div>' +
       (r.address ? '<div class="meta">📍 <a href="https://maps.google.com/?q='+encodeURIComponent(r.address)+'" target="_blank" rel="noopener">'+esc(r.address)+'</a></div>' : '') +
-      (r.notes ? '<div class="note">'+esc(r.notes)+'</div>' : '') +
+      (r.notes ? '<div class="note">'+esc(r.notes)+(r.lang === 'es' ? ' <button class="link" data-act="trnote" data-id="'+esc(r.id)+'">Translate</button>' : '')+'</div>' : '') +
+      (reqExtras(r) ? '<div class="meta">'+esc(reqExtras(r))+'</div>' : '') +
       (r.remindedAt ? '<div class="meta" style="margin-top:4px">Reminder sent '+esc(rel(r.remindedAt))+'</div>' : '') +
     '</div>' +
     '<div class="side">'+tag+st+'<span class="t2">'+esc(rel(r.createdAt))+'</span></div>' +
@@ -2191,12 +2430,20 @@ function deleteReq(r){
   }, 'Deleted');
 }
 var SITE_REPAIR = {'Screen':'Screen','Battery':'Battery','Charging port':'Charging port','Back glass':'Back glass','Camera':'Rear camera','Water damage':'Water damage','Speaker or mic':'Loudspeaker','Buttons':'Buttons','Not sure':'Diagnostic'};
+function isKiosk(r){ return !!r && r.kind === 'checkin' && !!r.kioskKey; }
 function reqToTicket(r){
   var part = /incell/i.test(r.screen) ? 'Incell' : /oled/i.test(r.screen) ? 'OLED' : /original/i.test(r.screen) ? 'Refurbished original' : '';
+  // the check-in iPad can send several repairs, e.g. "Screen, Battery"
+  var reps = SITE_REPAIR[r.repair] ? [r.repair] : String(r.repair||'').split(/\s*,\s*/).filter(Boolean);
+  if (!reps.length) reps = [''];
+  var items = reps.map(function(x){ return {repair: SITE_REPAIR[x] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: (reps.length === 1 || x === 'Screen') ? part : '', price:'', desc: SITE_REPAIR[x] ? '' : (r.notes||'').slice(0,120)}; });
+  var okSig = typeof r.sig === 'string' && /^data:image\/(png|jpeg);base64,/.test(r.sig);
   ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:r.email||'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
-    items: [{repair: SITE_REPAIR[r.repair] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: part, price:'', desc: SITE_REPAIR[r.repair] ? '' : (r.notes||'').slice(0,120)}],
-    reqId: r.id, notes: r.notes||''});
+    items: items.concat(ACCS.filter(function(a){ return a.name === r.addons; }).map(function(a){ return {repair:'Accessory', part:'', price:accPrice(a.k), desc:a.name}; })),
+    reqId: r.id, notes: r.notes||'', lang: r.lang === 'es' ? 'es' : '', sig: okSig ? r.sig : '', sigAt: okSig ? (r.createdAt || Date.now()) : 0,
+    kioskInfo: isKiosk(r) ? [r.heard ? 'found us on ' + r.heard : '', r.backup ? 'backed up: ' + r.backup : '', r.lang === 'es' ? 'prefers Spanish' : ''].filter(Boolean).join(', ') : ''});
 }
+function reqExtras(r){ return [r.addons || '', r.backup ? 'Backed up: ' + r.backup : '', r.heard ? 'Found us: ' + r.heard : '', r.lang === 'es' ? 'Prefers Spanish' : ''].filter(Boolean).join(' · '); }
 
 /* time picker used by Reschedule and Add appointment */
 function timeOptions(day, where, cur, exceptId){
@@ -2397,9 +2644,10 @@ function renderSheet(){
   var techOpts = '<option value="">Unassigned</option>' + (S.settings.techs||[]).concat(t.assigned && (S.settings.techs||[]).indexOf(t.assigned) < 0 ? [t.assigned] : []).map(function(n){ return '<option'+(n===t.assigned?' selected':'')+'>'+esc(n)+'</option>'; }).join('');
   var warrOpts = WARR.concat(t.warranty && WARR.indexOf(t.warranty) < 0 ? [t.warranty] : []).map(function(w){ return '<option'+(w===(t.warranty||'None')?' selected':'')+'>'+esc(w)+'</option>'; }).join('');
   var readyMsg = 'Hi ' + (c.name||'').split(' ')[0] + ', your ' + (d.model||'device') + ' is ready for pickup at iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Balance due: ' + money(bal) + '.' : '') + ' Thank you!';
+  if (isEs(t)) readyMsg = 'Hola ' + (c.name||'').split(' ')[0] + ', su ' + (d.model||'equipo') + ' está listo para recoger en iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Saldo pendiente: ' + money(bal) + '.' : '') + ' ¡Gracias!';
 
   sheet.innerHTML =
-    '<div class="shead"><div class="grow"><h2 id="sh-title">#'+esc(t.num)+' · '+esc(c.name)+'</h2><div class="sub">Checked in '+esc(dt(t.createdAt))+' by '+esc(t.createdBy||'Staff')+(t.type==='mobile'?' · Mobile repair':'')+(t.warrantyReturn?' · Warranty return':'')+'</div></div>' +
+    '<div class="shead"><div class="grow"><h2 id="sh-title">#'+esc(t.num)+' · '+esc(c.name)+'</h2><div class="sub">Checked in '+esc(dt(t.createdAt))+' by '+esc(t.createdBy||'Staff')+(t.type==='mobile'?' · Mobile repair':'')+(t.warrantyReturn?' · Warranty return':'')+(t.lang==='es'?' · Prefers Spanish':'')+'</div></div>' +
       '<button class="x" data-act="close" aria-label="Close ticket">✕</button></div>' +
     '<div class="sbody">' +
       '<div class="card"><h3>Status '+pill(t.status)+'</h3><div class="steps" role="group" aria-label="Set status">'+steps+'</div>' +
@@ -2512,26 +2760,37 @@ function orderBox(t, pid){
   $('form', m).addEventListener('submit', function(e){ e.preventDefault(); var live = byId(t.id); if (live) setPartStatus(live, pid, 'ordered', $('#ob-n', m).value.trim()); close(); });
 }
 
-function templates(t){
+function templates(t, lang){
   var c = t.customer||{}, d = t.device||{};
   var first = (c.name||'').split(' ')[0] || 'there';
   var dev = d.model || 'device';
   var bal = balance(t);
+  if (isEs(t, lang)) {
+    var hola = 'Hola' + (first === 'there' ? '' : ' ' + first), dv = d.model || 'equipo';
+    return [
+      ['Checked in', hola + ', le escribe iFixPhones. Recibimos su ' + dv + ' (ticket #' + t.num + ')' + (t.dueAt ? ' y esperamos tenerlo listo ' + dueTextEs(t.dueAt) : '') + '. Le avisaremos por mensaje cuando esté listo. Siga su reparación aquí: ' + statusUrl(t)],
+      ['Part ordered', hola + ', ya pedimos la pieza para su ' + dv + '. Le avisaremos en cuanto llegue. – iFixPhones'],
+      ['Ready for pickup', hola + ', su ' + dv + ' está listo para recoger en iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Saldo pendiente: ' + money(bal) + '.' : '') + ' Abierto lun–sáb 10–8, dom 12–6.'],
+      ['Pickup reminder', hola + ', le recordamos que su ' + dv + ' lo está esperando en iFixPhones, 9055 Marbach Rd, Suite 105. Abierto lun–sáb 10–8, dom 12–6.'],
+      ['Review request', reviewMsg(t, 'es')],
+      ['Mobile visit', hola + ', le escribe iFixPhones. Su técnico va en camino para la reparación de su ' + dv + (t.address ? ' en ' + t.address : '') + '.']
+    ];
+  }
   return [
     ['Checked in', 'Hi ' + first + ', this is iFixPhones. We’ve got your ' + dev + ' (ticket #' + t.num + ')' + (t.dueAt ? ' and expect it ready ' + dueText(t.dueAt) : '') + '. We’ll text you when it’s done. Track it here: ' + statusUrl(t)],
     ['Part ordered', 'Hi ' + first + ', the part for your ' + dev + ' has been ordered. We’ll let you know as soon as it arrives. – iFixPhones'],
     ['Ready for pickup', 'Hi ' + first + ', your ' + dev + ' is ready for pickup at iFixPhones, 9055 Marbach Rd, Suite 105.' + (bal && !t.paid ? ' Balance due: ' + money(bal) + '.' : '') + ' Open Mon–Sat 10–8, Sun 12–6.'],
     ['Pickup reminder', 'Hi ' + first + ', a reminder that your ' + dev + ' is still waiting for you at iFixPhones, 9055 Marbach Rd, Suite 105. Open Mon–Sat 10–8, Sun 12–6.'],
-    ['Review request', reviewMsg(t)],
+    ['Review request', reviewMsg(t, 'en')],
     ['Mobile visit', 'Hi ' + first + ', this is iFixPhones. Your technician is on the way for your ' + dev + ' repair' + (t.address ? ' at ' + t.address : '') + '.']
   ];
 }
-function msgBox(t){
-  var c = t.customer||{};
+function msgBox(t, lang){
+  var c = t.customer||{}, es = isEs(t, lang);
   var m = document.createElement('div');
   m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','mb-t');
-  m.innerHTML = '<div class="scrim on" style="position:fixed" data-mb-close></div><div class="mbox" style="position:relative;z-index:41;width:min(560px,100%)"><div class="mhead"><h2 id="mb-t">Message '+esc((c.name||'').split(' ')[0])+'</h2><button class="x" data-mb-close aria-label="Close">✕</button></div><div class="mbody">' +
-    templates(t).map(function(x, i){ return '<div class="tpl"><b>'+esc(x[0])+'</b><p id="tpl'+i+'">'+esc(x[1])+'</p><div class="acts" style="margin-top:0"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text it</a><button class="btn sm ghost" data-copy="'+i+'">Copy</button></div></div>'; }).join('') +
+  m.innerHTML = '<div class="scrim on" style="position:fixed" data-mb-close></div><div class="mbox" style="position:relative;z-index:41;width:min(560px,100%)"><div class="mhead"><h2 id="mb-t">Message '+esc((c.name||'').split(' ')[0])+'</h2><button class="link" data-mblang style="margin-left:auto;margin-right:12px">'+(es?'Show in English':'Mostrar en español')+'</button><button class="x" data-mb-close aria-label="Close">✕</button></div><div class="mbody">' +
+    templates(t, es ? 'es' : 'en').map(function(x, i){ return '<div class="tpl"><b>'+esc(x[0])+'</b><p id="tpl'+i+'">'+esc(x[1])+'</p><div class="acts" style="margin-top:0"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text it</a><button class="btn sm ghost" data-copy="'+i+'">Copy</button></div></div>'; }).join('') +
     '<p class="hint">“Text it” opens your messages app with the text filled in. If nothing opens on this computer, use Copy.</p></div></div>';
   document.body.appendChild(m);
   requestAnimationFrame(function(){ m.classList.add('on'); var x = $('.x', m); if (x) x.focus(); });
@@ -2540,6 +2799,7 @@ function msgBox(t){
   document.addEventListener('keydown', k, true);
   m.addEventListener('click', async function(e){
     if (e.target.closest('[data-mb-close]')) { close(); return; }
+    if (e.target.closest('[data-mblang]')) { close(); msgBox(t, es ? 'en' : 'es'); return; }
     var cp = e.target.closest('[data-copy]');
     if (cp) { var txt = $('#tpl' + cp.getAttribute('data-copy'), m).textContent; try { await navigator.clipboard.writeText(txt); toast('Copied'); } catch(err) { toast('Copy didn’t work here. Select the text instead.'); } return; }
     var sent = e.target.closest('[data-sent]');
@@ -2627,6 +2887,10 @@ function ticketForm(existing, prefill){
     type: t ? (t.type||'shop') : (prefill && prefill.type) || 'shop',
     items: t && t.items && t.items.length ? clone(t.items) : (prefill && prefill.items ? clone(prefill.items) : [{repair:'Screen', part:'', price:''}]),
     reqId: prefill && prefill.reqId || null,
+    preSig: (!t && prefill && prefill.sig) || '',
+    preSigAt: (!t && prefill && prefill.sigAt) || 0,
+    kioskInfo: (!t && prefill && prefill.kioskInfo) || '',
+    stkOff: {}, stk: [],
     taxRate: t ? num(t.taxRate) : (S.settings.taxRate == null ? 8.25 : num(S.settings.taxRate))
   };
   var c = t && t.customer || (prefill ? clone(prefill) : {}), d = t && t.device || (prefill && prefill.model ? {model:prefill.model, brand:guessBrand(prefill.model)} : {});
@@ -2643,6 +2907,7 @@ function ticketForm(existing, prefill){
         '<div class="g2"><div class="f"><label for="tf-phone">Phone</label><input class="in" id="tf-phone" type="tel" inputmode="tel" autocomplete="off" value="'+esc(fmtPhone(c.phone))+'" placeholder="(210) 555-0123"></div>' +
         '<div class="f"><label for="tf-name">Name</label><input class="in" id="tf-name" autocomplete="off" value="'+esc(c.name)+'" placeholder="First and last name"></div></div>' +
         '<div id="tf-match"></div>' +
+        '<label class="check" style="margin-top:10px"><input type="checkbox" id="tf-es"'+((t ? t.lang === 'es' : prefill && prefill.lang === 'es') ? ' checked' : '')+'>Prefers Spanish (texts and receipts in Spanish)</label>' +
         '<div style="margin-top:12px" class="seg" role="group" aria-label="Where"><button type="button" data-tftype="shop" aria-pressed="'+(NT.type==='shop')+'">At the shop</button><button type="button" data-tftype="mobile" aria-pressed="'+(NT.type==='mobile')+'">Mobile</button></div>' +
         '<div class="g2" style="margin-top:12px"><div class="f" id="tf-addrw"><label for="tf-addr" id="tf-addrl">'+(NT.type==='mobile'?'Address (where we’re going)':'Address (optional)')+'</label><input class="in" id="tf-addr" autocomplete="off" value="'+esc((t&&t.address)||c.address||'')+'"></div>' +
         '<div class="f"><label for="tf-email">Email (optional)</label><input class="in" id="tf-email" type="email" autocomplete="off" value="'+esc(c.email||'')+'"></div></div>' +
@@ -2668,7 +2933,7 @@ function ticketForm(existing, prefill){
         '<div class="g2" style="margin-top:12px"><div class="f"><label for="tf-due">Promised by (optional)</label><input class="in" id="tf-due" type="datetime-local" value="'+esc(toLocalInput(t && t.dueAt))+'"></div>' +
         '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-wret" '+(t&&t.warrantyReturn?'checked':'')+'>Warranty return</label></div></div>' +
         '<div class="acts" style="margin-top:8px"><button type="button" class="chip" data-due="1">In 1 hour</button><button type="button" class="chip" data-due="eod">Today by close</button><button type="button" class="chip" data-due="tmr">Tomorrow 2 PM</button></div>' +
-        '<div id="tf-sums" style="margin-top:14px"></div><div class="tot b"><span>Total</span><span id="tf-total">$0</span></div><div id="tf-card"></div>' +
+        '<div id="tf-stock"></div><div id="tf-sums" style="margin-top:14px"></div><div class="tot b"><span>Total</span><span id="tf-total">$0</span></div><div id="tf-card"></div>' +
       '</div>' +
       '<div class="msec"><h3><span class="n">4</span>Condition at check-in</h3>' +
         '<div class="cl">' + CHECKS.map(function(ch){
@@ -2679,8 +2944,9 @@ function ticketForm(existing, prefill){
         '<div class="f" style="margin-top:14px"><label for="tf-dmg">Existing damage</label><textarea class="in" id="tf-dmg" placeholder="Cracked back glass, dent on bottom left corner, scratches on screen…">'+esc(t&&t.damage)+'</textarea></div>' +
         '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
       '</div>' +
-      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms (Soft OLED: 30 days for glitches only, not breakage or drops; Incell: no warranty) were explained.</span></label>' +
-        '<div class="sigwrap"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
+      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"'+(NT.preSig?' checked':'')+'><span><b>Customer agreed to the repair policy and to texts about this repair.</b> Backup, repair risks, warranty terms (Soft OLED: 30 days for glitches only, not breakage or drops; Incell: no warranty) were explained.</span></label>' +
+        (NT.preSig ? '<div class="sigwrap" id="tf-sigdone"><img class="sigimg" alt="Customer signature from the check-in iPad" src="'+esc(NT.preSig)+'"><div class="sigbar"><span>Signed on the check-in iPad · '+esc(dt(NT.preSigAt))+'</span><button type="button" class="link" data-sigredo>Sign again</button></div></div>' : '') +
+        '<div class="sigwrap'+(NT.preSig?' hidden':'')+'" id="tf-sigw"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
     '</div>' +
     '<div class="mfoot"><span class="err" id="tf-err" role="alert"></span><button type="button" class="btn ghost" data-tf-close>Cancel</button><button type="submit" class="btn" id="tf-save">'+(t?'Save changes':'Check in')+'</button></div>' +
   '</form>';
@@ -2688,7 +2954,7 @@ function ticketForm(existing, prefill){
   m._pre = clone(pre);
   renderItems();
   fillModels();
-  var SIG = t ? null : sigPad($('#tf-sig', m), function(){ var a = $('#tf-agree', m); if (a) a.checked = true; });
+  var SIG = (t || NT.preSig) ? null : sigPad($('#tf-sig', m), function(){ var a = $('#tf-agree', m); if (a) a.checked = true; });
   m._sig = SIG;
   requestAnimationFrame(function(){ m.classList.add('on'); var p0 = prefill ? $('#tf-brand', m) : $('#tf-phone', m); if (p0) p0.focus(); if (prefill) lookupCustomer(); });
 
@@ -2700,6 +2966,7 @@ function ticketForm(existing, prefill){
     var el = e.target;
     if (el.closest('[data-tf-close]')) { closeForm(); return; }
     if (el.closest('[data-sigclear]')) { if (SIG) SIG.clear(); return; }
+    if (el.closest('[data-sigredo]')) { NT.preSig = ''; NT.preSigAt = 0; var sd = $('#tf-sigdone', m); if (sd) sd.remove(); $('#tf-sigw', m).classList.remove('hidden'); SIG = sigPad($('#tf-sig', m), function(){ var a = $('#tf-agree', m); if (a) a.checked = true; }); m._sig = SIG; return; }
     var ty = el.closest('[data-tftype]');
     if (ty) { NT.type = ty.getAttribute('data-tftype'); $$('[data-tftype]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b === ty)); }); $('#tf-addrl').textContent = NT.type === 'mobile' ? 'Address (where we’re going)' : 'Address (optional)'; if (NT.type==='mobile') $('#tf-addr').focus(); return; }
     if (el.closest('[data-additem]')) { syncItems(); NT.items.push({repair:'Battery', part:'', price:''}); renderItems(); var r = $$('.irow select', m); if (r.length) r[r.length-2].focus(); return; }
@@ -2718,6 +2985,11 @@ function ticketForm(existing, prefill){
     }
     var use = el.closest('[data-usecust]');
     if (use) { $('#tf-name').value = use.getAttribute('data-usecust'); $('#tf-model').focus(); return; }
+  });
+  m.addEventListener('input', function(e){ if (e.target.id === 'tf-model' || e.target.id === 'tf-brand') stockSuggest(); });
+  m.addEventListener('change', function(e){
+    if (e.target.id === 'tf-model' || e.target.id === 'tf-brand') stockSuggest();
+    var sk = e.target.closest && e.target.closest('[data-stk]'); if (sk && NT) { NT.stkOff = NT.stkOff || {}; NT.stkOff[sk.getAttribute('data-stk')] = !sk.checked; }
   });
   m.addEventListener('input', function(e){
     if (e.target.id === 'tf-phone') lookupCustomer();
@@ -2757,7 +3029,7 @@ function renderItems(){
       '<label class="sr" for="it-p'+i+'">Part</label><select class="in" id="it-p'+i+'" data-f="part">'+pOpts+'</select>' +
       '<label class="sr" for="it-pr'+i+'">Price</label><input class="in pr" id="it-pr'+i+'" data-f="price" inputmode="decimal" placeholder="Price" value="'+esc(it.price)+'">' +
       '<button type="button" class="del" data-delitem="'+i+'" aria-label="Remove this repair">✕</button>' +
-      ((it.repair === 'Other repair' || it.repair === 'Other') ? '<label class="sr" for="it-d'+i+'">Describe the repair</label><input class="in desc" id="it-d'+i+'" data-f="desc" placeholder="Describe the repair, e.g. replace vibration motor" value="'+esc(it.desc||'')+'" maxlength="120">' : '') +
+      ((it.repair === 'Other repair' || it.repair === 'Other' || it.repair === 'Accessory') ? '<label class="sr" for="it-d'+i+'">Describe the repair</label><input class="in desc" id="it-d'+i+'" data-f="desc" placeholder="Describe the repair, e.g. replace vibration motor" value="'+esc(it.desc||'')+'" maxlength="120">' : '') +
       '</div>';
   }).join('');
   updateTotal();
@@ -2776,6 +3048,29 @@ function hintPrices(){
     $('[data-f="price"]', r).placeholder = lp != null ? 'Last ' + money(lp) : 'Price';
   });
 }
+/* new tickets: offer matching parts that are on the shelf */
+function catalogModel(brand, model){ var lm = String(model||'').trim().toLowerCase(); return (CATALOG[brand]||[]).filter(function(x){ return x.toLowerCase() === lm; })[0] || ''; }
+function itemStockType(brand, model, it){
+  var types = partTypes(brand, model), r = it.repair, p = String(it.part||''), want = null;
+  if (r === 'Screen') {
+    if (brand === 'Apple iPhone') want = /incell/i.test(p) ? 'Screen · Incell' : /oled/i.test(p) ? 'Screen · OLED' : /original|genuine/i.test(p) ? 'Screen · Original' : null;
+    else want = types.indexOf('Screen') > -1 ? 'Screen' : types.indexOf('Screen / digitizer') > -1 ? 'Screen / digitizer' : null;
+  } else want = r;
+  return want && types.indexOf(want) > -1 ? want : null;
+}
+function stockSuggest(){
+  var box = document.getElementById('tf-stock'); if (!box || !NT || NT.editId) return;
+  var model0 = ($('#tf-model')||{}).value || '', brand = ($('#tf-brand')||{}).value || guessBrand(model0), model = catalogModel(brand, model0);
+  var seen = {}, rows = [];
+  if (model) NT.items.forEach(function(it){
+    var ty = itemStockType(brand, model, it); if (!ty) return;
+    var id = stockId(brand, model, ty); if (seen[id]) return; seen[id] = 1;
+    var inv = invById(id); if (!inv || num(inv.qty) <= 0) return;
+    rows.push({id:id, name:model + ' · ' + ty, qty:num(inv.qty)});
+  });
+  NT.stk = rows; NT.stkOff = NT.stkOff || {};
+  box.innerHTML = rows.length ? '<div class="stocksug"><b>From your stock</b>' + rows.map(function(r){ return '<label class="check"><input type="checkbox" data-stk="'+esc(r.id)+'"'+(NT.stkOff[r.id]?'':' checked')+'><span>Take <b>'+esc(r.name)+'</b> off the shelf <span class="t2">('+r.qty+' left)</span></span></label>'; }).join('') + '</div>' : '';
+}
 function syncItems(){
   $$('#tf-items .irow').forEach(function(r){
     var i = +r.getAttribute('data-i'); if (!NT.items[i]) return;
@@ -2788,6 +3083,7 @@ function syncItems(){
 function updateTotal(){
   var tmp = {items: NT.items, discount: num(($('#tf-disc')||{}).value), taxExempt: !!(($('#tf-tex')||{}).checked), taxRate: NT.taxRate};
   var el = $('#tf-total'); if (el) el.textContent = money(total(tmp));
+  stockSuggest();
   var sm = $('#tf-sums');
   if (sm) sm.innerHTML = '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
     '<div class="tot"><span>Sales tax'+(tmp.taxExempt ? ' (exempt)' : ' ('+num(NT.taxRate)+'%)')+'</span><span>'+money(taxAmt(tmp))+'</span></div>' + (num(($('#tf-dep')||{}).value) ? '<div class="tot"><span>Deposit</span><span>−'+money(num($('#tf-dep').value))+'</span></div>' : '');
@@ -2812,8 +3108,9 @@ function submitForm(t, m, closeForm){
 
   var needDesc = NT.items.filter(function(i){ return (i.repair === 'Other repair' || i.repair === 'Other') && !String(i.desc||'').trim(); });
   if (needDesc.length) { var di = NT.items.indexOf(needDesc[0]); var de = $('#it-d' + di); if (de) { de.classList.add('bad'); de.focus(); } err.textContent = 'Describe the “Other repair”.'; return; }
-  var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other') && i.desc) o.desc = String(i.desc).trim().slice(0,120); return o; });
+  var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other' || i.repair === 'Accessory') && i.desc) o.desc = String(i.desc).trim().slice(0,120); return o; });
   var data = {
+    lang: ($('#tf-es')||{}).checked ? 'es' : '',
     type: NT.type,
     address: NT.type === 'mobile' ? $('#tf-addr').value.trim() : '',
     customer: {name:name, phone:fmtPhone(phone), address:$('#tf-addr').value.trim(), email:$('#tf-email').value.trim()},
@@ -2846,11 +3143,13 @@ function submitForm(t, m, closeForm){
     return;
   }
   var now = Date.now();
+  var takeStk = (NT.stk||[]).filter(function(r){ return !NT.stkOff[r.id] && invById(r.id) && num(invById(r.id).qty) > 0; });
+  var stkParts = takeStk.map(function(r){ var i = invById(r.id); return {id:uid(), name:i.name || r.name, supplier:'From stock', cost:num(i.cost), status:'arrived', orderNo:'', addedAt:now, arrivedAt:now, stockId:r.id}; });
   var body = Object.assign(data, {
     num: nextNum(), status:'in', createdAt:now, updatedAt:now, createdBy:who(),
-    paid:false, payMethod:'', paidAt:0, agreed:true, post:{}, parts:[],
-    sig: (m._sig && m._sig.has()) ? m._sig.data() : '', sigAt: (m._sig && m._sig.has()) ? now : 0,
-    log:[logEntry('checked in the device')].concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
+    paid:false, payMethod:'', paidAt:0, agreed:true, post:{}, parts:stkParts,
+    sig: (m._sig && m._sig.has()) ? m._sig.data() : (NT.preSig || ''), sigAt: (m._sig && m._sig.has()) ? now : (NT.preSig ? (NT.preSigAt || now) : 0),
+    log:[logEntry('checked in the device')].concat(NT.preSig && !(m._sig && m._sig.has()) ? [logEntry('customer signed on the check-in iPad')] : []).concat(NT.kioskInfo ? [logEntry('noted from the iPad: ' + NT.kioskInfo)] : []).concat(stkParts.map(function(p){ return logEntry('took “' + p.name + '” from stock'); })).concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
   });
   var reqId = NT.reqId;
   var ref = S.db.collection('tickets').doc();
@@ -2860,8 +3159,10 @@ function submitForm(t, m, closeForm){
     closeForm(); toast('Ticket #' + body.num + ' created');
     S.filter = 'active'; S.q = ''; S.view = 'tickets'; render();
     openTicket(ref.id);
+    takeStk.forEach(function(r){ stockQty(r.id, -1); });
+    if (takeStk.length) toast('Took ' + takeStk.map(function(r){ return r.name; }).join(', ') + ' from stock');
     if (reqId) patchReq(reqId, {status:'done', ticketId: ref.id, ticketNum: body.num});
-    if (S.settings.pushTickets !== false) pushPhone('New ticket #' + body.num, (body.customer.name||'') + ' · ' + (body.device.model||'') + ' · ' + repairsText(body) + ' · by ' + who());
+    if (S.settings.pushNewTickets === true) pushPhone('New ticket #' + body.num, (body.customer.name||'') + ' · ' + (body.device.model||'') + ' · ' + repairsText(body) + ' · by ' + who());
     if (S.settings.autoLabel) { var nt2 = byId(ref.id); if (nt2) setTimeout(function(){ printLabel(nt2); }, 400); }
   }).catch(function(e){
     btn.disabled = false; btn.textContent = 'Check in';
@@ -3141,6 +3442,18 @@ document.addEventListener('click', async function(e){
     case 'addappt': addApptBox(a.getAttribute('data-v') || ''); break;
     case 'blockday': blockDayBox(a.getAttribute('data-v')); break;
     case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
+    case 'translate': translateBox(); break;
+    case 'trnote': { var rn = reqById(a.getAttribute('data-id')); if (rn) translateBox({text: rn.notes || '', from:'es'}); break; }
+    case 'kioskpair': kioskPair(); break;
+    case 'kioskdel': {
+      var kid = a.getAttribute('data-id'), kk = (S.kiosks||[]).filter(function(k){ return k.id === kid; })[0];
+      var okk = await confirmBox('Remove this iPad?', 'It stops taking check-ins right away. You can set it up again any time.', 'Remove', true);
+      if (!okk) break;
+      S.kiosks = (S.kiosks||[]).filter(function(k){ return k.id !== kid; }); render();
+      retryOnce(function(){ return S.db.doc('kiosks/'+kid).delete(); }).then(function(){ toast('iPad removed'); }).catch(writeErr);
+      if (kk && kk.code) S.db.doc('kioskPair/'+kk.code).delete().catch(function(){});
+      break;
+    }
     case 'testalert': alertNew('Test alert', 'This is how new bookings will look.'); pushPhone('Test alert', 'Phone alerts are working.'); break;
     case 'sign': if (t) signBox(t); break;
     case 'delete': {
