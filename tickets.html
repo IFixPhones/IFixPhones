@@ -326,20 +326,7 @@ select.in{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:14px}
 .seg button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
-.trbtn{font-size:15px}
-.trout{margin-top:12px;background:#f5f5f7;border-radius:12px;padding:14px 16px}
-.trres{font-size:22px;font-weight:600;line-height:1.35;letter-spacing:-.01em}
-.trmic.on{background:#c9302c}
-.phr{display:grid;gap:8px;margin-top:8px}
-.phrow{display:flex;gap:8px;align-items:stretch}
-.phbig{flex:1;text-align:left;border:1px solid #d2d2d7;background:#fff;border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer;color:inherit}
-.phbig b{display:block;font-size:15px}
-.phbig span{display:block;font-size:13px;color:#6e6e73;margin-top:2px}
-.phsay{border:1px solid #d2d2d7;background:#fff;border-radius:12px;width:48px;font-size:18px;cursor:pointer}
-.bigtr{position:fixed;inset:0;z-index:300;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
-.bigtr .b{font-size:clamp(34px,7vw,76px);font-weight:700;letter-spacing:-.025em;line-height:1.12;max-width:1000px;color:#1d1d1f}
-.bigtr .s{font-size:18px;color:#6e6e73;margin-top:20px;max-width:760px}
-.bigtr .acts{margin-top:34px;justify-content:center}
+.trbtn{font-size:15px;text-decoration:none}
 .stocksug{margin-top:14px;background:#eef7f1;border-radius:12px;padding:12px 14px}
 .stocksug>b{display:block;font-size:14px;margin-bottom:2px}
 .stocksug .check{margin-top:8px}
@@ -725,6 +712,10 @@ function ding(){
   } catch(e) {}
 }
 var titleT = 0;
+var lastErrAt = 0;
+function showErr(msg){ var now = Date.now(); if (now - lastErrAt < 4000) return; lastErrAt = now; try { toast('Something went wrong: ' + String(msg||'').slice(0, 120) + '. Reload the page, and send this to support if it keeps happening.'); } catch(e) {} }
+window.addEventListener('error', function(e){ if (e && e.message && !/ResizeObserver|Script error/i.test(e.message) && (!e.filename || /tickets\.html/.test(e.filename))) showErr(e.message); });
+window.addEventListener('unhandledrejection', function(e){ var r = e && e.reason; var m = r && (r.message || r.code) || ''; if (m && !/permission-denied|unavailable|network|offline|aborted/i.test(m)) showErr(m); });
 function alertNew(title, body, go){
   ding();
   toast(title + (body ? ' · ' + body.split('\n')[0] : ''));
@@ -878,7 +869,7 @@ function topbar(){
     '<div class="brand">iFixPhones<span>Tickets</span></div>' +
     '<nav class="tabs" aria-label="Sections">' + tabs + '</nav>' +
     '<div class="grow"></div>' +
-    (S.status==='ready' ? '<button class="btn ghost trbtn" data-act="translate" aria-label="Translator, English and Spanish">🌐<span class="newtxt"> Translate</span></button>' : '') +
+    (S.status==='ready' ? '<a class="btn ghost trbtn" href="translate.html" target="_blank" rel="noopener" aria-label="Translator, English and Spanish (opens in a new tab)">🌐<span class="newtxt"> Translate</span></a>' : '') +
     '<button class="me" data-act="who" aria-label="Working as '+esc(who())+'. Change"><span class="av">'+esc(S.me ? initials(S.me) : '?')+'</span><span class="nm">'+esc(S.me ? S.me : 'Who’s working?')+'</span></button>' +
     (S.status==='ready' && S.canWrite ? '<button class="btn" data-act="new">+ <span class="newtxt">New ticket</span></button>' : '') +
   '</div></header>';
@@ -1222,142 +1213,6 @@ function savePublic(patch){
   S.pub = Object.assign({}, S.pub||{}, patch); render();
   return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
 }
-/* ---------- translator (English ⇄ Spanish) ---------- */
-var PHRASES = [
-  ['Hi! How can I help you?','¡Hola! ¿En qué le puedo ayudar?'],
-  ['What’s wrong with your phone?','¿Qué problema tiene su teléfono?'],
-  ['Can I see your phone?','¿Me permite ver su teléfono?'],
-  ['What’s your passcode? We only use it to test the phone.','¿Cuál es su código de desbloqueo? Solo lo usamos para probar el teléfono.'],
-  ['Which screen do you want: Incell or OLED?','¿Qué pantalla prefiere: Incell u OLED?'],
-  ['The OLED screen has a 30-day warranty for glitches only, not drops or breaks.','La pantalla OLED tiene 30 días de garantía solo por fallas, no por caídas ni golpes.'],
-  ['Incell screens have no warranty.','Las pantallas Incell no tienen garantía.'],
-  ['This is the price, plus tax.','Este es el precio, más impuesto.'],
-  ['We have the part in stock.','Tenemos la pieza en existencia.'],
-  ['We need to order the part. It usually takes 1 to 2 days.','Necesitamos pedir la pieza. Normalmente tarda de 1 a 2 días.'],
-  ['The repair takes about 1 hour.','La reparación tarda como 1 hora.'],
-  ['Please back up your phone before the repair.','Por favor respalde su teléfono antes de la reparación.'],
-  ['Your phone has water damage. We can’t guarantee the repair.','Su teléfono tiene daño por agua. No podemos garantizar la reparación.'],
-  ['We’ll text you when it’s ready.','Le enviaremos un mensaje cuando esté listo.'],
-  ['Please wait a moment.','Un momento, por favor.'],
-  ['Your phone is ready.','Su teléfono está listo.'],
-  ['Please test your phone before you pay.','Por favor pruebe su teléfono antes de pagar.'],
-  ['Cash or card?','¿Efectivo o tarjeta?'],
-  ['If the screen doesn’t respond to touch, force restart: volume up, volume down, then hold the side button.','Si la pantalla no responde, haga un reinicio forzado: suba el volumen, baje el volumen y mantenga presionado el botón lateral.'],
-  ['Thank you! Have a great day.','¡Gracias! Que tenga un buen día.']
-];
-function speak(text, lang){
-  try {
-    if (!window.speechSynthesis) throw 0;
-    var u = new SpeechSynthesisUtterance(text), want = lang === 'es' ? 'es' : 'en';
-    var vs = speechSynthesis.getVoices().filter(function(v){ return String(v.lang||'').toLowerCase().indexOf(want) === 0; });
-    var pick = vs.filter(function(v){ return /US|MX/i.test(v.lang); })[0] || vs[0];
-    u.lang = lang === 'es' ? 'es-US' : 'en-US'; if (pick) u.voice = pick; u.rate = 0.95;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e) { toast('This device can’t read text out loud.'); }
-}
-function decodeHtml(x){ var ta = document.createElement('textarea'); ta.innerHTML = x; return ta.value; }
-async function translateText(text, from, to){
-  text = String(text||'').trim(); if (!text) return '';
-  // 1) built into the browser (Chrome on a computer): private and works offline
-  try {
-    if (self.Translator && Translator.availability) {
-      var av = await Translator.availability({sourceLanguage:from, targetLanguage:to});
-      if (av && av !== 'unavailable') { var tr = await Translator.create({sourceLanguage:from, targetLanguage:to}); return await tr.translate(text); }
-    }
-  } catch(e) {}
-  // 2) free MyMemory service (iPhone, iPad, other browsers), in pieces of about 400 characters
-  var parts = [], cur = '';
-  (text.match(/[^.!?\n]+[.!?\n]*\s*/g) || [text]).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(sn){ if ((cur + ' ' + sn).length > 400 && cur) { parts.push(cur); cur = sn; } else cur = cur ? cur + ' ' + sn : sn; });
-  if (cur) parts.push(cur);
-  var out = [];
-  for (var i = 0; i < parts.length; i++) {
-    var r = await fetch('https://api.mymemory.translated.net/get?' + new URLSearchParams({q: parts[i].slice(0, 450), langpair: from + '|' + to}));
-    var j = await r.json();
-    if (!j || !j.responseData || String(j.responseStatus) !== '200') throw new Error('translate');
-    out.push(decodeHtml(j.responseData.translatedText || ''));
-  }
-  return out.join(' ');
-}
-function googleTr(text, from, to){ return 'https://translate.google.com/?sl=' + from + '&tl=' + to + '&op=translate&text=' + encodeURIComponent(text||''); }
-function showBig(text, sub, lang){
-  var o = document.createElement('div'); o.className = 'bigtr'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true'); o.setAttribute('aria-label','Translation');
-  o.innerHTML = '<p class="b" lang="'+(lang==='es'?'es':'en')+'">'+esc(text)+'</p>' + (sub ? '<p class="s">'+esc(sub)+'</p>' : '') +
-    '<div class="acts"><button class="btn" data-big="say">🔊 '+(lang==='es'?'Escuchar':'Play')+'</button><button class="btn ghost" data-big="close">Close</button></div>';
-  document.body.appendChild(o);
-  var close = function(){ try { speechSynthesis.cancel(); } catch(e) {} o.remove(); document.removeEventListener('keydown', k, true); };
-  var k = function(e){ if (e.key === 'Escape') { e.stopPropagation(); close(); } };
-  document.addEventListener('keydown', k, true);
-  o.addEventListener('click', function(e){ var b = e.target.closest('[data-big]'); if (!b) return; if (b.getAttribute('data-big') === 'say') speak(text, lang); else close(); });
-  o.querySelector('[data-big="close"]').focus();
-}
-function translateBox(opts){
-  opts = opts || {};
-  var from = opts.from === 'es' ? 'es' : 'en', last = null, rec = null, listening = false;
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var phr = PHRASES.map(function(p, i){ return '<div class="phrow"><button type="button" class="phbig" data-ph="'+i+'"><b lang="es">'+esc(p[1])+'</b><span>'+esc(p[0])+'</span></button><button type="button" class="phsay" data-phsay="'+i+'" aria-label="Say it in Spanish: '+esc(p[0])+'">🔊</button></div>'; }).join('');
-  var m = modalShell('tr', 'Translator',
-    '<div class="seg" role="group" aria-label="Who is talking"><button type="button" data-trdir="en">You speak English</button><button type="button" data-trdir="es">Cliente habla español</button></div>' +
-    '<div class="f" style="margin-top:12px"><label for="tr-in" id="tr-inl"></label><textarea class="in" id="tr-in" rows="3"></textarea></div>' +
-    '<div class="acts"><button type="button" class="btn trmic" id="tr-mic">🎤 <span id="tr-micl"></span></button><button type="button" class="btn dark" id="tr-go">Translate</button></div>' +
-    '<p class="hint" id="tr-note" role="status"></p>' +
-    '<div class="trout hidden" id="tr-out"><div class="trres" id="tr-res"></div><div class="acts" style="margin-top:10px"><button type="button" class="btn sm" id="tr-say">🔊 Play</button><button type="button" class="btn sm ghost" id="tr-big">Show big</button><a class="btn sm ghost" id="tr-g" target="_blank" rel="noopener">Open in Google Translate</a></div></div>' +
-    '<h3 style="margin-top:20px;font-size:15px">Quick phrases <span class="muted" style="font-weight:400">· tap to show it big and play it in Spanish</span></h3><div class="phr">' + phr + '</div>' +
-    '<p class="hint" style="margin-top:14px">Typed or spoken words are sent to a free translation service (MyMemory). Chrome on a computer translates on the device instead. Don’t use it for passcodes or card numbers.</p>',
-    '<button class="btn" data-mclose>Done</button>', true);
-  function setDir(d){
-    from = d; stopMic();
-    $$('[data-trdir]', m).forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-trdir') === d)); });
-    $('#tr-inl', m).textContent = d === 'en' ? 'What you want to say (English)' : 'Lo que el cliente quiere decir (español)';
-    $('#tr-in', m).setAttribute('placeholder', d === 'en' ? 'Type it, or tap Talk and speak…' : 'Escriba aquí, o toque Hablar…');
-    $('#tr-in', m).setAttribute('lang', d);
-    $('#tr-micl', m).textContent = d === 'en' ? 'Talk' : 'Hablar';
-  }
-  async function run(auto){
-    var txt = $('#tr-in', m).value.trim(); if (!txt) { $('#tr-in', m).focus(); return; }
-    var to = from === 'en' ? 'es' : 'en', note = $('#tr-note', m);
-    note.textContent = 'Translating…';
-    $('#tr-g', m).href = googleTr(txt, from, to);
-    try {
-      var res = await translateText(txt, from, to);
-      last = {text: res, src: txt, lang: to};
-      $('#tr-res', m).textContent = res; $('#tr-res', m).setAttribute('lang', to);
-      $('#tr-say', m).textContent = '🔊 ' + (to === 'es' ? 'Escuchar' : 'Play');
-      $('#tr-out', m).classList.remove('hidden'); note.textContent = '';
-      if (auto) speak(res, to);
-    } catch(e) {
-      $('#tr-out', m).classList.add('hidden');
-      note.innerHTML = 'Couldn’t translate right now (no internet, or today’s free limit is used up). <a href="'+esc(googleTr(txt, from, to))+'" target="_blank" rel="noopener">Open it in Google Translate</a>.';
-    }
-  }
-  function stopMic(){ if (rec && listening) { try { rec.stop(); } catch(e) {} } listening = false; var b = $('#tr-mic', m); if (b) b.classList.remove('on'); }
-  $('#tr-mic', m).addEventListener('click', function(){
-    if (!SR) { $('#tr-note', m).textContent = 'Voice isn’t available in this browser. Tap the text box and use the microphone on your keyboard instead.'; $('#tr-in', m).focus(); return; }
-    if (listening) { stopMic(); return; }
-    try {
-      rec = new SR(); rec.lang = from === 'en' ? 'en-US' : 'es-US'; rec.interimResults = true; rec.continuous = false;
-      var finalText = '';
-      rec.onresult = function(ev){ var t2 = ''; for (var i = 0; i < ev.results.length; i++) t2 += ev.results[i][0].transcript; finalText = t2; $('#tr-in', m).value = t2; };
-      rec.onerror = function(ev){ listening = false; $('#tr-mic', m).classList.remove('on'); $('#tr-note', m).textContent = ev.error === 'not-allowed' ? 'Allow the microphone for this site, then try again.' : 'Didn’t catch that. Try again, or type it.'; };
-      rec.onend = function(){ var was = listening; listening = false; $('#tr-mic', m).classList.remove('on'); $('#tr-micl', m).textContent = from === 'en' ? 'Talk' : 'Hablar'; if (was && finalText.trim()) run(true); };
-      rec.start(); listening = true; $('#tr-mic', m).classList.add('on'); $('#tr-micl', m).textContent = from === 'en' ? 'Listening… tap to stop' : 'Escuchando… toque para parar';
-      $('#tr-note', m).textContent = '';
-    } catch(e) { $('#tr-note', m).textContent = 'Voice isn’t available here. Use the microphone on your keyboard instead.'; }
-  });
-  m.addEventListener('click', function(e){
-    var d = e.target.closest('[data-trdir]'); if (d) { setDir(d.getAttribute('data-trdir')); $('#tr-out', m).classList.add('hidden'); $('#tr-in', m).value = ''; return; }
-    if (e.target.closest('#tr-go')) { run(false); return; }
-    if (e.target.closest('#tr-say') && last) { speak(last.text, last.lang); return; }
-    if (e.target.closest('#tr-big') && last) { showBig(last.text, last.src, last.lang); return; }
-    var ph = e.target.closest('[data-ph]'); if (ph) { var p = PHRASES[+ph.getAttribute('data-ph')]; showBig(p[1], p[0], 'es'); speak(p[1], 'es'); return; }
-    var ps = e.target.closest('[data-phsay]'); if (ps) { speak(PHRASES[+ps.getAttribute('data-phsay')][1], 'es'); return; }
-    if (e.target.closest('[data-mclose]')) { stopMic(); try { speechSynthesis.cancel(); } catch(x) {} }
-  });
-  $('#tr-in', m).addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); run(false); } });
-  setDir(from);
-  if (opts.text) { $('#tr-in', m).value = opts.text; run(false); }
-  try { speechSynthesis.getVoices(); } catch(e) {}
-}
-
 /* ---------- front desk iPad (kiosk.html) ---------- */
 function kioskPanel(){
   var now = Date.now();
@@ -1386,7 +1241,8 @@ function kioskPair(){
   var m = modalShell('kp', 'Set up the front desk iPad',
     '<ol style="padding-left:20px;line-height:1.6;font-size:15px"><li>On the store iPad, open <b>ifixphones.net/kiosk.html</b> (or its Home Screen icon).</li><li>Tap <b>Set up this iPad</b> at the bottom of the screen.</li><li>Type this code:</li></ol>' +
     '<div style="font-size:40px;font-weight:700;letter-spacing:.12em;text-align:center;background:var(--mist,#f5f5f7);border-radius:14px;padding:18px 10px;margin:14px 0;font-variant-numeric:tabular-nums">'+esc(fmtCode(code))+'</div>' +
-    '<p class="hint" id="kp-status" role="status">Works once, for 10 minutes. Waiting for the iPad…</p>',
+    '<p class="hint" id="kp-status" role="status">Works once, for 10 minutes. Waiting for the iPad…</p>' +
+    '<p class="hint" style="margin-top:10px">Testing on this computer instead? <a href="kiosk.html#pair='+esc(code)+'" target="_blank" rel="noopener">Open the check-in page here, already set up</a>.</p>',
     '<button class="btn" data-mclose>Close</button>');
   retryOnce(function(){ return b.commit(); }).catch(function(e){ m.remove(); S.pairWait = null; writeErr(e); });
 }
@@ -2340,7 +2196,7 @@ function reqBox(r){
       '<div class="who">'+(r.name ? '<b>'+esc(r.name)+'</b> · ' : '')+'<a href="tel:'+esc(e164(r.phone))+'">'+esc(fmtPhone(r.phone))+'</a></div>' +
       '<div class="meta">'+esc(r.device||'')+(r.repair ? ' · '+esc(r.repair) : '')+(r.screen && !/not sure/i.test(r.screen) ? ' · '+esc(String(r.screen).replace(/\s*\(.*$/,'')) : '')+(r.source==='shop' ? ' · added by '+esc(r.createdBy||'staff') : '')+'</div>' +
       (r.address ? '<div class="meta">📍 <a href="https://maps.google.com/?q='+encodeURIComponent(r.address)+'" target="_blank" rel="noopener">'+esc(r.address)+'</a></div>' : '') +
-      (r.notes ? '<div class="note">'+esc(r.notes)+(r.lang === 'es' ? ' <button class="link" data-act="trnote" data-id="'+esc(r.id)+'">Translate</button>' : '')+'</div>' : '') +
+      (r.notes ? '<div class="note">'+esc(r.notes)+(r.lang === 'es' ? ' <a class="link" href="translate.html#from=es&text='+encodeURIComponent(r.notes)+'" target="_blank" rel="noopener">Translate</a>' : '')+'</div>' : '') +
       (reqExtras(r) ? '<div class="meta">'+esc(reqExtras(r))+'</div>' : '') +
       (r.remindedAt ? '<div class="meta" style="margin-top:4px">Reminder sent '+esc(rel(r.remindedAt))+'</div>' : '') +
     '</div>' +
@@ -3442,8 +3298,6 @@ document.addEventListener('click', async function(e){
     case 'addappt': addApptBox(a.getAttribute('data-v') || ''); break;
     case 'blockday': blockDayBox(a.getAttribute('data-v')); break;
     case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
-    case 'translate': translateBox(); break;
-    case 'trnote': { var rn = reqById(a.getAttribute('data-id')); if (rn) translateBox({text: rn.notes || '', from:'es'}); break; }
     case 'kioskpair': kioskPair(); break;
     case 'kioskdel': {
       var kid = a.getAttribute('data-id'), kk = (S.kiosks||[]).filter(function(k){ return k.id === kid; })[0];

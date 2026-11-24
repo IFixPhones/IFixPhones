@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="format-detection" content="telephone=no">
+<title>Translator | iFixPhones</title>
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--mist:#f5f5f7;--ink:#1d1d1f;--graphite:#6e6e73;--blue:#0071e3;--blue-d:#0058b0;--green:#1a7f37;--red:#c9302c;--line:#d2d2d7;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[tabindex="-1"]:focus{outline:none}
+
+/* header */
+.hd{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;border-bottom:1px solid rgba(0,0,0,.07);background:rgba(255,255,255,.92)}
+.hd h1{font-size:19px;letter-spacing:-.02em;margin-right:auto}
+.hd h1 span{color:var(--graphite);font-weight:500}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-size:15px;white-space:nowrap}
+.pill[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.notice{flex:none;font-size:14px;line-height:1.4;background:#fff8e6;color:#5c4400;padding:9px 16px}
+
+/* conversation */
+.chat{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px}
+.empty{margin:auto;text-align:center;color:var(--graphite);max-width:420px;padding:20px}
+.empty b{display:block;color:var(--ink);font-size:22px;letter-spacing:-.02em;margin-bottom:8px}
+.empty p{font-size:16px;line-height:1.45}
+.msg{max-width:88%;border-radius:20px;padding:12px 16px 10px;position:relative}
+.msg.en{align-self:flex-end;background:#0066cc;color:#fff;border-bottom-right-radius:6px}
+.msg.es{align-self:flex-start;background:var(--mist);border-bottom-left-radius:6px}
+.msg .tr{font-size:22px;font-weight:600;line-height:1.3;letter-spacing:-.015em}
+.msg .src{font-size:14px;margin-top:6px;line-height:1.35}
+.msg.en .src{color:#fff}
+.msg.es .src{color:#48484a}
+.msg .tools{display:flex;gap:6px;margin-top:8px}
+.msg .tools button{border:0;border-radius:999px;padding:6px 12px;font-size:14px;background:#fff;color:#0058b0;font-weight:600}
+.msg.es .tools button{background:#fff;color:var(--ink)}
+.msg.live{opacity:.7}
+.msg.err{background:#fde8e7;color:#8a1f1b}
+
+/* bottom bar */
+.bar{flex:none;border-top:1px solid rgba(0,0,0,.07);padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);background:#fff}
+.mics{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mic{display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:18px;height:68px;font-size:19px;font-weight:600;color:#fff}
+.mic svg{width:22px;height:22px;fill:currentColor}
+.mic.en{background:var(--blue)}
+.mic.es{background:var(--ink)}
+.mic.on{background:var(--red)!important;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.75}}
+@media (prefers-reduced-motion:reduce){.mic.on{animation:none}}
+.type{display:flex;gap:8px;margin-top:10px}
+.type .lang{flex:none;border:1px solid var(--line);background:#fff;border-radius:14px;padding:0 12px;font-size:15px;font-weight:600;min-width:58px}
+.type input{flex:1;min-width:0;font:inherit;font-size:17px;border:1px solid #86868b;border-radius:14px;padding:0 14px;height:48px;outline:none;-webkit-appearance:none}
+.type input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,113,227,.18)}
+.type .send{flex:none;border:0;background:var(--blue);color:#fff;border-radius:14px;padding:0 16px;font-size:16px;font-weight:600}
+.row2{display:flex;gap:8px;margin-top:10px}
+.row2 .pill{flex:1;text-align:center}
+
+@media (max-width:430px){.hd h1 span{display:none}}
+/* phrases sheet */
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.3);display:flex;align-items:flex-end;justify-content:center}
+.sheet .box{background:#fff;width:100%;max-width:760px;max-height:86dvh;border-radius:22px 22px 0 0;display:flex;flex-direction:column}
+.sheet .top{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 10px}
+.sheet .top h2{font-size:20px}
+.sheet .top button{border:0;background:var(--blue);color:#fff;border-radius:999px;padding:9px 18px;font-size:16px;font-weight:600}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 18px 10px;-webkit-overflow-scrolling:touch}
+.tabs button{flex:none}
+.plist{overflow-y:auto;padding:4px 18px calc(env(safe-area-inset-bottom) + 18px);display:grid;gap:8px}
+.ph{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px}
+.ph b{display:block;font-size:17px;line-height:1.3}
+.ph span{display:block;font-size:14px;color:var(--graphite);margin-top:3px}
+
+/* show big */
+.big{position:fixed;inset:0;z-index:40;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+.big .t{font-size:clamp(34px,8vw,80px);font-weight:700;letter-spacing:-.025em;line-height:1.12;max-width:1000px}
+.big .s{font-size:18px;color:var(--graphite);margin-top:20px;max-width:760px}
+.big .acts{display:flex;gap:10px;margin-top:34px}
+.big .acts button{border:0;border-radius:999px;padding:14px 24px;font-size:18px;font-weight:600}
+.big .play{background:var(--blue);color:#fff}
+.big .close{background:var(--mist)}
+
+/* face to face */
+.face{flex:1;display:grid;grid-template-rows:1fr 1fr;min-height:0}
+.face .half{display:flex;flex-direction:column;justify-content:space-between;padding:18px 18px 14px;min-height:0}
+.face .half.them{transform:rotate(180deg);background:var(--mist);border-bottom:1px solid var(--line)}
+.face .say{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(26px,6vw,52px);font-weight:700;letter-spacing:-.02em;line-height:1.15;overflow:auto;padding:6px}
+.face .say.dim{font-size:20px;font-weight:500;color:var(--graphite)}
+.face .mic{height:62px}
+</style>
+</head>
+<body>
+<header class="hd">
+  <h1>Translator <span>EN ⇄ ES</span></h1>
+  <button class="pill" type="button" id="facebtn" aria-pressed="false">Face to face</button>
+  <button class="pill" type="button" id="clear">Clear</button>
+</header>
+<p class="notice hidden" id="notice" role="status"></p>
+
+<main class="chat" id="chat" aria-live="polite">
+  <div class="empty" id="empty"><b>Talk, type or tap a phrase.</b><p>Tap <b style="display:inline;font-size:inherit">English</b> and speak, or let the customer tap <b style="display:inline;font-size:inherit">Español</b>. The translation shows here and plays out loud.</p></div>
+</main>
+
+<section class="face hidden" id="face" aria-label="Face to face">
+  <div class="half them" lang="es">
+    <div class="say dim" id="saythem">Toque “Hablar” y diga lo que necesita.</div>
+    <button class="mic es" type="button" data-mic="es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg><span>Hablar</span></button>
+  </div>
+  <div class="half me">
+    <div class="say dim" id="sayme">Tap “English” and speak. The customer sees it in Spanish.</div>
+    <button class="mic en" type="button" data-mic="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg><span>English</span></button>
+  </div>
+</section>
+
+<footer class="bar" id="bar">
+  <div class="mics">
+    <button class="mic en" type="button" data-mic="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg><span>English</span></button>
+    <button class="mic es" type="button" data-mic="es" lang="es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg><span>Español</span></button>
+  </div>
+  <form class="type" id="typeform" autocomplete="off">
+    <button class="lang" type="button" id="tlang" aria-label="Typing in English. Tap to switch to Spanish.">EN</button>
+    <label class="sr" for="tin">Type something to translate</label>
+    <input id="tin" placeholder="Type in English…" enterkeyhint="send" autocorrect="on">
+    <button class="send" type="submit">Go</button>
+  </form>
+  <div class="row2"><button class="pill" type="button" id="phbtn">Quick phrases</button><button class="pill" type="button" id="autobtn" aria-pressed="true">Auto-play: on</button></div>
+</footer>
+
+<div class="sheet hidden" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+  <div class="box">
+    <div class="top"><h2 id="sheet-t">Quick phrases</h2><button type="button" id="sheetx">Done</button></div>
+    <div class="tabs" id="tabs" role="group" aria-label="Phrase groups"></div>
+    <div class="plist" id="plist"></div>
+  </div>
+</div>
+
+<div class="big hidden" id="big" role="dialog" aria-modal="true" aria-label="Translation, large">
+  <p class="t" id="bigt"></p><p class="s" id="bigs"></p>
+  <div class="acts"><button class="play" type="button" id="bigplay">🔊 Play</button><button class="close" type="button" id="bigx">Close</button></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  /* Optional: paste a Google Cloud Translation API key here for the best quality on iPhone and iPad.
+     Restrict the key to ifixphones.net and to the Cloud Translation API, and set a daily quota.
+     Left empty, the page uses Chrome's built-in translator on computers and the free MyMemory service elsewhere. */
+  var GOOGLE_KEY = '';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  var auto = true, typeLang = 'en', face = false, rec = null, recLang = '', engine = '';
+
+  var GROUPS = [
+    ['Start', [
+      ['Hi! How can I help you?','¡Hola! ¿En qué le puedo ayudar?'],
+      ['One moment, please.','Un momento, por favor.'],
+      ['Please check in on the iPad.','Por favor regístrese en el iPad.'],
+      ['What’s wrong with your phone?','¿Qué problema tiene su teléfono?'],
+      ['Can I see your phone?','¿Me permite ver su teléfono?'],
+      ['Did the phone get wet?','¿Se le mojó el teléfono?'],
+      ['What’s your passcode? We only use it to test the phone.','¿Cuál es su código de desbloqueo? Solo lo usamos para probar el teléfono.'],
+      ['Please back up your phone before the repair.','Por favor respalde su teléfono antes de la reparación.']
+    ]],
+    ['Screens', [
+      ['Which screen do you want: Incell or OLED?','¿Qué pantalla prefiere: Incell u OLED?'],
+      ['The OLED looks like the original screen.','La OLED se ve como la pantalla original.'],
+      ['The OLED screen has a 30-day warranty for glitches only, not drops or breaks.','La pantalla OLED tiene 30 días de garantía solo por fallas, no por caídas ni golpes.'],
+      ['Incell screens have no warranty.','Las pantallas Incell no tienen garantía.'],
+      ['Do you want a screen protector? We have regular and privacy.','¿Quiere un protector de pantalla? Tenemos regular y de privacidad.'],
+      ['Your phone has water damage. We can’t guarantee the repair.','Su teléfono tiene daño por agua. No podemos garantizar la reparación.']
+    ]],
+    ['Time & parts', [
+      ['The repair takes about 1 hour.','La reparación tarda como 1 hora.'],
+      ['The repair takes about 30 minutes.','La reparación tarda como 30 minutos.'],
+      ['We have the part in stock.','Tenemos la pieza en existencia.'],
+      ['We need to order the part. It usually takes 1 to 2 days.','Necesitamos pedir la pieza. Normalmente tarda de 1 a 2 días.'],
+      ['We’ll text you when it’s ready.','Le enviaremos un mensaje cuando esté listo.'],
+      ['You can wait here or come back later.','Puede esperar aquí o regresar más tarde.']
+    ]],
+    ['Pay & pickup', [
+      ['This is the price, plus tax.','Este es el precio, más impuesto.'],
+      ['Cash or card?','¿Efectivo o tarjeta?'],
+      ['Cards have a small fee.','Con tarjeta hay un pequeño cargo.'],
+      ['Your phone is ready.','Su teléfono está listo.'],
+      ['Please test your phone before you pay.','Por favor pruebe su teléfono antes de pagar.'],
+      ['If the screen doesn’t respond to touch, force restart: volume up, volume down, then hold the side button.','Si la pantalla no responde, haga un reinicio forzado: suba el volumen, baje el volumen y mantenga presionado el botón lateral.'],
+      ['Thank you! Have a great day.','¡Gracias! Que tenga un buen día.']
+    ]],
+    ['Customer answers', [
+      ['Yes.','Sí.', 'es'],
+      ['No.','No.', 'es'],
+      ['I don’t understand.','No entiendo.', 'es'],
+      ['How much does it cost?','¿Cuánto cuesta?', 'es'],
+      ['How long does it take?','¿Cuánto tiempo tarda?', 'es'],
+      ['I’ll wait here.','Voy a esperar aquí.', 'es'],
+      ['I’ll come back later.','Regreso más tarde.', 'es'],
+      ['Can you text me?','¿Me puede enviar un mensaje?', 'es']
+    ]]
+  ];
+
+  /* ---------- speaking out loud ---------- */
+  var voices = [];
+  function loadVoices(){ try { voices = speechSynthesis.getVoices() || []; } catch(e) { voices = []; } }
+  if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+  function pickVoice(lang){
+    var l = lang === 'es' ? 'es' : 'en', vs = voices.filter(function(v){ return String(v.lang||'').toLowerCase().indexOf(l) === 0; });
+    var pref = lang === 'es' ? /(es-MX|es-US|es_MX|es_US)/i : /(en-US|en_US)/i;
+    return vs.filter(function(v){ return pref.test(v.lang) && v.localService; })[0] || vs.filter(function(v){ return pref.test(v.lang); })[0] || vs[0] || null;
+  }
+  function speak(text, lang){
+    if (!window.speechSynthesis || !text) return;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text); u.lang = lang === 'es' ? 'es-MX' : 'en-US';
+      var v = pickVoice(lang); if (v) u.voice = v; u.rate = 0.95;
+      speechSynthesis.speak(u);
+    } catch(e) {}
+  }
+
+  /* ---------- translating ---------- */
+  function decode(x){ var t = document.createElement('textarea'); t.innerHTML = x; return t.value; }
+  function pieces(text){ var out = [], cur = ''; (text.match(/[^.!?\n]+[.!?\n]*\s*/g) || [text]).forEach(function(s){ s = s.trim(); if (!s) return; if ((cur + ' ' + s).length > 400 && cur) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s; }); if (cur) out.push(cur); return out; }
+  var onDevice = {};
+  async function viaChrome(text, from, to){
+    if (!('Translator' in self)) return null;
+    var k = from + to;
+    if (!onDevice[k]) {
+      var av = await Translator.availability({sourceLanguage:from, targetLanguage:to});
+      if (!av || av === 'unavailable') return null;
+      onDevice[k] = await Translator.create({sourceLanguage:from, targetLanguage:to});
+    }
+    return await onDevice[k].translate(text);
+  }
+  async function viaGoogle(text, from, to){
+    if (!GOOGLE_KEY) return null;
+    var r = await fetch('https://translation.googleapis.com/language/translate/v2?key=' + encodeURIComponent(GOOGLE_KEY), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({q:text, source:from, target:to, format:'text'})});
+    if (!r.ok) return null;
+    var j = await r.json(); return j && j.data && j.data.translations && j.data.translations[0] ? j.data.translations[0].translatedText : null;
+  }
+  async function viaMyMemory(text, from, to){
+    var out = [], ps = pieces(text);
+    for (var i = 0; i < ps.length; i++) {
+      var r = await fetch('https://api.mymemory.translated.net/get?' + new URLSearchParams({q:ps[i].slice(0, 450), langpair:from + '|' + to, mt:'1'}));
+      var j = await r.json();
+      if (!j || String(j.responseStatus) !== '200' || !j.responseData) throw new Error(j && j.responseDetails || 'translate');
+      out.push(decode(j.responseData.translatedText || ''));
+    }
+    return out.join(' ');
+  }
+  async function translate(text, from, to){
+    var tries = [['Chrome (on this computer)', viaChrome], ['Google', viaGoogle], ['MyMemory (free)', viaMyMemory]];
+    for (var i = 0; i < tries.length; i++) {
+      try { var res = await tries[i][1](text, from, to); if (res) { engine = tries[i][0]; return res; } } catch(e) { if (i === tries.length - 1) throw e; }
+    }
+    throw new Error('translate');
+  }
+
+  /* ---------- conversation ---------- */
+  var chat = $('chat');
+  function bubble(from, src, tr, live){
+    $('empty').classList.add('hidden');
+    var to = from === 'en' ? 'es' : 'en';
+    var b = document.createElement('div'); b.className = 'msg ' + from + (live ? ' live' : '');
+    var t = document.createElement('div'); t.className = 'tr'; t.setAttribute('lang', to); t.textContent = tr || '…';
+    var s = document.createElement('div'); s.className = 'src'; s.setAttribute('lang', from); s.textContent = src;
+    var tools = document.createElement('div'); tools.className = 'tools';
+    tools.innerHTML = '<button type="button" data-a="play">🔊 ' + (to === 'es' ? 'Escuchar' : 'Play') + '</button><button type="button" data-a="big">Show big</button>';
+    b.appendChild(t); b.appendChild(s); b.appendChild(tools);
+    b._d = {tr:tr, src:src, to:to};
+    chat.appendChild(b); chat.scrollTop = chat.scrollHeight;
+    return b;
+  }
+  function fill(b, tr){ b._d.tr = tr; b.querySelector('.tr').textContent = tr; b.classList.remove('live'); chat.scrollTop = chat.scrollHeight; }
+  chat.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-a]'), b = e.target.closest('.msg'); if (!btn || !b || !b._d.tr) return;
+    if (btn.getAttribute('data-a') === 'play') speak(b._d.tr, b._d.to); else showBig(b._d.tr, b._d.src, b._d.to);
+  });
+  function faceShow(from, src, tr){
+    var to = from === 'en' ? 'es' : 'en';
+    var them = $('saythem'), me = $('sayme');
+    them.classList.remove('dim'); me.classList.remove('dim');
+    them.textContent = to === 'es' ? tr : src;
+    me.textContent = to === 'en' ? tr : src;
+  }
+  async function say(text, from, preset){
+    text = String(text||'').trim(); if (!text) return;
+    var to = from === 'en' ? 'es' : 'en';
+    var b = bubble(from, text, preset || '', !preset);
+    if (preset) { if (face) faceShow(from, text, preset); if (auto) speak(preset, to); return; }
+    try {
+      var tr = await translate(text, from, to);
+      fill(b, tr); if (face) faceShow(from, text, tr); if (auto) speak(tr, to);
+    } catch(e) {
+      b.classList.remove('live'); b.classList.add('err');
+      b.querySelector('.tr').textContent = 'Couldn’t translate. Check the internet, or try again.';
+      var a = document.createElement('a'); a.href = 'https://translate.google.com/?sl=' + from + '&tl=' + to + '&op=translate&text=' + encodeURIComponent(text); a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Open in Google Translate';
+      a.style.cssText = 'display:inline-block;margin-top:8px;color:inherit;font-weight:600';
+      b.querySelector('.tools').replaceWith(a);
+    }
+  }
+
+  /* ---------- voice ---------- */
+  function note(msg){ var n = $('notice'); n.textContent = msg || ''; n.classList.toggle('hidden', !msg); }
+  function micUI(lang, on){ Array.prototype.forEach.call(document.querySelectorAll('[data-mic]'), function(m){ var me = m.getAttribute('data-mic') === lang && on; m.classList.toggle('on', me); m.querySelector('span').textContent = me ? (lang === 'es' ? 'Escuchando… toque para parar' : 'Listening… tap to stop') : (m.getAttribute('data-mic') === 'es' ? (m.closest('.face') ? 'Hablar' : 'Español') : 'English'); }); }
+  function listen(lang){
+    if (rec) { try { rec.stop(); } catch(e) {} return; }
+    if (!SR) {
+      note(standalone ? 'Voice doesn’t work when this page is opened from the Home Screen. Open ifixphones.net/translate.html in Safari, or type and use your keyboard’s mic.' : 'Voice isn’t available in this browser. Use Safari on iPhone/iPad or Chrome on a computer, or tap the mic on your keyboard.');
+      typeLang = lang; paintType(); $('tin').focus(); return;
+    }
+    try { speechSynthesis.cancel(); } catch(e) {}
+    var r = new SR(), heard = '', live = null, ended = false;
+    r.lang = lang === 'es' ? 'es-MX' : 'en-US'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+    r.onresult = function(ev){
+      var txt = ''; for (var i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
+      heard = txt.trim();
+      if (!face) { if (!live) live = bubble(lang, heard, '', true); live.querySelector('.src').textContent = heard; live.querySelector('.tr').textContent = '…'; chat.scrollTop = chat.scrollHeight; }
+      else ($(lang === 'es' ? 'saythem' : 'sayme')).textContent = heard;
+    };
+    r.onerror = function(ev){
+      if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') note('Allow the microphone for this site' + (/iPhone|iPad/.test(navigator.userAgent) ? ', and turn on Siri (Settings → Siri)' : '') + ', then try again.');
+      else if (ev.error === 'no-speech') note('Didn’t hear anything. Tap the mic and speak a little louder.');
+      else if (ev.error !== 'aborted') note('Voice had a problem (' + ev.error + '). Try again, or type it.');
+    };
+    r.onend = function(){
+      if (ended) return; ended = true; rec = null; micUI(lang, false);
+      if (live) live.remove();
+      if (heard) { note(''); say(heard, lang); }
+    };
+    rec = r; recLang = lang;
+    try { r.start(); micUI(lang, true); note(''); } catch(e) { rec = null; micUI(lang, false); note('Couldn’t start the microphone. Try again.'); }
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-mic]'), function(m){ m.addEventListener('click', function(){ listen(m.getAttribute('data-mic')); }); });
+
+  /* ---------- typing ---------- */
+  function paintType(){ $('tlang').textContent = typeLang.toUpperCase(); $('tlang').setAttribute('aria-label', typeLang === 'en' ? 'Typing in English. Tap to switch to Spanish.' : 'Escribiendo en español. Toque para cambiar a inglés.'); $('tin').setAttribute('placeholder', typeLang === 'en' ? 'Type in English…' : 'Escriba en español…'); $('tin').setAttribute('lang', typeLang); }
+  $('tlang').addEventListener('click', function(){ typeLang = typeLang === 'en' ? 'es' : 'en'; paintType(); $('tin').focus(); });
+  $('typeform').addEventListener('submit', function(e){ e.preventDefault(); var v = $('tin').value; $('tin').value = ''; say(v, typeLang); });
+
+  /* ---------- phrases ---------- */
+  var group = 0;
+  function paintPhrases(){
+    $('tabs').innerHTML = GROUPS.map(function(g, i){ return '<button type="button" class="pill" aria-pressed="'+(i===group)+'" data-g="'+i+'">'+g[0]+'</button>'; }).join('');
+    $('plist').innerHTML = GROUPS[group][1].map(function(p, i){
+      var cust = p[2] === 'es';
+      return '<button type="button" class="ph" data-p="'+i+'"><b lang="'+(cust?'es':'es')+'">'+(cust ? p[1] : p[1])+'</b><span>'+p[0]+'</span></button>';
+    }).join('');
+  }
+  $('tabs').addEventListener('click', function(e){ var b = e.target.closest('[data-g]'); if (!b) return; group = +b.getAttribute('data-g'); paintPhrases(); });
+  $('plist').addEventListener('click', function(e){
+    var b = e.target.closest('[data-p]'); if (!b) return;
+    var p = GROUPS[group][1][+b.getAttribute('data-p')];
+    closeSheet();
+    if (p[2] === 'es') say(p[1], 'es', p[0]);         // customer taps a Spanish answer → you see/hear English
+    else { say(p[0], 'en', p[1]); showBig(p[1], p[0], 'es'); }
+  });
+  function openSheet(){ paintPhrases(); $('sheet').classList.remove('hidden'); $('sheetx').focus(); }
+  function closeSheet(){ $('sheet').classList.add('hidden'); }
+  $('phbtn').addEventListener('click', openSheet);
+  $('sheetx').addEventListener('click', closeSheet);
+  $('sheet').addEventListener('click', function(e){ if (e.target === $('sheet')) closeSheet(); });
+
+  /* ---------- show big ---------- */
+  var bigD = null;
+  function showBig(t, s, lang){ bigD = {t:t, lang:lang}; $('bigt').textContent = t; $('bigt').setAttribute('lang', lang); $('bigs').textContent = s || ''; $('bigplay').textContent = '🔊 ' + (lang === 'es' ? 'Escuchar' : 'Play'); $('big').classList.remove('hidden'); $('bigx').focus(); }
+  $('bigplay').addEventListener('click', function(){ if (bigD) speak(bigD.t, bigD.lang); });
+  $('bigx').addEventListener('click', function(){ $('big').classList.add('hidden'); try { speechSynthesis.cancel(); } catch(e) {} });
+  document.addEventListener('keydown', function(e){ if (e.key !== 'Escape') return; if (!$('big').classList.contains('hidden')) $('bigx').click(); else if (!$('sheet').classList.contains('hidden')) closeSheet(); });
+
+  /* ---------- toggles ---------- */
+  $('autobtn').addEventListener('click', function(){ auto = !auto; this.setAttribute('aria-pressed', String(auto)); this.textContent = 'Auto-play: ' + (auto ? 'on' : 'off'); });
+  $('facebtn').addEventListener('click', function(){
+    face = !face; this.setAttribute('aria-pressed', String(face));
+    $('face').classList.toggle('hidden', !face); $('chat').classList.toggle('hidden', face); $('bar').querySelector('.mics').classList.toggle('hidden', face);
+  });
+  $('clear').addEventListener('click', function(){ Array.prototype.slice.call(chat.querySelectorAll('.msg')).forEach(function(m){ m.remove(); }); $('empty').classList.remove('hidden'); $('saythem').textContent = 'Toque “Hablar” y diga lo que necesita.'; $('sayme').textContent = 'Tap “English” and speak. The customer sees it in Spanish.'; $('saythem').classList.add('dim'); $('sayme').classList.add('dim'); note(''); try { speechSynthesis.cancel(); } catch(e) {} });
+
+  /* ---------- opened from the shop app with text to translate (#from=es&text=...) ---------- */
+  try {
+    var h = new URLSearchParams(location.hash.slice(1));
+    if (h.get('text')) { var fl = h.get('from') === 'es' ? 'es' : 'en'; history.replaceState(null, '', location.pathname); say(h.get('text'), fl); }
+  } catch(e) {}
+  if (!SR) note(standalone ? 'Tip: voice works when this page is opened in Safari, not from the Home Screen.' : '');
+  paintType();
+})();
+</script>
+</body>
+</html>
