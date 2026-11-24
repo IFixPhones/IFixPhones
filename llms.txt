@@ -1,0 +1,56 @@
+# iFixPhones
+
+> Phone, iPad and tablet repair shop in San Antonio, Texas, at 9055 Marbach Rd, Suite 105. Walk-ins welcome, open 7 days. Mobile repair is also available: a technician comes to the customer's home or work anywhere around San Antonio. Most screen repairs take about 10 minutes.
+
+## Contact and hours
+
+- Shop: 9055 Marbach Rd, Suite 105, San Antonio, TX
+- Shop phone (calls and texts): (210) 773-3548
+- Mobile repair line: (210) 724-2800
+- Website: https://ifixphones.net
+- Hours: Monday to Saturday 10 AM to 8 PM, Sunday 12 PM to 6 PM
+- No appointment needed at the shop. Mobile repair is booked online or by calling (210) 724-2800.
+
+## Repairs
+
+- Screens: cracked, black or not responding. Most take about 10 minutes.
+- Batteries: phone dies fast or shuts off. 15 to 20 minutes.
+- Charging ports, back glass, cameras, speakers, microphones and buttons
+- Water damage
+- Soldering, unlocking and data recovery
+- Brands: iPhone, Samsung Galaxy, Google Pixel, Motorola, OnePlus, iPad and Galaxy Tab
+
+## Screen options
+
+- Incell: the lowest-price option. No warranty, and not recommended for long-term use.
+- OLED: the best aftermarket screen, with deep blacks and accurate color. 30-day warranty for glitches only. Offered for iPhone 13 Pro and newer Pro models, iPhone 17 and iPhone Air.
+- Original: a refurbished original or a genuine Apple part, closest to factory.
+- The shop tells each customer exactly which part goes in their phone.
+
+## Prices and warranty
+
+- Prices depend on the exact model and part, so the shop gives a free quote by text. Request one at https://ifixphones.net/#quote or text a photo to (210) 773-3548.
+- Soft OLED screens have a 30-day warranty for glitches that happen on their own. It isn't breakage coverage: drops, pressure, bending or liquid aren't covered, even if the glass isn't cracked.
+- Incell screens have no warranty.
+- Every screen is tested with the customer before they pay.
+- Mobile repair has a trip fee based on distance, quoted before the visit is booked.
+
+## After a screen repair
+
+- If a new screen turns on but doesn't respond to touch, a force restart often fixes it and doesn't erase anything.
+- iPhone 8 and newer: press and quickly release volume up, then volume down, then press and hold the side button until the Apple logo appears.
+- Samsung Galaxy: hold the side button and volume down together for 7 seconds or more.
+- Steps with pictures: https://ifixphones.net/#after
+
+## Other services
+
+- Buys used phones for cash, cracked or working: https://ifixphones.net/#sell
+- Repairs for schools and businesses, with pricing for groups of devices: https://ifixphones.net/#business
+
+## Pages
+
+- [Home](https://ifixphones.net/): repairs, screen options, mobile repair, booking, hours and questions
+- [Book a repair](https://ifixphones.net/#book): at the shop or mobile
+- [Check my repair](https://ifixphones.net/status.html): repair status for customers with a ticket
+- [Check in online](https://ifixphones.net/checkin.html)
+- [Warranty and repair policy](https://ifixphones.net/policy.html)

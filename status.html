@@ -147,6 +147,7 @@ h1{font-size:clamp(34px,7vw,48px);letter-spacing:-.03em;line-height:1.05;margin-
         '<p style="margin-top:16px">'+st.msg+'</p>' +
         (val(f.wait) ? '<div class="note">We sent you a text about extra work that needs your OK. Check your messages.</div>' : '') +
         (val(f.st) === 'ready' && !val(f.mobile) ? '<div class="note" style="background:#e5f5ea">Pick up at 9055 Marbach Rd, Suite 105. Open Mon–Sat 10 AM–8 PM, Sun 12–6 PM.</div>' : '') +
+        ((val(f.st) === 'ready' || val(f.st) === 'done') && /screen|oled|incell|lcd|display/i.test(val(f.rep)) ? '<div class="note"><b>Touch not responding after pickup?</b> Try a force restart: press volume up, then volume down, then hold the side button until the Apple logo appears. It doesn’t erase anything. <a href="index.html#after">See the steps</a></div>' : '') +
         '<div style="margin-top:14px">'+rows+'</div>' +
         '<div class="acts"><a href="tel:+12107733548">Call the shop</a><a href="sms:+12107733548">Text us</a></div>';
       $('res').classList.remove('hidden');
