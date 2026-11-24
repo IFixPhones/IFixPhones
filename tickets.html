@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<style id="antiframe">html{display:none!important}</style>
+<script>if (self === top) { var af = document.getElementById('antiframe'); af.parentNode.removeChild(af); } else { try { top.location = self.location.href; } catch (e) {} }</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>iFixPhones Tickets</title>
 <meta name="robots" content="noindex,nofollow">

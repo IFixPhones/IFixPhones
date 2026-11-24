@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<style id="antiframe">html{display:none!important}</style>
+<script>if (self === top) { var af = document.getElementById('antiframe'); af.parentNode.removeChild(af); } else { try { top.location = self.location.href; } catch (e) {} }</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Approve repair | iFixPhones</title>
 <meta name="robots" content="noindex,nofollow">
@@ -34,7 +38,7 @@ h1{font-size:28px;letter-spacing:-.025em;line-height:1.15}
 .done .ic{width:56px;height:56px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px}
 .err{color:var(--red);margin-top:12px}
 .foot{text-align:center;color:var(--graphite);font-size:13px;margin:30px 0}
-.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#86868b;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
+.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#6e6e73;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
 </head>
 <body>
 <nav class="nav"><div class="w"><a class="brand" href="/">iFixPhones</a><a href="tel:+12107733548">Call</a></div></nav>

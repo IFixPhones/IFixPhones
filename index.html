@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>iFixPhones | Phone, iPad and Mobile Repair in San Antonio</title>
 <meta name="description" content="Phone and iPad repair for every model in San Antonio. Walk in at 9055 Marbach Rd, Suite 105, or book mobile repair and we come to you. Open 7 days.">
@@ -490,6 +492,7 @@ section{padding:clamp(72px,10vw,120px) 0}
 .field.bad input,.field.bad select{border-color:#d70015;background-color:#fff5f6}
 .err{color:#d70015;font-size:14px;margin-top:12px;text-align:center}
 .note{font-size:13px;color:var(--graphite);text-align:center;margin-top:14px}
+.note a,.illus a,details p a{text-decoration:underline;text-underline-offset:2px}
 .submit{width:100%;margin-top:18px;padding:16px;font-size:17px;border-radius:12px}
 .hidden{display:none !important}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -529,7 +532,7 @@ footer .fbrand{font-size:17px;font-weight:600;letter-spacing:-.02em;color:var(--
 footer h3{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:10px;letter-spacing:0}
 footer p{margin-top:8px;line-height:1.5;font-size:13px}
 footer .fcols a{display:block;font-size:13px;color:var(--graphite);padding:5px 0}
-footer .fcols p a{display:inline;padding:0;color:var(--blue)}
+footer .fcols p a{display:inline;padding:0;color:#0066cc}
 footer .flegal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 20px;margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
 @media (max-width:700px){footer .fcols{grid-template-columns:1fr 1fr}footer .fcols>div:first-child{grid-column:1/-1}}
 .qfab{position:fixed;right:22px;bottom:22px;z-index:59;display:none;align-items:center;gap:8px;padding:13px 20px;border-radius:999px;background:rgba(29,29,31,.86);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);color:#fff;font-size:15px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.18);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s ease,transform .3s ease}
@@ -557,7 +560,7 @@ footer .flegal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px
 .fx-cap.first .lede{margin-top:10px}
 
 @media (prefers-reduced-motion:reduce){.fx{height:100vh}}
-.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#86868b;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
+.grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#6e6e73;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
 </head>
 <body>
 
@@ -651,10 +654,10 @@ footer .flegal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px
       <h2>Pick your screen.</h2>
       <p class="lede">Three options. Tap to compare. We'll always tell you exactly which part goes in your phone.</p>
       <div class="cmp">
-        <div class="seg" role="tablist" aria-label="Screen type">
-          <button type="button" role="tab" data-t="incell" aria-pressed="false">Incell</button>
-          <button type="button" role="tab" data-t="oled" aria-pressed="true">OLED</button>
-          <button type="button" role="tab" data-t="original" aria-pressed="false">Original</button>
+        <div class="seg" role="group" aria-label="Screen type">
+          <button type="button" data-t="incell" aria-pressed="false">Incell</button>
+          <button type="button" data-t="oled" aria-pressed="true">OLED</button>
+          <button type="button" data-t="original" aria-pressed="false">Original</button>
         </div>
         <div class="cmpbody">
           <div class="cmpstage" aria-hidden="true">
@@ -669,10 +672,10 @@ footer .flegal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px
             <h3 id="cName">Premium OLED</h3>
             <p class="desc" id="cDesc">True deep blacks and bright, sharp color like the original, for a lot less.</p>
             <ul class="rates">
-              <li><span>Black levels</span><span class="dots" data-r="black"><i></i><i></i><i></i><i></i><i></i></span></li>
-              <li><span>Color</span><span class="dots" data-r="color"><i></i><i></i><i></i><i></i><i></i></span></li>
-              <li><span>Brightness</span><span class="dots" data-r="bright"><i></i><i></i><i></i><i></i><i></i></span></li>
-              <li><span>Touch feel</span><span class="dots" data-r="touch"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Black levels</span><span class="dots" role="img" data-r="black"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Color</span><span class="dots" role="img" data-r="color"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Brightness</span><span class="dots" role="img" data-r="bright"><i></i><i></i><i></i><i></i><i></i></span></li>
+              <li><span>Touch feel</span><span class="dots" role="img" data-r="touch"><i></i><i></i><i></i><i></i><i></i></span></li>
               <li><span>Warranty</span><span class="val" id="cWarr">When supplier-covered</span></li>
               <li><span>Price</span><span class="val" id="cPrice">$$</span></li>
             </ul>
