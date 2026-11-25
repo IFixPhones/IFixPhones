@@ -712,6 +712,15 @@ function ding(){
   } catch(e) {}
 }
 var titleT = 0;
+document.addEventListener('change', function(e){
+  var x = e.target; if (!x || !x.getAttribute || !x.getAttribute('data-spt') || !S.canWrite) return;
+  var m = x.getAttribute('data-spm'), t = x.getAttribute('data-spt'), v = num(x.value);
+  setTimeout(function(){
+    var sp = JSON.parse(JSON.stringify(S.settings.screenPrices || {}));
+    sp[m] = sp[m] || {}; if (v > 0) sp[m][t] = Math.round(v * 100) / 100; else delete sp[m][t];
+    saveSettings({screenPrices: sp});
+  }, 0);
+});
 var lastErrAt = 0;
 function showErr(msg){ var now = Date.now(); if (now - lastErrAt < 4000) return; lastErrAt = now; try { toast('Something went wrong: ' + String(msg||'').slice(0, 120) + '. Reload the page, and send this to support if it keeps happening.'); } catch(e) {} }
 window.addEventListener('error', function(e){ if (e && e.message && !/ResizeObserver|Script error/i.test(e.message) && (!e.filename || /tickets\.html/.test(e.filename))) showErr(e.message); });
@@ -749,7 +758,7 @@ function startData(){
         if (ch.type !== 'added' || seenReqs[ch.doc.id] || ch.doc.metadata.hasPendingWrites) return;
         var r = ch.doc.data() || {};
         if (r.kind === 'sell') alertNew('Someone wants to sell a phone', (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
-        else if (r.kind === 'checkin') alertNew(isKiosk(r) ? 'iPad check-in' : 'Online check-in · ' + (r.whenText||''), (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
+        else if (r.kind === 'checkin') alertNew(isKiosk(r) ? 'Tablet check-in' : 'Online check-in · ' + (r.whenText||''), (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'business') alertNew('New school / business request', (r.org||'') + ' · ' + (r.name||''), function(){ S.view='bookings'; render(); });
         else if (r.kind === 'quote') alertNew('New quote request', (r.device||'') + (r.notes ? ' — ' + r.notes.slice(0,80) : ''), function(){ S.view='bookings'; render(); });
         else alertNew(r.where === 'mobile' ? 'New MOBILE booking' : 'New shop booking', (r.whenText||'') + '\n' + (r.name||'') + ' · ' + (r.device||'') + ' · ' + (r.repair||''), function(){ S.view='bookings'; render(); });
@@ -1148,7 +1157,7 @@ function settingsView(){
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
     comm +
   '</div>' + backupPanel() +
-  siteSettingsPanel() + kioskPanel() +
+  siteSettingsPanel() + kioskPanel() + screenPricesPanel() +
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushNewTickets"'+(S.settings.pushNewTickets===true?' checked':'')+'>Also alert me when a ticket is checked in (off by default)</label>' +
@@ -1213,17 +1222,39 @@ function savePublic(patch){
   S.pub = Object.assign({}, S.pub||{}, patch); render();
   return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
 }
+/* ---------- iPad screen prices (private: only the paired iPad sees them) ---------- */
+var SP_TIERS = [['incell','Incell'],['oled','Soft OLED'],['original','Original']];
+function spKey(model){ return String(model||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+function allModels(){ return BRANDS.reduce(function(a,k){ return a.concat(CATALOG[k]); }, []); }
+function catalogNameAny(m){ var lm = String(m||'').trim().toLowerCase(); if (!lm) return ''; return allModels().filter(function(x){ return x.toLowerCase() === lm; })[0] || String(m).trim().slice(0,40); }
+function tierFromPart(p){ p = String(p||''); return /incell/i.test(p) ? 'incell' : /oled/i.test(p) ? 'oled' : /original|genuine/i.test(p) ? 'original' : ''; }
+function screenPrice(model, tier){ var r = (S.settings.screenPrices || {})[catalogNameAny(model)]; return r && tier && num(r[tier]) > 0 ? num(r[tier]) : 0; }
+function screenPricesPanel(){
+  var sp = S.settings.screenPrices || {}, order = allModels();
+  var models = Object.keys(sp).sort(function(a,b){ var ia = order.indexOf(a), ib = order.indexOf(b); if (ia < 0) ia = 9999; if (ib < 0) ib = 9999; return ia - ib || a.localeCompare(b); });
+  var rows = models.map(function(m, i){
+    return '<tr><td><b>'+esc(m)+'</b></td>' + SP_TIERS.map(function(t){
+      var v = num((sp[m]||{})[t[0]]);
+      return '<td><label class="sr" for="sp-'+i+'-'+t[0]+'">'+esc(m)+' '+t[1]+' price</label><input class="in" style="width:92px" id="sp-'+i+'-'+t[0]+'" data-wsp data-spm="'+esc(m)+'" data-spt="'+t[0]+'" inputmode="decimal" placeholder="—" value="'+(v > 0 ? v : '')+'"'+(S.canWrite?'':' disabled')+'></td>';
+    }).join('') + '<td class="right">'+(S.canWrite?'<button class="link red" data-act="sprm" data-m="'+esc(m)+'">Remove</button>':'')+'</td></tr>';
+  }).join('');
+  return '<div class="panel" id="screen-prices"><h2>Tablet screen prices</h2><p class="d">When a customer picks <b>Screen</b> on the check-in tablet, they see the options and prices you set here. Leave a box empty to hide that option for that model. Models not on this list show all options without prices. Only your paired tablet sees these, never the public website. New tickets fill in the price too.</p>' +
+    (rows ? '<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>Model</th>'+SP_TIERS.map(function(t){ return '<th>'+t[1]+'</th>'; }).join('')+'<th></th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '<p class="muted">No prices yet.</p>') +
+    (S.canWrite ? '<form class="inline" data-form="addsp" style="flex-wrap:wrap;margin-top:12px"><label class="sr" for="sp-model">Model</label><input class="in" id="sp-model" list="sp-models" placeholder="Add a model, e.g. iPhone 15 Pro Max" style="flex:2;min-width:180px"><datalist id="sp-models">'+allModels().map(function(m){ return '<option value="'+esc(m)+'"></option>'; }).join('')+'</datalist><button class="btn dark" type="submit">Add model</button><button class="btn ghost" type="button" data-act="spaddall">Add all iPhones</button></form>' : '') +
+  '</div>';
+}
+
 /* ---------- front desk iPad (kiosk.html) ---------- */
 function kioskPanel(){
   var now = Date.now();
   var ks = (S.kiosks||[]).slice().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
   var rows = ks.map(function(k){
-    var st = k.pairedAt ? 'Set up '+esc(dt(k.pairedAt)) + (k.lastUsed ? ' · last check-in '+esc(rel(k.lastUsed)) : '') : (k.expiresAt > now ? 'Waiting for the iPad · code <b>'+esc(fmtCode(k.code))+'</b>' : 'Code expired, not set up');
-    return '<tr><td><b>'+esc(k.name||'Front desk iPad')+'</b></td><td class="muted">'+st+'</td><td class="right">'+(S.canWrite?'<button class="link red" data-act="kioskdel" data-id="'+esc(k.id)+'">Remove</button>':'')+'</td></tr>';
+    var st = k.pairedAt ? 'Set up '+esc(dt(k.pairedAt)) + (k.lastUsed ? ' · last check-in '+esc(rel(k.lastUsed)) : '') : (k.expiresAt > now ? 'Waiting for the tablet · code <b>'+esc(fmtCode(k.code))+'</b>' : 'Code expired, not set up');
+    return '<tr><td><b>'+esc(k.name && k.name !== 'Front desk iPad' ? k.name : 'Front desk tablet')+'</b></td><td class="muted">'+st+'</td><td class="right">'+(S.canWrite?'<button class="link red" data-act="kioskdel" data-id="'+esc(k.id)+'">Remove</button>':'')+'</td></tr>';
   }).join('');
-  return '<div class="panel"><h2>Front desk iPad</h2><p class="d">Customers check in and sign at <b>ifixphones.net/kiosk.html</b>. Only iPads you set up here can use it. Any other phone or computer just sees “Please check in at the counter.”</p>' +
-    (rows ? '<table class="rtable"><tbody>'+rows+'</tbody></table>' : '<p class="muted">No iPad set up yet.</p>') +
-    (S.canWrite ? '<div class="acts" style="margin-top:12px"><button class="btn sm" data-act="kioskpair">Set up an iPad</button></div>' : '') +
+  return '<div class="panel"><h2>Front desk tablet</h2><p class="d">Customers check in and sign at <b>ifixphones.net/kiosk.html</b>. Only tablets you set up here can use it (the iFix Check-in app or the page itself). Any other phone or computer just sees “Please check in at the counter.”</p>' +
+    (rows ? '<table class="rtable"><tbody>'+rows+'</tbody></table>' : '<p class="muted">No tablet set up yet.</p>') +
+    (S.canWrite ? '<div class="acts" style="margin-top:12px"><button class="btn sm" data-act="kioskpair">Set up a tablet</button></div>' : '') +
   '</div>';
 }
 function fmtCode(c){ c = String(c||''); return c.length === 8 ? c.slice(0,4) + '-' + c.slice(4) : c; }
@@ -1235,36 +1266,38 @@ function kioskPair(){
   var b = S.db.batch();
   // clear out older setups that were never finished
   (S.kiosks||[]).forEach(function(k){ if (!k.pairedAt && !(k.expiresAt > now)) { b.delete(S.db.doc('kiosks/'+k.id)); if (k.code) b.delete(S.db.doc('kioskPair/'+k.code)); } });
-  b.set(S.db.doc('kiosks/'+key), {name:'Front desk iPad', createdAt:now, createdBy:who(), code:code, expiresAt:exp});
+  b.set(S.db.doc('kiosks/'+key), {name:'Front desk tablet', createdAt:now, createdBy:who(), code:code, expiresAt:exp});
   b.set(S.db.doc('kioskPair/'+code), {key:key, expiresAt:exp, createdAt:now});
   S.pairWait = key;
-  var m = modalShell('kp', 'Set up the front desk iPad',
-    '<ol style="padding-left:20px;line-height:1.6;font-size:15px"><li>On the store iPad, open <b>ifixphones.net/kiosk.html</b> (or its Home Screen icon).</li><li>Tap <b>Set up this iPad</b> at the bottom of the screen.</li><li>Type this code:</li></ol>' +
+  var m = modalShell('kp', 'Set up the front desk tablet',
+    '<ol style="padding-left:20px;line-height:1.6;font-size:15px"><li>On the store tablet, open the <b>iFix Check-in</b> app (or ifixphones.net/kiosk.html).</li><li>Tap <b>Staff: set up this device</b>.</li><li>Type this code:</li></ol>' +
     '<div style="font-size:40px;font-weight:700;letter-spacing:.12em;text-align:center;background:var(--mist,#f5f5f7);border-radius:14px;padding:18px 10px;margin:14px 0;font-variant-numeric:tabular-nums">'+esc(fmtCode(code))+'</div>' +
-    '<p class="hint" id="kp-status" role="status">Works once, for 10 minutes. Waiting for the iPad…</p>' +
+    '<p class="hint" id="kp-status" role="status">Works once, for 10 minutes. Waiting for the tablet…</p>' +
     '<p class="hint" style="margin-top:10px">Testing on this computer instead? <a href="kiosk.html#pair='+esc(code)+'" target="_blank" rel="noopener">Open the check-in page here, already set up</a>.</p>',
     '<button class="btn" data-mclose>Close</button>');
   retryOnce(function(){ return b.commit(); }).catch(function(e){ m.remove(); S.pairWait = null; writeErr(e); });
 }
 var kioskPubT = 0;
 function kioskPublishSoon(){ clearTimeout(kioskPubT); kioskPubT = setTimeout(kioskPublish, 2500); }
-function normFeed(st, acc){ return Object.keys(st||{}).filter(function(k){ return st[k]; }).sort().join(',') + '|' + Object.keys(acc||{}).sort().map(function(k){ return k + ':' + num(acc[k]); }).join(','); }
+function normFeed(st, acc, sc){ return Object.keys(st||{}).filter(function(k){ return st[k]; }).sort().join(',') + '|' + Object.keys(acc||{}).sort().map(function(k){ return k + ':' + num(acc[k]); }).join(',') + '|' + Object.keys(sc||{}).sort().map(function(k){ return k + ':' + SP_TIERS.map(function(t){ return num((sc[k]||{})[t[0]]); }).join('/'); }).join(','); }
 function kioskPublish(){
   if (!S.db || !S.canWrite || !S.invLoaded || !S.settingsLoaded) return;
   var stock = {}, acc = {};
   (S.inv||[]).forEach(function(i){ if (i.brand && i.model && i.part && num(i.qty) > 0) stock[i.id] = true; });
   ACCS.forEach(function(a){ if (/^sp/.test(a.k)) acc[a.k] = accPrice(a.k); });
-  var want = normFeed(stock, acc);
+  var screens = {}, sp = S.settings.screenPrices || {};
+  Object.keys(sp).forEach(function(m){ var o = {}, any = false; SP_TIERS.forEach(function(t){ var v = num((sp[m]||{})[t[0]]); if (v > 0) { o[t[0]] = v; any = true; } }); if (any) screens[spKey(m)] = o; });
+  var want = normFeed(stock, acc, screens);
   (S.kiosks||[]).forEach(function(k){
-    if (!k.pairedAt || normFeed(k.stock, k.acc) === want) return;
-    S.db.doc('kiosks/' + k.id).update({stock:stock, acc:acc, feedAt:Date.now()}).catch(function(){});
+    if (!k.pairedAt || normFeed(k.stock, k.acc, k.screens) === want) return;
+    S.db.doc('kiosks/' + k.id).update({stock:stock, acc:acc, screens:screens, feedAt:Date.now()}).catch(function(){});
   });
 }
 function kioskPairWatch(){
   if (!S.pairWait) return;
   var k = (S.kiosks||[]).filter(function(x){ return x.id === S.pairWait; })[0];
   var el = document.getElementById('kp-status');
-  if (k && k.pairedAt && el) { el.innerHTML = '<b style="color:var(--green,#1a7f37)">✓ The iPad is set up.</b> You can close this.'; S.pairWait = null; toast('Front desk iPad is set up'); }
+  if (k && k.pairedAt && el) { el.innerHTML = '<b style="color:var(--green,#1a7f37)">✓ The tablet is set up.</b> You can close this.'; S.pairWait = null; toast('Front desk tablet is set up'); }
 }
 function siteSettingsPanel(){
   var pub = S.pub || {}, prices = pub.prices || [];
@@ -2180,14 +2213,14 @@ function holdsSlot(r){ return isBooking(r) && r.status !== 'cancel'; }
 
 function reqBox(r){
   var isQ = r.kind !== 'booking';
-  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : r.kind === 'checkin' ? '<span class="tagk" style="background:#e6f0fc;color:#0058b0">'+(isKiosk(r)?'iPad check-in':'Online check-in')+'</span>'+(r.sig?'<span class="tagk ok">Signed</span>':'') : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
+  var tag = r.kind === 'quote' ? '<span class="tagk q">Quote</span>' : r.kind === 'sell' ? '<span class="tagk ok">Wants to sell</span>' : r.kind === 'business' ? '<span class="tagk" style="background:#1d1d1f;color:#fff">School / business</span>' : r.kind === 'checkin' ? '<span class="tagk" style="background:#e6f0fc;color:#0058b0">'+(isKiosk(r)?'Tablet check-in':'Online check-in')+'</span>'+(r.sig?'<span class="tagk ok">Signed</span>':'') : (r.where === 'mobile' ? '<span class="tagk mob">Mobile</span>' : '<span class="tagk shop">At the shop</span>');
   var st = r.status === 'new' ? '<span class="tagk" style="background:#e30000;color:#fff">New</span>' : r.status === 'confirmed' ? '<span class="tagk ok">Confirmed</span>' : r.status === 'done' ? '<span class="tagk gr">'+(r.ticketNum ? 'Ticket #'+esc(r.ticketNum) : 'Handled')+'</span>' : r.status === 'cancel' ? '<span class="tagk gr">Cancelled</span>' : '';
   var first = String(r.name||'').split(' ')[0];
   var place = r.where === 'mobile' ? '' : ' at 9055 Marbach Rd, Suite 105';
   var msg = r.kind === 'sell' ? 'Hi ' + (first||'there') + ', this is iFixPhones about the ' + (r.device||'phone') + ' you want to sell. We can offer $' : r.kind === 'business' ? 'Hi ' + (first||'there') + ', this is iFixPhones following up on your repair request' + (r.org ? ' for ' + r.org : '') + '. ' : isQ ? 'Hi, this is iFixPhones about your ' + (r.device||'phone') + ' quote: '
     : 'Hi ' + (first||'there') + ', this is iFixPhones. Your ' + (r.repair||'repair') + ' appointment for your ' + (r.device||'phone') + ' is confirmed for ' + (r.whenText||'') + place + '.' + (r.where==='mobile' ? ' We’ll text you when we’re on the way.' : '') + ' Reply here if anything changes.';
   var rem = 'Hi ' + (first||'there') + ', reminder from iFixPhones: your ' + (r.repair||'repair') + ' appointment is ' + (sameDay(r.apptAt, Date.now()) ? 'today' : 'tomorrow') + ' at ' + (r.time||'') + place + '. Reply here if you need to change it.';
-  var when = r.kind === 'checkin' ? esc(isKiosk(r) ? 'Checked in on the front desk iPad' : 'Checked in online · ' + (r.whenText||'')) : r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
+  var when = r.kind === 'checkin' ? esc(isKiosk(r) ? 'Checked in on the front desk tablet' : 'Checked in online · ' + (r.whenText||'')) : r.kind === 'sell' ? 'Sell request' : r.kind === 'business' ? esc(r.org || 'School / business request') : isQ ? 'Quote request' : esc(r.whenText || 'No time picked');
   var open = r.status === 'new' || r.status === 'confirmed';
   var late = !isQ && r.apptAt && r.apptAt < Date.now() - 3600e3 && open;
   var soon = !isQ && open && r.apptAt && r.apptAt > Date.now() && r.apptAt - Date.now() < 36*3600e3;
@@ -2292,7 +2325,7 @@ function reqToTicket(r){
   // the check-in iPad can send several repairs, e.g. "Screen, Battery"
   var reps = SITE_REPAIR[r.repair] ? [r.repair] : String(r.repair||'').split(/\s*,\s*/).filter(Boolean);
   if (!reps.length) reps = [''];
-  var items = reps.map(function(x){ return {repair: SITE_REPAIR[x] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: (reps.length === 1 || x === 'Screen') ? part : '', price:'', desc: SITE_REPAIR[x] ? '' : (r.notes||'').slice(0,120)}; });
+  var items = reps.map(function(x){ var pt = (reps.length === 1 || x === 'Screen') ? part : ''; var lp = SITE_REPAIR[x] === 'Screen' && pt ? screenPrice(r.device, tierFromPart(pt)) : 0; return {repair: SITE_REPAIR[x] || (r.kind === 'quote' ? 'Diagnostic' : 'Other repair'), part: pt, price: lp ? String(lp) : '', desc: SITE_REPAIR[x] ? '' : (r.notes||'').slice(0,120)}; });
   var okSig = typeof r.sig === 'string' && /^data:image\/(png|jpeg);base64,/.test(r.sig);
   ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:r.email||'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
     items: items.concat(ACCS.filter(function(a){ return a.name === r.addons; }).map(function(a){ return {repair:'Accessory', part:'', price:accPrice(a.k), desc:a.name}; })),
@@ -2801,7 +2834,7 @@ function ticketForm(existing, prefill){
         '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
       '</div>' +
       (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"'+(NT.preSig?' checked':'')+'><span><b>Customer agreed to the repair policy and to texts about this repair.</b> Backup, repair risks, warranty terms (Soft OLED: 30 days for glitches only, not breakage or drops; Incell: no warranty) were explained.</span></label>' +
-        (NT.preSig ? '<div class="sigwrap" id="tf-sigdone"><img class="sigimg" alt="Customer signature from the check-in iPad" src="'+esc(NT.preSig)+'"><div class="sigbar"><span>Signed on the check-in iPad · '+esc(dt(NT.preSigAt))+'</span><button type="button" class="link" data-sigredo>Sign again</button></div></div>' : '') +
+        (NT.preSig ? '<div class="sigwrap" id="tf-sigdone"><img class="sigimg" alt="Customer signature from the check-in tablet" src="'+esc(NT.preSig)+'"><div class="sigbar"><span>Signed on the check-in tablet · '+esc(dt(NT.preSigAt))+'</span><button type="button" class="link" data-sigredo>Sign again</button></div></div>' : '') +
         '<div class="sigwrap'+(NT.preSig?' hidden':'')+'" id="tf-sigw"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
     '</div>' +
     '<div class="mfoot"><span class="err" id="tf-err" role="alert"></span><button type="button" class="btn ghost" data-tf-close>Cancel</button><button type="submit" class="btn" id="tf-save">'+(t?'Save changes':'Check in')+'</button></div>' +
@@ -2844,6 +2877,11 @@ function ticketForm(existing, prefill){
   });
   m.addEventListener('input', function(e){ if (e.target.id === 'tf-model' || e.target.id === 'tf-brand') stockSuggest(); });
   m.addEventListener('change', function(e){
+    var row = e.target.closest && e.target.closest('.irow');
+    if (row && /^(part|repair)$/.test(e.target.getAttribute('data-f')||'')) {
+      var prIn = $('[data-f="price"]', row), lstp = $('[data-f="repair"]', row).value === 'Screen' ? screenPrice(($('#tf-model')||{}).value, tierFromPart($('[data-f="part"]', row).value)) : 0;
+      if (lstp && prIn && !prIn.value.trim()) { prIn.value = String(lstp); prIn.dispatchEvent(new Event('input', {bubbles:true})); }
+    }
     if (e.target.id === 'tf-model' || e.target.id === 'tf-brand') stockSuggest();
     var sk = e.target.closest && e.target.closest('[data-stk]'); if (sk && NT) { NT.stkOff = NT.stkOff || {}; NT.stkOff[sk.getAttribute('data-stk')] = !sk.checked; }
   });
@@ -2901,7 +2939,8 @@ function hintPrices(){
   $$('#tf-items .irow').forEach(function(r){
     var i = +r.getAttribute('data-i'); if (!NT || !NT.items[i]) return;
     var lp = lastPrice(model, $('[data-f="repair"]', r).value, $('[data-f="part"]', r).value, NT.editId);
-    $('[data-f="price"]', r).placeholder = lp != null ? 'Last ' + money(lp) : 'Price';
+    var lst = $('[data-f="repair"]', r).value === 'Screen' ? screenPrice(model, tierFromPart($('[data-f="part"]', r).value)) : 0;
+    $('[data-f="price"]', r).placeholder = lst ? 'List ' + money(lst) : lp != null ? 'Last ' + money(lp) : 'Price';
   });
 }
 /* new tickets: offer matching parts that are on the shelf */
@@ -3005,7 +3044,7 @@ function submitForm(t, m, closeForm){
     num: nextNum(), status:'in', createdAt:now, updatedAt:now, createdBy:who(),
     paid:false, payMethod:'', paidAt:0, agreed:true, post:{}, parts:stkParts,
     sig: (m._sig && m._sig.has()) ? m._sig.data() : (NT.preSig || ''), sigAt: (m._sig && m._sig.has()) ? now : (NT.preSig ? (NT.preSigAt || now) : 0),
-    log:[logEntry('checked in the device')].concat(NT.preSig && !(m._sig && m._sig.has()) ? [logEntry('customer signed on the check-in iPad')] : []).concat(NT.kioskInfo ? [logEntry('noted from the iPad: ' + NT.kioskInfo)] : []).concat(stkParts.map(function(p){ return logEntry('took “' + p.name + '” from stock'); })).concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
+    log:[logEntry('checked in the device')].concat(NT.preSig && !(m._sig && m._sig.has()) ? [logEntry('customer signed on the check-in tablet')] : []).concat(NT.kioskInfo ? [logEntry('noted from the tablet: ' + NT.kioskInfo)] : []).concat(stkParts.map(function(p){ return logEntry('took “' + p.name + '” from stock'); })).concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
   });
   var reqId = NT.reqId;
   var ref = S.db.collection('tickets').doc();
@@ -3298,13 +3337,15 @@ document.addEventListener('click', async function(e){
     case 'addappt': addApptBox(a.getAttribute('data-v') || ''); break;
     case 'blockday': blockDayBox(a.getAttribute('data-v')); break;
     case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
+    case 'sprm': { var spr = Object.assign({}, S.settings.screenPrices || {}); delete spr[a.getAttribute('data-m')]; saveSettings({screenPrices: spr}); break; }
+    case 'spaddall': { var spa = Object.assign({}, S.settings.screenPrices || {}), added = 0; (CATALOG['Apple iPhone'] || []).forEach(function(m){ if (!spa[m]) { spa[m] = {}; added++; } }); saveSettings({screenPrices: spa}); toast(added ? 'Added ' + added + ' iPhone models. Type the prices you offer.' : 'All iPhones are already on the list'); break; }
     case 'kioskpair': kioskPair(); break;
     case 'kioskdel': {
       var kid = a.getAttribute('data-id'), kk = (S.kiosks||[]).filter(function(k){ return k.id === kid; })[0];
-      var okk = await confirmBox('Remove this iPad?', 'It stops taking check-ins right away. You can set it up again any time.', 'Remove', true);
+      var okk = await confirmBox('Remove this tablet?', 'It stops taking check-ins right away. You can set it up again any time.', 'Remove', true);
       if (!okk) break;
       S.kiosks = (S.kiosks||[]).filter(function(k){ return k.id !== kid; }); render();
-      retryOnce(function(){ return S.db.doc('kiosks/'+kid).delete(); }).then(function(){ toast('iPad removed'); }).catch(writeErr);
+      retryOnce(function(){ return S.db.doc('kiosks/'+kid).delete(); }).then(function(){ toast('Tablet removed'); }).catch(writeErr);
       if (kk && kk.code) S.db.doc('kioskPair/'+kk.code).delete().catch(function(){});
       break;
     }
@@ -3373,6 +3414,15 @@ document.addEventListener('submit', function(e){
     var eref = S.db.collection('expenses').doc(); var eo = {amt:ea, cat:$('#ex-cat').value, note:$('#ex-note').value.trim().slice(0,80), at:ed, by:who(), createdAt:Date.now()};
     S.exp = [Object.assign({id:eref.id}, eo)].concat(S.exp||[]); render();
     eref.set(eo).then(function(){ toast('Expense added'); }).catch(writeErr); return;
+  }
+  if (f.getAttribute('data-form') === 'addsp') {
+    e.preventDefault();
+    var spm = catalogNameAny(($('#sp-model')||{}).value); if (!spm) { $('#sp-model').focus(); return; }
+    var spl = Object.assign({}, S.settings.screenPrices || {});
+    if (spl[spm]) { toast(spm + ' is already on the list'); return; }
+    spl[spm] = {}; saveSettings({screenPrices: spl});
+    setTimeout(function(){ var first = $$('[data-spt="incell"]').filter(function(x){ return x.getAttribute('data-spm') === spm; })[0]; if (first) first.focus(); }, 50);
+    return;
   }
   if (f.getAttribute('data-form') === 'addprice') {
     var pm = $('#pg-model').value.trim(), pf = num($('#pg-from').value);

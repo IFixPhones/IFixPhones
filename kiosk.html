@@ -247,7 +247,7 @@ h2{font-size:clamp(40px,6vw,52px);letter-spacing:-.035em;line-height:1.05;outlin
 <section class="screen lock hidden" id="sP" aria-labelledby="hP">
   <div class="wm">iFixPhones</div>
   <h1 id="hP" tabindex="-1">Set up this device.</h1>
-  <p class="lede">In your shop app, go to Settings → Front desk iPad → Set up an iPad, then type the 8-character code here.</p>
+  <p class="lede">In your shop app, go to Settings → Front desk tablet → Set up a tablet, then type the 8-character code here.</p>
   <div class="codebox">
     <label class="sr" for="code">Setup code</label>
     <input id="code" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="9" placeholder="XXXX-XXXX" enterkeyhint="go">
@@ -260,7 +260,7 @@ h2{font-size:clamp(40px,6vw,52px);letter-spacing:-.035em;line-height:1.05;outlin
 <section class="screen lock hidden" id="sD" aria-labelledby="hD">
   <div class="okc"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 25l8 8 16-18"/></svg></div>
   <h1 id="hD" tabindex="-1">This device is set up.</h1>
-  <p class="lede">Customers can check in here now. Lock it with Guided Access when you’re ready.</p>
+  <p class="lede">Customers can check in here now. In the iFix Check-in app, hold the top-left corner for 4 seconds to lock the tablet to this screen.</p>
   <div class="codebox"><button class="btn" type="button" id="pairdone">Open check-in</button></div>
 </section>
 
@@ -587,7 +587,9 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
 
   /* ---------- state ---------- */
   var step = -1, flowAt = 0, chosen = [], brand = '', model = '', showAll = false, tier = '', heard = '', backup = '';
-  var idleT = 0, idleTick = 0, doneTick = 0, sending = false, STOCK = {}, ACC = {}, prot = '';
+  var idleT = 0, idleTick = 0, doneTick = 0, sending = false, STOCK = {}, ACC = {}, SPRICE = {}, prot = '';
+  function spKey(m){ return String(m||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function numv(f){ return f ? +(f.integerValue != null ? f.integerValue : f.doubleValue) || 0 : 0; }
 
   /* ---------- this iPad's key (set up from the shop app) ---------- */
   var KEY = ''; try { KEY = localStorage.getItem('ifx_kiosk_key') || ''; } catch(e) {}
@@ -602,6 +604,8 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
         STOCK = {}; Object.keys(f).forEach(function(k){ if (f[k] && f[k].booleanValue) STOCK[k] = 1; });
         var a = j.fields.acc && j.fields.acc.mapValue && j.fields.acc.mapValue.fields || {};
         ACC = {}; Object.keys(a).forEach(function(k){ var v = a[k].integerValue != null ? +a[k].integerValue : a[k].doubleValue; if (v > 0) ACC[k] = v; });
+        var sc = j.fields.screens && j.fields.screens.mapValue && j.fields.screens.mapValue.fields || {};
+        SPRICE = {}; Object.keys(sc).forEach(function(k){ var g = sc[k].mapValue && sc[k].mapValue.fields || {}; SPRICE[k] = {incell:numv(g.incell), oled:numv(g.oled), original:numv(g.original)}; });
         paintProt();
         return true;
       }).catch(function(){ return true; });
@@ -707,11 +711,14 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
   }
 
   /* ---------- screen options ---------- */
+  function priced(){ var p = SPRICE[spKey(deviceName())]; return p && (p.incell > 0 || p.oled > 0 || p.original > 0) ? p : null; }
   function tierKeys(){
+    var p = priced(); if (p) return ['incell','oled','original'].filter(function(k){ return p[k] > 0; });
     if (brand !== 'Apple iPhone' || !model) return [];
     return partTypes(brand, model).filter(function(p){ return /^Screen · /.test(p); }).map(function(p){ return p === 'Screen · Incell' ? 'incell' : p === 'Screen · OLED' ? 'oled' : 'original'; });
   }
-  function needScreen(){ return chosen.indexOf('Screen') > -1 && tierKeys().length > 1; }
+  function needScreen(){ var k = tierKeys(); return chosen.indexOf('Screen') > -1 && (k.length > 1 || (k.length === 1 && !!priced())); }
+  function tierPrice(k){ var p = priced(); return p && p[k] > 0 ? p[k] : 0; }
   function dots(n){ var s = ''; for (var i = 0; i < 5; i++) s += '<i'+(i < n ? ' class="on"' : '')+'></i>'; return '<span class="d" aria-hidden="true">'+s+'</span>'; }
   function paintTiers(){
     var keys = tierKeys();
@@ -720,7 +727,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
       var rate = function(key, lab){ return '<div class="rate"><span>'+lab+'</span>'+dots(d.r[key])+'<span class="sr">'+d.r[key]+' / 5</span></div>'; };
       return '<button type="button" class="tier" role="radio" aria-checked="'+(tier===k)+'" data-k="'+k+'">' +
         '<span class="top"><span class="nm">'+d.name+'</span><span class="pill'+(d.star?' star':'')+'">'+L(d.tag)+'</span>'+(inStock?'<span class="pill stock">✓ '+t('instock')+'</span>':'')+'<span class="radio" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></span>' +
-        '<span><span class="ds">'+L(d.d)+'</span><span class="meta"><span>'+t('warr')+': <b>'+L(d.warr)+'</b></span><span>'+t('price')+': <b>'+d.price+'</b></span></span></span>' +
+        '<span><span class="ds">'+L(d.d)+'</span><span class="meta"><span>'+t('warr')+': <b>'+L(d.warr)+'</b></span><span>'+t('price')+': <b>'+(tierPrice(k) ? money(tierPrice(k)) + '</b> ' + t('tax') : d.price + '</b>')+'</span></span></span>' +
         '<span class="rates">'+rate('black', t('r_black'))+rate('color', t('r_color'))+rate('bright', t('r_bright'))+rate('touch', t('r_touch')) +
           '<span class="thick"><span>'+t('thick')+'</span><span class="edge"><span style="height:'+d.th+'px"></span>'+L(d.thl)+'</span></span></span>' +
       '</button>';
@@ -835,7 +842,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
 
   function repairLabel(r){ var x = REPAIRS.filter(function(y){ return y[0] === r; })[0]; return x ? (LANG === 'es' ? x[1] : x[0]) : r; }
   function repairsText(lang){
-    var a = chosen.map(function(r){ var lab = lang === 'en' ? r : repairLabel(r); return r === 'Screen' && TIERS[tier] ? lab + ' (' + TIERS[tier].name + ')' : lab; });
+    var a = chosen.map(function(r){ var lab = lang === 'en' ? r : repairLabel(r); return r === 'Screen' && TIERS[tier] ? lab + ' (' + TIERS[tier].name + (tierPrice(tier) ? ' · ' + money(tierPrice(tier)) : '') + ')' : lab; });
     var o = PROT.filter(function(x){ return x[0] === prot; })[0];
     if (o) a.push(lang === 'es' ? o[4] : o[2] + ' screen protector');
     return a.join(', ');
