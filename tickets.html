@@ -816,6 +816,12 @@ function startData(){
     }
     render(); kioskPublishSoon();
   }, function(){}));
+  var mStart = new Date(); mStart.setDate(1); mStart.setHours(0,0,0,0);
+  unsubs.push(db.collection('messages').where('createdAt', '>=', mStart.getTime()).onSnapshot(function(snap){
+    S.msgs = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }).sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
+    if (S.view === 'settings') render();
+    var mb = document.getElementById('mb-texts'); if (mb && mb._t) mb.innerHTML = textsList(mb._t);
+  }, function(){ S.msgs = []; }));
   unsubs.push(db.collection('kiosks').onSnapshot(function(snap){
     S.kiosks = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
     kioskPairWatch(); kioskPublishSoon();
@@ -1157,7 +1163,7 @@ function settingsView(){
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
     comm +
   '</div>' + backupPanel() +
-  siteSettingsPanel() + kioskPanel() + screenPricesPanel() +
+  siteSettingsPanel() + kioskPanel() + screenPricesPanel() + twilioPanel() +
   '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
     '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushNewTickets"'+(S.settings.pushNewTickets===true?' checked':'')+'>Also alert me when a ticket is checked in (off by default)</label>' +
@@ -1222,6 +1228,61 @@ function savePublic(patch){
   S.pub = Object.assign({}, S.pub||{}, patch); render();
   return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
 }
+/* ---------- text messages through Twilio (Firebase "Send Messages with Twilio" add-on) ---------- */
+function canTwilio(t){ return S.settings.twilioOn === true && !!t && t.textOk !== false && /^\+1\d{10}$/.test(e164((t.customer||{}).phone)); }
+function smsClean(b){ return String(b||'').replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/…/g, '...').replace(/ /g, ' ').replace(/\s+/g, ' ').trim(); }
+function segs(b){ b = String(b||''); var gsm = /^[A-Za-z0-9 \r\n@£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\[~\]|€]*$/.test(b); var one = gsm ? 160 : 70, many = gsm ? 153 : 67; return b.length <= one ? 1 : Math.ceil(b.length / many); }
+function msgStatus(m){
+  var d = m.delivery || {}, st = String((d.info && d.info.status) || d.state || '').toLowerCase();
+  if (st === 'delivered') return 'Delivered ✓';
+  if (st === 'sent' || st === 'success') return 'Sent';
+  if (st === 'undelivered' || st === 'failed' || st === 'error') return 'Didn’t go through' + (d.errorMessage || (d.info && d.info.errorMessage) ? ': ' + String(d.errorMessage || d.info.errorMessage).slice(0, 80) : '');
+  return 'Sending…';
+}
+function queueText(to, body, extra){
+  var ref = S.db.collection('messages').doc(), doc = Object.assign({to: to, body: smsClean(body), createdAt: Date.now(), by: who()}, extra || {});
+  S.msgs = [Object.assign({id: ref.id}, doc)].concat(S.msgs || []);
+  return retryOnce(function(){ return ref.set(doc); }).then(function(){ return ref.id; });
+}
+function sendText(t, body, kind){
+  if (!canTwilio(t)) return Promise.reject(new Error('This customer can’t get texts from the shop number'));
+  var to = e164(t.customer.phone), es = isEs(t);
+  var first = !(S.msgs || []).some(function(m){ return m.to === to; });
+  if ((first || kind === 'Checked in') && !/STOP/.test(body)) body += es ? ' Responda STOP para no recibir mensajes.' : ' Reply STOP to opt out.';
+  return queueText(to, body, {ticketId: t.id, ticketNum: t.num || 0, kind: kind || ''}).then(function(id){
+    var live = byId(t.id); if (live) patchTicket(live, {}, [logEntry('texted ' + (kind ? '“' + kind + '”' : 'the customer') + ' from the shop number')]);
+    return id;
+  });
+}
+function autoText(t, kind){
+  if (!t || !canTwilio(t)) return;
+  if (kind === 'Checked in' && S.settings.autoCheckin === false) return;
+  if (kind === 'Ready for pickup' && (S.settings.autoReady === false || (t.readyTextAt || 0) > Date.now() - 12*3600e3)) return;
+  var tp = templates(t).filter(function(x){ return x[0] === kind; })[0]; if (!tp) return;
+  sendText(t, tp[1], kind).then(function(){
+    if (kind === 'Ready for pickup') { var live = byId(t.id); if (live) patchTicket(live, {readyTextAt: Date.now()}, []); }
+    toast('Texted ' + (String((t.customer||{}).name||'').split(' ')[0] || 'the customer') + ': ' + kind);
+  }).catch(function(){});
+}
+function textsList(t){
+  var ms = (S.msgs || []).filter(function(m){ return m.ticketId === t.id; });
+  if (!ms.length) return '';
+  return '<div class="match" style="margin-bottom:12px"><b>Texts this month</b>' + ms.slice(0, 5).map(function(m){ return '<div style="display:flex;justify-content:space-between;gap:10px;margin-top:4px"><span>'+esc(m.kind || 'Text')+' · '+esc(rel(m.createdAt))+'</span><span class="t2">'+esc(msgStatus(m))+'</span></div>'; }).join('') + '</div>';
+}
+function twilioPanel(){
+  var on = S.settings.twilioOn === true, ms = S.msgs || [], cost = 0;
+  ms.forEach(function(m){ cost += segs(m.body) * 0.0125; });
+  var test = ms.filter(function(m){ return m.kind === 'Test'; })[0];
+  return '<div class="panel" id="tw-panel"><h2>Text messages</h2><p class="d">Text customers from the shop’s own number through Twilio instead of from your phone. Turn this on after the Twilio add-on is installed in Firebase (see the setup guide). Only customers who said yes to texts get them; for anyone else, “Text it” still opens your phone like before.</p>' +
+    '<label class="check"><input type="checkbox" data-setting="twilioOn"'+(on?' checked':'')+(S.canWrite?'':' disabled')+'><b>Send texts from the shop number (Twilio)</b></label>' +
+    '<label class="check" style="margin-top:8px"><input type="checkbox" data-setting="autoCheckin"'+(S.settings.autoCheckin!==false?' checked':'')+(S.canWrite?'':' disabled')+'>Text automatically when a ticket is checked in</label>' +
+    '<label class="check" style="margin-top:8px"><input type="checkbox" data-setting="autoReady"'+(S.settings.autoReady!==false?' checked':'')+(S.canWrite?'':' disabled')+'>Text automatically when it’s ready for pickup</label>' +
+    '<div class="inline" style="margin-top:14px"><label class="sr" for="tw-to">Send a test text to</label><input class="in" id="tw-to" inputmode="tel" placeholder="Your cell number" value="'+esc(S.settings.testTo||'')+'" style="max-width:220px"><button class="btn dark" data-act="twtest"'+(S.canWrite?'':' disabled')+'>Send a test text</button></div>' +
+    (test ? '<p class="hint">Last test: <b>'+esc(msgStatus(test))+'</b> · '+esc(rel(test.createdAt))+'</p>' : '') +
+    '<p class="hint" style="margin-top:8px">This month: <b>'+ms.length+'</b> text'+(ms.length===1?'':'s')+', about <b>'+money(cost)+'</b> in Twilio message fees (plus your number and registration).</p>' +
+  '</div>';
+}
+
 /* ---------- iPad screen prices (private: only the paired iPad sees them) ---------- */
 var SP_TIERS = [['incell','Incell'],['oled','Soft OLED'],['original','Original']];
 function spKey(model){ return String(model||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
@@ -1352,15 +1413,15 @@ function followups(){
   return out.sort(function(a,b){ return a.order - b.order; });
 }
 function followBox(){
-  var list = followups();
-  var m = modalShell('fu', 'Follow-ups', list.length ? list.map(function(f){
+  var list = followups(), canAll = list.filter(function(f){ return canTwilio(f.t); });
+  var m = modalShell('fu', 'Follow-ups', (canAll.length > 1 ? '<div class="acts" style="margin:0 0 12px"><button class="btn" data-fuall>Send all ' + canAll.length + ' from the shop number</button>' + (canAll.length < list.length ? '<span class="t2" style="align-self:center">' + (list.length - canAll.length) + ' can only be texted from your phone</span>' : '') + '</div>' : '') + (list.length ? list.map(function(f){
     var c = f.t.customer || {};
     return '<div class="tpl"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><b'+(f.warn?' style="color:var(--red)"':'')+'>'+esc(f.title)+'</b><span class="t2">#'+esc(f.t.num)+' · '+esc(f.sub)+'</span></div>' +
       '<p style="margin:4px 0 8px"><b>'+esc(c.name||'')+'</b> · '+esc(fmtPhone(c.phone))+' · '+esc((f.t.device||{}).model||'')+'</p>' +
       '<p class="muted" style="font-size:13.5px">'+esc(f.msg)+'</p>' +
-      '<div class="acts" style="margin-top:8px"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(f.msg)+'" data-fu="'+f.kind+'" data-id="'+esc(f.t.id)+'">Text it</a><button class="btn sm ghost" data-fuskip="'+f.kind+'" data-id="'+esc(f.t.id)+'">'+(f.kind==='review'?'Skip':'Done')+'</button><button class="link" data-fuopen="'+esc(f.t.id)+'">Open ticket</button></div></div>';
+      '<div class="acts" style="margin-top:8px">' + (canTwilio(f.t) ? '<button class="btn sm" data-fusend="'+f.kind+'" data-id="'+esc(f.t.id)+'">Send</button>' : '<a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(f.msg)+'" data-fu="'+f.kind+'" data-id="'+esc(f.t.id)+'">Text it</a>') + '<button class="btn sm ghost" data-fuskip="'+f.kind+'" data-id="'+esc(f.t.id)+'">'+(f.kind==='review'?'Skip':'Done')+'</button><button class="link" data-fuopen="'+esc(f.t.id)+'">Open ticket</button></div></div>';
   }).join('') + (!(S.pub||{}).reviewUrl && list.some(function(f){ return f.kind === 'review'; }) ? '<p class="hint">Tip: add your Google review link in <b>Settings → Website</b> so it’s included in review texts.</p>' : '')
-  : '<div class="empty" style="padding:30px"><h3>All caught up</h3><p>No reviews to ask for and no devices waiting too long.</p></div>',
+  : '<div class="empty" style="padding:30px"><h3>All caught up</h3><p>No reviews to ask for and no devices waiting too long.</p></div>'),
   '<button class="btn ghost" data-mclose>Close</button>', true);
   m.addEventListener('click', function(e){
     var a = e.target.closest('[data-fu]'), sk = e.target.closest('[data-fuskip]'), op = e.target.closest('[data-fuopen]');
@@ -1370,6 +1431,23 @@ function followBox(){
       else patchTicket(t, {pickupRemindedAt: Date.now()}, [logEntry(skip ? 'marked the pickup follow-up done' : 'sent a pickup reminder')]);
       var card = (a || sk).closest('.tpl'); if (card) card.remove();
     };
+    var fs = e.target.closest('[data-fusend]'), fa = e.target.closest('[data-fuall]');
+    var twSend = function(f, btn){
+      var kindName = f.kind === 'review' ? 'Review request' : 'Pickup reminder';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      return sendText(f.t, f.msg, kindName).then(function(){
+        if (f.kind === 'review') patchTicket(byId(f.t.id) || f.t, {reviewAskedAt: Date.now()}, []);
+        else patchTicket(byId(f.t.id) || f.t, {pickupRemindedAt: Date.now()}, []);
+        var card = m.querySelector('[data-fusend][data-id="' + f.t.id + '"]'); if (card) card.closest('.tpl').remove();
+      }).catch(function(err){ if (btn) { btn.disabled = false; btn.textContent = 'Send'; } throw err; });
+    };
+    if (fs) { var f1 = list.filter(function(x){ return x.t.id === fs.getAttribute('data-id') && x.kind === fs.getAttribute('data-fusend'); })[0]; if (f1) twSend(f1, fs).then(function(){ toast('Sent'); }).catch(writeErr); return; }
+    if (fa) {
+      fa.disabled = true; fa.textContent = 'Sending…';
+      var todo = list.filter(function(x){ return canTwilio(x.t); }), okN = 0;
+      todo.reduce(function(p, f){ return p.then(function(){ return twSend(f).then(function(){ okN++; }).catch(function(){}); }); }, Promise.resolve()).then(function(){ toast('Sent ' + okN + ' of ' + todo.length + ' texts'); fa.remove(); });
+      return;
+    }
     if (a) mark(a.getAttribute('data-fu'), a.getAttribute('data-id'), false);
     if (sk) mark(sk.getAttribute('data-fuskip'), sk.getAttribute('data-id'), true);
     if (op) { m.remove(); openTicket(op.getAttribute('data-fuopen')); }
@@ -2329,7 +2407,7 @@ function reqToTicket(r){
   var okSig = typeof r.sig === 'string' && /^data:image\/(png|jpeg);base64,/.test(r.sig);
   ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:r.email||'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
     items: items.concat(ACCS.filter(function(a){ return a.name === r.addons; }).map(function(a){ return {repair:'Accessory', part:'', price:accPrice(a.k), desc:a.name}; })),
-    reqId: r.id, notes: r.notes||'', lang: r.lang === 'es' ? 'es' : '', sig: okSig ? r.sig : '', sigAt: okSig ? (r.createdAt || Date.now()) : 0,
+    reqId: r.id, notes: r.notes||'', lang: r.lang === 'es' ? 'es' : '', textOk: r.textOk === true, sig: okSig ? r.sig : '', sigAt: okSig ? (r.createdAt || Date.now()) : 0,
     kioskInfo: isKiosk(r) ? [r.heard ? 'found us on ' + r.heard : '', r.backup ? 'backed up: ' + r.backup : '', r.lang === 'es' ? 'prefers Spanish' : ''].filter(Boolean).join(', ') : ''});
 }
 function reqExtras(r){ return [r.addons || '', r.backup ? 'Backed up: ' + r.backup : '', r.heard ? 'Found us: ' + r.heard : '', r.lang === 'es' ? 'Prefers Spanish' : ''].filter(Boolean).join(' · '); }
@@ -2679,15 +2757,23 @@ function msgBox(t, lang){
   var m = document.createElement('div');
   m.className = 'modal'; m.setAttribute('role','dialog'); m.setAttribute('aria-modal','true'); m.setAttribute('aria-labelledby','mb-t');
   m.innerHTML = '<div class="scrim on" style="position:fixed" data-mb-close></div><div class="mbox" style="position:relative;z-index:41;width:min(560px,100%)"><div class="mhead"><h2 id="mb-t">Message '+esc((c.name||'').split(' ')[0])+'</h2><button class="link" data-mblang style="margin-left:auto;margin-right:12px">'+(es?'Show in English':'Mostrar en español')+'</button><button class="x" data-mb-close aria-label="Close">✕</button></div><div class="mbody">' +
-    templates(t, es ? 'es' : 'en').map(function(x, i){ return '<div class="tpl"><b>'+esc(x[0])+'</b><p id="tpl'+i+'">'+esc(x[1])+'</p><div class="acts" style="margin-top:0"><a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text it</a><button class="btn sm ghost" data-copy="'+i+'">Copy</button></div></div>'; }).join('') +
-    '<p class="hint">“Text it” opens your messages app with the text filled in. If nothing opens on this computer, use Copy.</p></div></div>';
+    '<div id="mb-texts"></div>' +
+    templates(t, es ? 'es' : 'en').map(function(x, i){ return '<div class="tpl"><b>'+esc(x[0])+'</b><p id="tpl'+i+'">'+esc(x[1])+'</p><div class="acts" style="margin-top:0">' + (canTwilio(t) ? '<button class="btn sm" data-tw="'+i+'" data-kind="'+esc(x[0])+'">Send</button><a class="link" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text from my phone</a>' : '<a class="btn sm" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(x[1])+'" data-sent="'+esc(x[0])+'">Text it</a>') + '<button class="btn sm ghost" data-copy="'+i+'">Copy</button></div></div>'; }).join('') +
+    '<p class="hint">' + (canTwilio(t) ? '“Send” texts from the shop number. ' : (S.settings.twilioOn === true && t.textOk === false ? 'This customer didn’t say yes to texts, so the shop number won’t text them. ' : '')) + '“Text it” opens your messages app with the text filled in. If nothing opens on this computer, use Copy.</p></div></div>';
   document.body.appendChild(m);
+  var tl = $('#mb-texts', m); if (tl) { tl._t = t; tl.innerHTML = textsList(t); }
   requestAnimationFrame(function(){ m.classList.add('on'); var x = $('.x', m); if (x) x.focus(); });
   function close(){ m.remove(); document.removeEventListener('keydown', k, true); }
   function k(e){ if (e.key === 'Escape') { e.stopPropagation(); close(); } }
   document.addEventListener('keydown', k, true);
   m.addEventListener('click', async function(e){
     if (e.target.closest('[data-mb-close]')) { close(); return; }
+    var tw = e.target.closest('[data-tw]');
+    if (tw) {
+      tw.disabled = true; tw.textContent = 'Sending…';
+      sendText(byId(t.id) || t, $('#tpl' + tw.getAttribute('data-tw'), m).textContent, tw.getAttribute('data-kind')).then(function(){ tw.textContent = 'Sent ✓'; toast('Text sent from the shop number'); var tl2 = $('#mb-texts', m); if (tl2) tl2.innerHTML = textsList(t); }).catch(function(err){ tw.disabled = false; tw.textContent = 'Send'; writeErr(err); });
+      return;
+    }
     if (e.target.closest('[data-mblang]')) { close(); msgBox(t, es ? 'en' : 'es'); return; }
     var cp = e.target.closest('[data-copy]');
     if (cp) { var txt = $('#tpl' + cp.getAttribute('data-copy'), m).textContent; try { await navigator.clipboard.writeText(txt); toast('Copied'); } catch(err) { toast('Copy didn’t work here. Select the text instead.'); } return; }
@@ -2716,6 +2802,7 @@ async function setStatus(t, k){
   }
   patchTicket(t, fields, logs);
   toast(SMAP[k].label);
+  if (k === 'ready') autoText(byId(t.id) || t, 'Ready for pickup');
 }
 
 function confirmBox(title, text, okLabel, danger){
@@ -2796,7 +2883,8 @@ function ticketForm(existing, prefill){
         '<div class="g2"><div class="f"><label for="tf-phone">Phone</label><input class="in" id="tf-phone" type="tel" inputmode="tel" autocomplete="off" value="'+esc(fmtPhone(c.phone))+'" placeholder="(210) 555-0123"></div>' +
         '<div class="f"><label for="tf-name">Name</label><input class="in" id="tf-name" autocomplete="off" value="'+esc(c.name)+'" placeholder="First and last name"></div></div>' +
         '<div id="tf-match"></div>' +
-        '<label class="check" style="margin-top:10px"><input type="checkbox" id="tf-es"'+((t ? t.lang === 'es' : prefill && prefill.lang === 'es') ? ' checked' : '')+'>Prefers Spanish (texts and receipts in Spanish)</label>' +
+        '<label class="check" style="margin-top:10px"><input type="checkbox" id="tf-text"'+((t ? t.textOk !== false : !!(prefill && prefill.textOk)) ? ' checked' : '')+'>Customer said yes to texts about this repair <span class="t2">(ask: “Can we text you when it’s ready?”)</span></label>' +
+        '<label class="check" style="margin-top:8px"><input type="checkbox" id="tf-es"'+((t ? t.lang === 'es' : prefill && prefill.lang === 'es') ? ' checked' : '')+'>Prefers Spanish (texts and receipts in Spanish)</label>' +
         '<div style="margin-top:12px" class="seg" role="group" aria-label="Where"><button type="button" data-tftype="shop" aria-pressed="'+(NT.type==='shop')+'">At the shop</button><button type="button" data-tftype="mobile" aria-pressed="'+(NT.type==='mobile')+'">Mobile</button></div>' +
         '<div class="g2" style="margin-top:12px"><div class="f" id="tf-addrw"><label for="tf-addr" id="tf-addrl">'+(NT.type==='mobile'?'Address (where we’re going)':'Address (optional)')+'</label><input class="in" id="tf-addr" autocomplete="off" value="'+esc((t&&t.address)||c.address||'')+'"></div>' +
         '<div class="f"><label for="tf-email">Email (optional)</label><input class="in" id="tf-email" type="email" autocomplete="off" value="'+esc(c.email||'')+'"></div></div>' +
@@ -2833,7 +2921,7 @@ function ticketForm(existing, prefill){
         '<div class="f" style="margin-top:14px"><label for="tf-dmg">Existing damage</label><textarea class="in" id="tf-dmg" placeholder="Cracked back glass, dent on bottom left corner, scratches on screen…">'+esc(t&&t.damage)+'</textarea></div>' +
         '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-liq" '+(t&&t.liquid?'checked':'')+'>Signs of liquid damage</label>' +
       '</div>' +
-      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"'+(NT.preSig?' checked':'')+'><span><b>Customer agreed to the repair policy and to texts about this repair.</b> Backup, repair risks, warranty terms (Soft OLED: 30 days for glitches only, not breakage or drops; Incell: no warranty) were explained.</span></label>' +
+      (t ? '' : '<div class="msec"><label class="check"><input type="checkbox" id="tf-agree"'+(NT.preSig?' checked':'')+'><span><b>Customer agreed to the repair policy.</b> Backup, repair risks, warranty terms (Soft OLED: 30 days for glitches only, not breakage or drops; Incell: no warranty) were explained.</span></label>' +
         (NT.preSig ? '<div class="sigwrap" id="tf-sigdone"><img class="sigimg" alt="Customer signature from the check-in tablet" src="'+esc(NT.preSig)+'"><div class="sigbar"><span>Signed on the check-in tablet · '+esc(dt(NT.preSigAt))+'</span><button type="button" class="link" data-sigredo>Sign again</button></div></div>' : '') +
         '<div class="sigwrap'+(NT.preSig?' hidden':'')+'" id="tf-sigw"><div class="sigpad" id="tf-sig"><div class="ln"></div><canvas></canvas><div class="ph">Customer signs here (finger or mouse)</div></div><div class="sigbar"><span>Signature (optional)</span><button type="button" class="link" data-sigclear>Clear</button></div></div></div>') +
     '</div>' +
@@ -3006,6 +3094,7 @@ function submitForm(t, m, closeForm){
   var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other' || i.repair === 'Accessory') && i.desc) o.desc = String(i.desc).trim().slice(0,120); return o; });
   var data = {
     lang: ($('#tf-es')||{}).checked ? 'es' : '',
+    textOk: !!($('#tf-text')||{}).checked,
     type: NT.type,
     address: NT.type === 'mobile' ? $('#tf-addr').value.trim() : '',
     customer: {name:name, phone:fmtPhone(phone), address:$('#tf-addr').value.trim(), email:$('#tf-email').value.trim()},
@@ -3054,6 +3143,7 @@ function submitForm(t, m, closeForm){
     closeForm(); toast('Ticket #' + body.num + ' created');
     S.filter = 'active'; S.q = ''; S.view = 'tickets'; render();
     openTicket(ref.id);
+    autoText(byId(ref.id), 'Checked in');
     takeStk.forEach(function(r){ stockQty(r.id, -1); });
     if (takeStk.length) toast('Took ' + takeStk.map(function(r){ return r.name; }).join(', ') + ' from stock');
     if (reqId) patchReq(reqId, {status:'done', ticketId: ref.id, ticketNum: body.num});
@@ -3339,6 +3429,13 @@ document.addEventListener('click', async function(e){
     case 'rqticket': { var rr = reqById(a.getAttribute('data-id')); if (!rr) break; if (!S.me) { whoBox(); break; } reqToTicket(rr); break; }
     case 'sprm': { var spr = Object.assign({}, S.settings.screenPrices || {}); delete spr[a.getAttribute('data-m')]; saveSettings({screenPrices: spr}); break; }
     case 'spaddall': { var spa = Object.assign({}, S.settings.screenPrices || {}), added = 0; (CATALOG['Apple iPhone'] || []).forEach(function(m){ if (!spa[m]) { spa[m] = {}; added++; } }); saveSettings({screenPrices: spa}); toast(added ? 'Added ' + added + ' iPhone models. Type the prices you offer.' : 'All iPhones are already on the list'); break; }
+    case 'twtest': {
+      var tv = (($('#tw-to')||{}).value || '').trim(), te = e164(tv);
+      if (!/^\+1\d{10}$/.test(te)) { toast('Type a 10-digit cell number first'); break; }
+      if (tv !== (S.settings.testTo||'')) saveSettings({testTo: tv});
+      queueText(te, 'iFixPhones: test text from your shop app. If you got this, texting works.', {kind:'Test'}).then(function(){ toast('Test text queued. It should arrive in a few seconds.'); render(); }).catch(writeErr);
+      break;
+    }
     case 'kioskpair': kioskPair(); break;
     case 'kioskdel': {
       var kid = a.getAttribute('data-id'), kk = (S.kiosks||[]).filter(function(k){ return k.id === kid; })[0];

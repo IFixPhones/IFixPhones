@@ -289,7 +289,7 @@ h2{font-size:clamp(40px,6vw,52px);letter-spacing:-.035em;line-height:1.05;outlin
   <section class="screen step hidden" id="s1" aria-labelledby="h1t">
     <div class="wrap">
       <h2 id="h1t" tabindex="-1" data-t="you_h">First, a little about you.</h2>
-      <p class="sub" data-t="you_p">We’ll text you when your phone is ready.</p>
+      <p class="sub" data-t="you_p">We’ll let you know when your phone is ready.</p>
       <div class="fields">
         <div class="field" id="f-name"><label for="name" data-t="name_l">Full name</label><input id="name" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" maxlength="80" enterkeyhint="next"><p class="help hidden" id="name-h" data-t="name_e">Please enter your name.</p></div>
         <div class="field" id="f-phone"><label for="phone" data-t="phone_l">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="(210) 555-0123" enterkeyhint="next"><p class="help hidden" id="phone-h" data-t="phone_e">Please enter a 10-digit number.</p></div>
@@ -365,7 +365,8 @@ h2{font-size:clamp(40px,6vw,52px);letter-spacing:-.035em;line-height:1.05;outlin
 
       <div class="group"><p class="glabel" id="bk-l" data-t="bk_l">Is your phone backed up?</p><div class="chips" id="backup" role="group" aria-labelledby="bk-l"></div><p class="tip hidden" id="bk-tip" data-t="bk_tip">No problem. If your phone still turns on, ask us and we’ll help you back it up first.</p></div>
 
-      <label class="check" id="agree-w"><input type="checkbox" id="agree"><span class="box" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg></span><span data-t="agree">I’ve read and agree to the iFixPhones Warranty and Repair Policy, I’ll back up my data, and iFixPhones may text me about this repair.</span></label>
+      <label class="check" id="agree-w"><input type="checkbox" id="agree"><span class="box" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg></span><span data-t="agree">I’ve read and agree to the iFixPhones Warranty and Repair Policy, and I’ll back up my data.</span></label>
+      <label class="check" id="sms-w" style="margin-top:12px"><input type="checkbox" id="smsok"><span class="box" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg></span><span><b data-t="sms_b">Optional: text me about this repair from iFixPhones.</b> <span data-t="sms_t">We’ll text you when it’s checked in and ready. Message frequency varies (usually 2–5 per repair). Msg &amp; data rates may apply. Reply HELP for help, STOP to opt out. Not required for your repair.</span></span></label>
 
       <div class="siglabel"><span id="sig-l" data-t="sig_l">Sign with your finger</span><button type="button" id="sigclear" data-t="clear">Clear</button></div>
       <div class="sigpad" id="sig" role="img" aria-labelledby="sig-l"><span class="x" aria-hidden="true">×</span><div class="ln"></div><canvas></canvas><div class="ph" data-t="sig_ph">Sign here</div></div>
@@ -484,7 +485,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
     en: {
       w_h:'Welcome in.', w_p:'Check in here. It takes about a minute.', w_btn:'Start check-in',
       back:'Back', over:'Start over', stepof:'Step {n} of {t}', continue:'Continue', optional:'(optional)',
-      you_h:'First, a little about you.', you_p:'We’ll text you when your phone is ready.',
+      you_h:'First, a little about you.', you_p:'We’ll let you know when your phone is ready.',
       name_l:'Full name', name_e:'Please enter your name.', phone_l:'Mobile number', phone_e:'Please enter a 10-digit number.',
       email_l:'Email', email_o:'(optional, for your receipt)', email_e:'That email doesn’t look right.',
       heard_l:'How did you hear about us?',
@@ -499,11 +500,12 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
       unsure_n:'Help me choose at the counter', unsure_d:'We’ll show you the options in person.',
       sign_h:'Review and sign.', pol_h:'The short version of our policy', readall:'Read the full policy',
       bk_l:'Is your phone backed up?', bk_tip:'No problem. If your phone still turns on, ask us and we’ll help you back it up first.',
-      agree:'I’ve read and agree to the iFixPhones Warranty and Repair Policy, I’ll back up my data, and iFixPhones may text me about this repair.',
+      agree:'I’ve read and agree to the iFixPhones Warranty and Repair Policy, and I’ll back up my data.',
+      sms_b:'Optional: text me about this repair from iFixPhones.', sms_t:'We’ll text you when it’s checked in and ready. Message frequency varies (usually 2–5 per repair). Msg & data rates may apply. Reply HELP for help, STOP to opt out. Not required for your repair.',
       sig_l:'Sign with your finger', clear:'Clear', sig_ph:'Sign here', signote:'Can’t sign here? Just let us know at the counter.',
       need_both:'Please check the box and sign to finish.', need_box:'Please check the box to finish.', need_sig:'Please sign to finish.',
       go:'Check me in', sending:'Checking you in…', retry:'Try again', send_e:'That didn’t go through. Try again, or let us know at the counter.',
-      done_h:'You’re checked in, {name}.', done_p:'Have a seat. We’ll call your name in a moment. We’ll text {phone} when it’s ready.',
+      done_h:'You’re checked in, {name}.', done_p:'Have a seat. We’ll call your name in a moment. We’ll text {phone} when it’s ready.', done_p2:'Have a seat. We’ll call your name in a moment.',
       finish:'Done', count:'This screen resets in {n} seconds.', count1:'This screen resets in 1 second.',
       idle_h:'Still there?', idle_p:'For your privacy, this check-in will clear in {n} seconds.', keep:'Keep going',
       ask_h:'Start over?', ask_p:'This clears everything you’ve entered.',
@@ -519,7 +521,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
     es: {
       w_h:'Bienvenido.', w_p:'Regístrese aquí. Toma como un minuto.', w_btn:'Comenzar registro',
       back:'Atrás', over:'Empezar de nuevo', stepof:'Paso {n} de {t}', continue:'Continuar', optional:'(opcional)',
-      you_h:'Primero, cuéntenos sobre usted.', you_p:'Le enviaremos un mensaje cuando su teléfono esté listo.',
+      you_h:'Primero, cuéntenos sobre usted.', you_p:'Le avisaremos cuando su teléfono esté listo.',
       name_l:'Nombre completo', name_e:'Escriba su nombre.', phone_l:'Número de celular', phone_e:'Escriba un número de 10 dígitos.',
       email_l:'Correo electrónico', email_o:'(opcional, para su recibo)', email_e:'Ese correo no parece correcto.',
       heard_l:'¿Cómo supo de nosotros?',
@@ -534,11 +536,12 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
       unsure_n:'Ayúdenme a elegir en el mostrador', unsure_d:'Le mostramos las opciones en persona.',
       sign_h:'Revise y firme.', pol_h:'Nuestra política, en resumen', readall:'Leer la política completa',
       bk_l:'¿Tiene respaldo de su teléfono?', bk_tip:'No hay problema. Si su teléfono todavía prende, pídanos ayuda y lo respaldamos primero.',
-      agree:'Leí y acepto la Política de Garantía y Reparación de iFixPhones, respaldaré mis datos, y iFixPhones puede enviarme mensajes de texto sobre esta reparación.',
+      agree:'Leí y acepto la Política de Garantía y Reparación de iFixPhones, y respaldaré mis datos.',
+      sms_b:'Opcional: envíenme mensajes de texto de iFixPhones sobre esta reparación.', sms_t:'Le avisaremos cuando la recibamos y cuando esté lista. La frecuencia varía (normalmente de 2 a 5 por reparación). Pueden aplicar tarifas de mensajes y datos. Responda HELP para ayuda o STOP para cancelar. No es obligatorio para su reparación.',
       sig_l:'Firme con su dedo', clear:'Borrar', sig_ph:'Firme aquí', signote:'¿No puede firmar aquí? Avísenos en el mostrador.',
       need_both:'Marque la casilla y firme para terminar.', need_box:'Marque la casilla para terminar.', need_sig:'Firme para terminar.',
       go:'Registrarme', sending:'Registrando…', retry:'Intentar de nuevo', send_e:'No se pudo enviar. Intente de nuevo o avísenos en el mostrador.',
-      done_h:'¡Listo, {name}! Ya está registrado.', done_p:'Tome asiento. En un momento le llamamos. Le enviaremos un mensaje al {phone} cuando esté listo.',
+      done_h:'¡Listo, {name}! Ya está registrado.', done_p:'Tome asiento. En un momento le llamamos. Le enviaremos un mensaje al {phone} cuando esté listo.', done_p2:'Tome asiento. En un momento le llamamos.',
       finish:'Listo', count:'Esta pantalla se reinicia en {n} segundos.', count1:'Esta pantalla se reinicia en 1 segundo.',
       idle_h:'¿Sigue ahí?', idle_p:'Por su privacidad, este registro se borrará en {n} segundos.', keep:'Continuar',
       ask_h:'¿Empezar de nuevo?', ask_p:'Esto borra todo lo que escribió.',
@@ -851,7 +854,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
     var you = $('you'); you.textContent = '';
     [$('name').value.trim(), fmtPhone($('phone').value), deviceName(), repairsText(LANG)].forEach(function(v){ if (!v) return; var s = document.createElement('span'); s.textContent = v; you.appendChild(s); });
   }
-  function dirty(){ return !!($('name').value || $('phone').value || $('email').value || brand || $('notes').value || chosen.length || SIG.has() || $('agree').checked || heard || backup || prot); }
+  function dirty(){ return !!($('name').value || $('phone').value || $('email').value || brand || $('notes').value || chosen.length || SIG.has() || $('agree').checked || $('smsok').checked || heard || backup || prot); }
 
   var MAIN = document.querySelector('main');
   function open_(id){ $(id).classList.remove('hidden'); MAIN.inert = true; var b = $(id).querySelector('button'); if (b) b.focus(); }
@@ -895,7 +898,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
     var d = {kind:'checkin', status:'new', where:'shop', name:$('name').value.trim().slice(0,80), phone:fmtPhone(ph), device:deviceName().slice(0,80),
       repair:reps.join(', '), screen: tier === 'unsure' ? 'Not sure' : TIERS[tier] ? TIERS[tier].send : '', day:'', time:'', whenText:'Front desk iPad', apptAt:0, address:'',
       notes:notes.slice(0,500), createdAt:Date.now(), email:$('email').value.trim().slice(0,100), org:'',
-      agreed:true, textOk:true, sig:SIG.data(), kioskKey:KEY, heard:heard, backup:backup, lang:LANG, addons:protName()};
+      agreed:true, textOk:$('smsok').checked, sig:SIG.data(), kioskKey:KEY, heard:heard, backup:backup, lang:LANG, addons:protName()};
     var f = {}; Object.keys(d).forEach(function(k){ var v = d[k]; f[k] = typeof v === 'boolean' ? {booleanValue:v} : typeof v === 'number' ? {integerValue:String(Math.round(v))} : {stringValue:String(v)}; });
     sending = true; var b = $('go'); b.disabled = true; b.textContent = t('sending');
     fetch(BASE + 'requests?key=' + API_KEY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:f})}).then(function(r){
@@ -904,7 +907,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
       sending = false; b.disabled = false; b.textContent = t('go');
       var first = d.name.split(/\s+/)[0], masked = '(•••) •••-' + ph.slice(6);
       $('h4t').textContent = t('done_h', {name:first});
-      $('dmsg').textContent = t('done_p', {phone:masked});
+      $('dmsg').textContent = d.textOk ? t('done_p', {phone:masked}) : t('done_p2');
       $('dsum').textContent = d.device + ' · ' + repairsText(LANG);
       wipe(); step = 4; focusHead(showId('s4')); doneCountdown();
     }).catch(function(){
@@ -927,7 +930,7 @@ function stockId(brand, model, part){ return (brand + '-' + model + '-' + part).
     chosen = []; brand = ''; model = ''; tier = ''; heard = ''; backup = ''; prot = ''; showAll = false; flowAt = 0;
     $('tiles').classList.remove('bad'); $('rep-h').classList.add('hidden'); $('scr-h').classList.add('hidden'); $('bk-tip').classList.add('hidden');
     $('model-h').classList.remove('bad'); $('f-mfree').classList.remove('bad');
-    $('agree').checked = false; $('agree-w').classList.remove('bad');
+    $('agree').checked = false; $('agree-w').classList.remove('bad'); $('smsok').checked = false;
     SIG.clear(); $('sig').classList.remove('bad');
     $('err').textContent = ''; $('you').textContent = ''; $('go').disabled = false;
     LANG = 'en'; applyLang();
