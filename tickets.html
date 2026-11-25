@@ -821,6 +821,7 @@ function startData(){
     S.msgs = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }).sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); });
     if (S.view === 'settings') render();
     var mb = document.getElementById('mb-texts'); if (mb && mb._t) mb.innerHTML = textsList(mb._t);
+    if (!S.polledTexts) { S.polledTexts = true; setTimeout(pollTexts, 3000); }
   }, function(){ S.msgs = []; }));
   unsubs.push(db.collection('kiosks').onSnapshot(function(snap){
     S.kiosks = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; });
@@ -1228,7 +1229,7 @@ function savePublic(patch){
   S.pub = Object.assign({}, S.pub||{}, patch); render();
   return enqueue('public/site', function(){ return retryOnce(function(){ return S.db.doc('public/site').set(patch, {merge:true}); }); }).then(function(){ toast('Saved. The website updates right away.'); }).catch(writeErr);
 }
-/* ---------- text messages through Twilio (Firebase "Send Messages with Twilio" add-on) ---------- */
+/* ---------- text messages through Twilio (a Twilio Function link, or the Firebase "Send Messages with Twilio" add-on) ---------- */
 function canTwilio(t){ return S.settings.twilioOn === true && !!t && t.textOk !== false && /^\+1\d{10}$/.test(e164((t.customer||{}).phone)); }
 function smsClean(b){ return String(b||'').replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/…/g, '...').replace(/ /g, ' ').replace(/\s+/g, ' ').trim(); }
 function segs(b){ b = String(b||''); var gsm = /^[A-Za-z0-9 \r\n@£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\[~\]|€]*$/.test(b); var one = gsm ? 160 : 70, many = gsm ? 153 : 67; return b.length <= one ? 1 : Math.ceil(b.length / many); }
@@ -1239,10 +1240,64 @@ function msgStatus(m){
   if (st === 'undelivered' || st === 'failed' || st === 'error') return 'Didn’t go through' + (d.errorMessage || (d.info && d.info.errorMessage) ? ': ' + String(d.errorMessage || d.info.errorMessage).slice(0, 80) : '');
   return 'Sending…';
 }
+function fnUrl(){ var u = String(S.settings.twilioUrl || '').trim(); return /^https:\/\/[a-z0-9.-]+\.twil\.io\/[^\s]*$/i.test(u) ? u : ''; }
+var TW_ERR = {21610:'they replied STOP earlier', 21211:'that number isn’t valid', 21614:'that number can’t get texts', 30003:'their phone is off or out of service', 30004:'the number blocked it', 30005:'that number doesn’t exist', 30006:'it’s a landline or can’t get texts', 30007:'the carrier filtered it', 30008:'unknown carrier error', 30034:'the shop number isn’t registered yet'};
+function twErr(code, msg){ return TW_ERR[code] || String(msg || ('error ' + code)).slice(0, 120); }
+function fnPost(params){
+  var url = fnUrl(), u = firebase.auth().currentUser;
+  if (!url) return Promise.reject(new Error('Add the Twilio send link in Settings'));
+  if (!u) return Promise.reject(new Error('Sign in again'));
+  return u.getIdToken().then(function(tok){
+    return fetch(url, {method: 'POST', body: new URLSearchParams(Object.assign({token: tok}, params))});
+  }).then(function(r){
+    return r.json().catch(function(){ return {}; }).then(function(j){
+      if (!r.ok) { var e = new Error(j.error || ('Twilio link answered ' + r.status)); e.code = j.code || null; throw e; }
+      return j;
+    });
+  });
+}
+function fnSend(ref, doc){
+  return fnPost({to: doc.to, body: doc.body}).then(function(j){
+    ref.update({sid: j.sid || '', delivery: {state: 'PROCESSING', info: {status: j.status || 'accepted'}}}).catch(function(){});
+    pollSoon();
+  }, function(e){
+    var why = e.code ? twErr(e.code, e.message) : String(e.message || e).slice(0, 120);
+    ref.update({delivery: {state: 'ERROR', errorMessage: why}}).catch(function(){});
+    toast('Text didn’t send: ' + why);
+  });
+}
+var pollT = null, pollN = 0, POLL_WAIT = [4000, 10000, 20000, 30000, 60000, 60000, 120000, 300000];
+function pendingTexts(){
+  var cut = Date.now() - 2*86400e3;
+  return (S.msgs || []).filter(function(m){
+    var d = m.delivery || {}, st = String((d.info && d.info.status) || '').toLowerCase();
+    return m.sid && (m.createdAt || 0) > cut && d.state !== 'ERROR' && !/^(delivered|undelivered|failed|canceled|read)$/.test(st);
+  });
+}
+function pollSoon(){ pollN = 0; clearTimeout(pollT); pollT = setTimeout(pollTexts, POLL_WAIT[0]); }
+function pollTexts(){
+  pollT = null;
+  var ms = pendingTexts().slice(0, 20);
+  if (!fnUrl() || !ms.length) return;
+  fnPost({action: 'status', sids: ms.map(function(m){ return m.sid; }).join(',')}).then(function(j){
+    var st = j.statuses || {};
+    ms.forEach(function(m){
+      var s = st[m.sid]; if (!s || !s.status || s.status === 'unknown') return;
+      if (s.status === String(((m.delivery || {}).info || {}).status || '')) return;
+      var bad = /^(failed|undelivered)$/.test(s.status);
+      var d = {state: /^(delivered|sent|read)$/.test(s.status) ? 'SUCCESS' : bad ? 'ERROR' : 'PROCESSING', info: {status: s.status, errorCode: s.errorCode || null}};
+      if (bad) d.errorMessage = twErr(s.errorCode, 'the carrier didn’t deliver it');
+      S.db.collection('messages').doc(m.id).update({delivery: d}).catch(function(){});
+    });
+  }).catch(function(){}).then(function(){
+    pollN++;
+    if (!pollT && pollN < POLL_WAIT.length && pendingTexts().length) pollT = setTimeout(pollTexts, POLL_WAIT[pollN]);
+  });
+}
 function queueText(to, body, extra){
-  var ref = S.db.collection('messages').doc(), doc = Object.assign({to: to, body: smsClean(body), createdAt: Date.now(), by: who()}, extra || {});
+  var ref = S.db.collection('messages').doc(), doc = Object.assign({to: to, body: smsClean(body), createdAt: Date.now(), by: who()}, fnUrl() ? {via: 'function'} : {}, extra || {});
   S.msgs = [Object.assign({id: ref.id}, doc)].concat(S.msgs || []);
-  return retryOnce(function(){ return ref.set(doc); }).then(function(){ return ref.id; });
+  return retryOnce(function(){ return ref.set(doc); }).then(function(){ if (fnUrl()) fnSend(ref, doc); return ref.id; });
 }
 function sendText(t, body, kind){
   if (!canTwilio(t)) return Promise.reject(new Error('This customer can’t get texts from the shop number'));
@@ -1273,11 +1328,12 @@ function twilioPanel(){
   var on = S.settings.twilioOn === true, ms = S.msgs || [], cost = 0;
   ms.forEach(function(m){ cost += segs(m.body) * 0.0125; });
   var test = ms.filter(function(m){ return m.kind === 'Test'; })[0];
-  return '<div class="panel" id="tw-panel"><h2>Text messages</h2><p class="d">Text customers from the shop’s own number through Twilio instead of from your phone. Turn this on after the Twilio add-on is installed in Firebase (see the setup guide). Only customers who said yes to texts get them; for anyone else, “Text it” still opens your phone like before.</p>' +
+  return '<div class="panel" id="tw-panel"><h2>Text messages</h2><p class="d">Text customers from the shop’s own number through Twilio instead of from your phone. Paste your Twilio send link below (see the setup guide), send yourself a test, then turn this on. Only customers who said yes to texts get them; for anyone else, “Text it” still opens your phone like before.</p>' +
+    '<div class="field" style="margin-bottom:12px"><label for="tw-url">Twilio send link</label><div class="inline"><input class="in" id="tw-url" data-wsp placeholder="https://ifixphones-texts-1234.twil.io/send" value="'+esc(S.settings.twilioUrl||'')+'" autocomplete="off" spellcheck="false" style="max-width:420px"'+(S.canWrite?'':' disabled')+'><button class="btn" data-act="twurl"'+(S.canWrite?'':' disabled')+'>Save link</button></div><p class="hint">'+(fnUrl() ? 'Texts send through this link.' : S.settings.twilioUrl ? 'That link doesn’t look right. It should end in .twil.io/send.' : 'No link yet. Without one, texts wait for the Firebase add-on instead.')+'</p></div>' +
     '<label class="check"><input type="checkbox" data-setting="twilioOn"'+(on?' checked':'')+(S.canWrite?'':' disabled')+'><b>Send texts from the shop number (Twilio)</b></label>' +
     '<label class="check" style="margin-top:8px"><input type="checkbox" data-setting="autoCheckin"'+(S.settings.autoCheckin!==false?' checked':'')+(S.canWrite?'':' disabled')+'>Text automatically when a ticket is checked in</label>' +
     '<label class="check" style="margin-top:8px"><input type="checkbox" data-setting="autoReady"'+(S.settings.autoReady!==false?' checked':'')+(S.canWrite?'':' disabled')+'>Text automatically when it’s ready for pickup</label>' +
-    '<div class="inline" style="margin-top:14px"><label class="sr" for="tw-to">Send a test text to</label><input class="in" id="tw-to" inputmode="tel" placeholder="Your cell number" value="'+esc(S.settings.testTo||'')+'" style="max-width:220px"><button class="btn dark" data-act="twtest"'+(S.canWrite?'':' disabled')+'>Send a test text</button></div>' +
+    '<div class="inline" style="margin-top:14px"><label class="sr" for="tw-to">Send a test text to</label><input class="in" id="tw-to" data-wsp inputmode="tel" placeholder="Your cell number" value="'+esc(S.settings.testTo||'')+'" style="max-width:220px"><button class="btn dark" data-act="twtest"'+(S.canWrite?'':' disabled')+'>Send a test text</button></div>' +
     (test ? '<p class="hint">Last test: <b>'+esc(msgStatus(test))+'</b> · '+esc(rel(test.createdAt))+'</p>' : '') +
     '<p class="hint" style="margin-top:8px">This month: <b>'+ms.length+'</b> text'+(ms.length===1?'':'s')+', about <b>'+money(cost)+'</b> in Twilio message fees (plus your number and registration).</p>' +
   '</div>';
@@ -1413,8 +1469,8 @@ function followups(){
   return out.sort(function(a,b){ return a.order - b.order; });
 }
 function followBox(){
-  var list = followups(), canAll = list.filter(function(f){ return canTwilio(f.t); });
-  var m = modalShell('fu', 'Follow-ups', (canAll.length > 1 ? '<div class="acts" style="margin:0 0 12px"><button class="btn" data-fuall>Send all ' + canAll.length + ' from the shop number</button>' + (canAll.length < list.length ? '<span class="t2" style="align-self:center">' + (list.length - canAll.length) + ' can only be texted from your phone</span>' : '') + '</div>' : '') + (list.length ? list.map(function(f){
+  var list = followups(), canAll = list.filter(function(f){ return canTwilio(f.t); }), canRev = canAll.filter(function(f){ return f.kind === 'review'; });
+  var m = modalShell('fu', 'Follow-ups', (canAll.length > 1 || canRev.length ? '<div class="acts" style="margin:0 0 12px">' + (canRev.length && canRev.length < canAll.length ? '<button class="btn" data-fuall="review">Send ' + canRev.length + ' review request' + (canRev.length === 1 ? '' : 's') + '</button>' : '') + (canAll.length > 1 ? '<button class="btn' + (canRev.length && canRev.length < canAll.length ? ' ghost' : '') + '" data-fuall="all">Send all ' + canAll.length + ' from the shop number</button>' : canRev.length === 1 && canAll.length === 1 ? '' : '') + (canAll.length < list.length ? '<span class="t2" style="align-self:center">' + (list.length - canAll.length) + ' can only be texted from your phone</span>' : '') + '</div>' : '') + (list.length ? list.map(function(f){
     var c = f.t.customer || {};
     return '<div class="tpl"><div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline"><b'+(f.warn?' style="color:var(--red)"':'')+'>'+esc(f.title)+'</b><span class="t2">#'+esc(f.t.num)+' · '+esc(f.sub)+'</span></div>' +
       '<p style="margin:4px 0 8px"><b>'+esc(c.name||'')+'</b> · '+esc(fmtPhone(c.phone))+' · '+esc((f.t.device||{}).model||'')+'</p>' +
@@ -1444,8 +1500,13 @@ function followBox(){
     if (fs) { var f1 = list.filter(function(x){ return x.t.id === fs.getAttribute('data-id') && x.kind === fs.getAttribute('data-fusend'); })[0]; if (f1) twSend(f1, fs).then(function(){ toast('Sent'); }).catch(writeErr); return; }
     if (fa) {
       fa.disabled = true; fa.textContent = 'Sending…';
-      var todo = list.filter(function(x){ return canTwilio(x.t); }), okN = 0;
-      todo.reduce(function(p, f){ return p.then(function(){ return twSend(f).then(function(){ okN++; }).catch(function(){}); }); }, Promise.resolve()).then(function(){ toast('Sent ' + okN + ' of ' + todo.length + ' texts'); fa.remove(); });
+      var onlyRev = fa.getAttribute('data-fuall') === 'review';
+      var todo = list.filter(function(x){ return canTwilio(x.t) && (!onlyRev || x.kind === 'review'); }), okN = 0;
+      m.querySelectorAll('[data-fuall]').forEach(function(b){ b.disabled = true; });
+      todo.reduce(function(p, f){ return p.then(function(){ return twSend(f).then(function(){ okN++; }).catch(function(){}); }); }, Promise.resolve()).then(function(){
+        toast('Sent ' + okN + ' of ' + todo.length + (onlyRev ? ' review requests' : ' texts'));
+        var bar = fa.closest('.acts'); if (bar) bar.remove();
+      });
       return;
     }
     if (a) mark(a.getAttribute('data-fu'), a.getAttribute('data-id'), false);
@@ -3435,6 +3496,11 @@ document.addEventListener('click', async function(e){
       if (tv !== (S.settings.testTo||'')) saveSettings({testTo: tv});
       queueText(te, 'iFixPhones: test text from your shop app. If you got this, texting works.', {kind:'Test'}).then(function(){ toast('Test text queued. It should arrive in a few seconds.'); render(); }).catch(writeErr);
       break;
+    }
+    case 'twurl': {
+      var tu = (($('#tw-url')||{}).value || '').trim();
+      if (tu && !/^https:\/\/[a-z0-9.-]+\.twil\.io\/[^\s]*$/i.test(tu)) { toast('That link doesn’t look right. Copy it from Twilio: it ends in .twil.io/send'); break; }
+      saveSettings({twilioUrl: tu}); toast(tu ? 'Link saved. Send yourself a test text.' : 'Link removed'); break;
     }
     case 'kioskpair': kioskPair(); break;
     case 'kioskdel': {
