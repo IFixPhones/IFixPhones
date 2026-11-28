@@ -404,6 +404,8 @@ select.in{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .msec h3{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .msec h3 .n{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;display:grid;place-items:center}
 .mfoot{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:14px 22px;border-top:1px solid var(--line2);background:#fff;border-radius:0 0 20px 20px;flex:none}
+.mfoot{position:sticky;bottom:0;z-index:2}
+@media (max-width:620px){.mfoot{padding-bottom:calc(14px + env(safe-area-inset-bottom))}}
 .mbox.tall{display:flex;flex-direction:column;max-height:calc(100vh - 48px);max-height:calc(100dvh - 48px)}
 .mbox.tall .mhead{flex:none}
 .mbox.tall .mbody{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0}
@@ -477,7 +479,7 @@ kbd{display:inline-block;min-width:24px;text-align:center;border:1px solid var(-
 .rtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
 .rseg{overflow-x:auto;max-width:100%;scrollbar-width:none}.rseg::-webkit-scrollbar{display:none}
 .rseg button{white-space:nowrap}
-.rdates{display:flex;gap:8px;align-items:center}.rdates .in{width:auto;min-height:36px;padding:6px 10px}
+.rdates{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}.rdates .in{width:auto;min-height:36px;padding:6px 10px}
 .rlabel{margin:0 2px 12px;font-size:15px}
 .kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
 .kpi{background:#fff;border-radius:var(--r);padding:14px 16px;border:0;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -626,7 +628,8 @@ function cardFee(amount, taxRate){ // Square: 3% of the amount (tax included), t
 function withCard(amount, t){ return r2(amount + cardFee(amount, taxRateOf(t||{})).all); }
 function total(t){ return r2(subtotal(t) - discountAmt(t) + taxAmt(t)); }
 function netSales(t){ return r2(subtotal(t) - discountAmt(t)); }
-function balance(t){ return Math.max(0, r2(total(t) - num(t.deposit))); }
+function balance(t){ return Math.max(0, r2(total(t) - num(t.deposit) + depRefunded(t))); }
+function depRefunded(t){ return r2((Array.isArray(t && t.refunds) ? t.refunds : []).reduce(function(a,r){ return a + (r.dep ? num(r.amt) : 0); }, 0)); }
 function collected(t){ return r2(total(t) + num(t.surcharge) + num(t.depSurcharge)); }
 function cardFees(t){ return r2(num(t.surcharge) + num(t.depSurcharge) - num(t.surTax) - num(t.depSurTax)); }
 function allTax(t){ return r2(taxAmt(t) + num(t.surTax) + num(t.depSurTax)); }
@@ -678,7 +681,7 @@ function refundedAmt(x){ return r2(refundsOf(x).reduce(function(a,r){ return a +
 function payParts(t){ // the money taken at checkout, by method (the deposit is separate)
   var out = [];
   if (t.payMethod === 'Split' && t.split && t.split.length) t.split.forEach(function(x){ out.push({m:x.m, a:num(x.a)}); });
-  else out.push({m:t.payMethod || 'Not recorded', a:r2(total(t) - num(t.deposit))});
+  else out.push({m:t.payMethod || 'Not recorded', a:r2(total(t) - num(t.deposit) + depRefunded(t))});
   if (num(t.surcharge)) out.push({m:t.surMethod || 'Credit card', a:num(t.surcharge), fee:true});
   return out;
 }
@@ -1025,14 +1028,15 @@ function renderSoon(){ if (raf) return; raf = requestAnimationFrame(function(){ 
 function render(){
   if (S.status === 'signin') return;
   var app = $('#app');
-  var ae = document.activeElement, keep = ae && ae.id && ae.hasAttribute && ae.hasAttribute('data-wsp') && ae.type !== 'checkbox' ? {id:ae.id, v:ae.value, s:ae.selectionStart, e:ae.selectionEnd} : null;
+  var ae = document.activeElement, keep = null;
+  if (ae && ae.id && app.contains(ae) && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && !/^(checkbox|radio|file|button|submit)$/.test(ae.type)) { keep = {id:ae.id, v:ae.value, s:null, e:null}; try { keep.s = ae.selectionStart; keep.e = ae.selectionEnd; } catch(x) {} }
   app.innerHTML = topbar() + '<div class="wrap">' + mobileTabs() + body() + '</div>' +
     (S.view === 'tickets' && S.status === 'ready' && S.canWrite ? '<button class="btn fab" data-act="new">+ New ticket</button>' : '');
   restoreSearchFocus();
   if (S.openId) renderSheet(); else if (S.profile) renderProfile();
   maybeAskWho();
   if (S.status === 'ready' && !S.cacheOnly) backfillStatus();
-  if (keep) { var ke = document.getElementById(keep.id); if (ke) { ke.value = keep.v; ke.focus(); try { ke.setSelectionRange(keep.s, keep.e); } catch(e) {} } }
+  if (keep) { var ke = document.getElementById(keep.id); if (ke && app.contains(ke)) { ke.value = keep.v; if (document.activeElement !== ke) ke.focus(); if (keep.s != null) try { ke.setSelectionRange(keep.s, keep.e); } catch(e) {} } }
   if (S.status === 'ready' && /#t=\d+/.test(location.hash||'')) setTimeout(checkHash, 50);
 }
 
@@ -1205,7 +1209,7 @@ function partsView0(){
 }
 
 var RP = 'today', RPC = {a:'', b:''};
-try { RP = localStorage.getItem('ifx_rp') || 'today'; } catch(e) {}
+try { RP = localStorage.getItem('ifx_rp') || 'today'; var rpc0 = JSON.parse(localStorage.getItem('ifx_rpc') || 'null'); if (rpc0 && rpc0.a && rpc0.b) RPC = rpc0; } catch(e) {}
 var RPS = [['today','Today'],['yday','Yesterday'],['7','7 days'],['month','This month'],['lmonth','Last month'],['year','This year'],['custom','Pick dates']];
 var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function rpRange(){
@@ -1246,7 +1250,7 @@ function rStats(a, b){
   var bbSold = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inR(x.soldAt); });
   var bbP = r2(bbSold.reduce(function(s2,x){ return s2 + bbProfit(x); }, 0));
   var salesNet = r2(repRev + accTotal - refundPre);
-  var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
+  var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt || t.paidAt || t.updatedAt); });
   var rd = done.map(function(t){ var r = readyTs(t); return r && r > t.createdAt ? {t:t, ms:r - t.createdAt, same:sameDay(r, t.createdAt)} : null; }).filter(Boolean);
   var created = S.tickets.filter(function(t){ return inR(t.createdAt) && t.status !== 'cancel'; });
   var comebacks = S.tickets.filter(function(t){ return t.warrantyReturn && inR(t.createdAt); }).length;
@@ -1349,7 +1353,7 @@ function techBlock(st, a, b){
   var by = {}, tk = function(k){ return by[k] || (by[k] = {n:0, rev:0, ready:0, rn:0, bench:0, bn:0, wr:0}); };
   st.done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += netSales(t) - accRev(t); var r = readyTs(t); if (r && r > t.createdAt) { o.ready += r - t.createdAt; o.rn++; } if (num(t.benchMs)) { o.bench += num(t.benchMs); o.bn++; } });
   S.tickets.filter(function(t){ return t.warrantyReturn && t.createdAt >= a && t.createdAt < b; }).forEach(function(t){
-    var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && digits(x.customer&&x.customer.phone) === digits(t.customer&&t.customer.phone); }).sort(function(p, q){ return q.createdAt - p.createdAt; })[0];
+    var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && custKey(x.customer) === custKey(t.customer); }).sort(function(p, q){ return q.createdAt - p.createdAt; })[0];
     tk((prev && prev.assigned) || t.assigned || 'Unassigned').wr++;
   });
   var hrsBy = {};
@@ -1405,14 +1409,14 @@ function salesList(st){
 function reportsView(){
   var R = rpRange(), st = rStats(R.a, R.b), pv = rStats(R.pa, R.pb);
   var seg = '<div class="rtop"><div class="seg rseg" role="group" aria-label="Period">' + RPS.map(function(o){ return '<button data-act="rp" data-v="'+o[0]+'" aria-pressed="'+(RP===o[0])+'">'+o[1]+'</button>'; }).join('') + '</div>' +
-    (RP === 'custom' ? '<div class="rdates"><label class="sr" for="rp-a">From</label><input class="in" type="date" id="rp-a" value="'+esc(RPC.a || isoDay(new Date(R.a)))+'"><span class="t2">to</span><label class="sr" for="rp-b">To</label><input class="in" type="date" id="rp-b" value="'+esc(RPC.b || isoDay(new Date(R.b - 1)))+'"></div>' : '') +
     '<span class="grow"></span>' + (S.canWrite ? '<button class="btn sm ghost" data-act="expadd">+ Expense</button>' : '') + '<button class="btn sm ghost" data-act="rexport">Export</button><button class="btn sm ghost" data-act="rprint">Print</button></div>' +
+    (RP === 'custom' ? '<form class="rdates" data-form="rpdates" novalidate><label class="sr" for="rp-a">From</label><input class="in" type="date" id="rp-a" max="'+isoDay(new Date())+'" value="'+esc(isoDay(new Date(R.a)))+'"><span class="t2">to</span><label class="sr" for="rp-b">To</label><input class="in" type="date" id="rp-b" max="'+isoDay(new Date())+'" value="'+esc(isoDay(new Date(R.b - 1)))+'"><button class="btn sm dark" type="submit">Show</button></form>' : '') +
     '<p class="rlabel"><b>'+esc(R.label)+'</b> <span class="t2">· arrows compare with '+esc(R.vs)+'</span></p>';
   var kp = '<div class="kgrid">' +
     kpi('Sales', money(st.salesNet), delta(st.salesNet, pv.salesNet), st.refundAmt ? 'after '+money(st.refundAmt)+' refunds' : 'before tax') +
     kpi('Profit', '<span style="color:'+(st.profit >= 0 ? 'var(--green)' : 'var(--red)')+'">'+money(st.profit)+'</span>', delta(st.profit, pv.profit), 'after parts and expenses') +
     kpi('Repairs done', st.done.length, delta(st.done.length, pv.done.length), st.created.length + ' checked in') +
-    kpi('Average ticket', st.avgTicket ? money(st.avgTicket) : '—', delta(st.avgTicket || null, pv.avgTicket || null), st.paid.length + ' paid tickets') +
+    kpi('Average ticket', st.avgTicket ? money(st.avgTicket) : '—', delta(st.avgTicket || null, pv.avgTicket || null), st.paid.length + ' paid ticket' + (st.paid.length === 1 ? '' : 's')) +
     kpi('Profit margin', pctTxt(st.margin), delta(st.margin, pv.margin, 'pct'), 'after part costs') +
     kpi('Same-day repairs', pctTxt(st.sameDayPct), delta(st.sameDayPct, pv.sameDayPct, 'pct'), 'ready the day they came in') +
     kpi('Check-in to ready', fmtDur(st.avgReady), delta(st.avgReady || null, pv.avgReady || null, null, true), 'average') +
@@ -2353,7 +2357,7 @@ function closeoutDoc(){
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Close-out '+esc(dateOnly(d.day))+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:640px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:20px;margin:0}h2{font-size:14px;margin:18px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid #eee}.sig{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:24px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}</style></head><body>' +
     '<h1>iFixPhones · Close-out</h1><div>'+esc(d.day.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}))+' · printed by '+esc(who())+'</div>' +
     '<h2>Money taken in</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total taken in</b>', '<b>'+money(d.total)+'</b>') + (d.credit ? tr('Paid with store credit (not cash)', money(d.credit)) : '') + tr('Sales tax collected (owed to Texas)', money(d.taxC)) + tr('Card fees', money(d.surC)) + tr('<b>Cash drawer should be up by</b>', '<b>'+money(d.cash)+'</b>') + '</table>' +
-    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(r2(total(t) - num(t.deposit) + num(t.surcharge)))+' '+esc(payLabel(t))); }).join('') || tr('None','')) + '</table>' +
+    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(r2(balance(t) + num(t.surcharge)))+' '+esc(payLabel(t))); }).join('') || tr('None','')) + '</table>' +
     (d.sales.length ? '<h2>Quick sales</h2><table>' + d.sales.map(function(x){ return tr(esc(saleText(x)), money(num(x.total) + num(x.surcharge)) + ' ' + esc(x.payMethod === 'Split' ? 'Split' : x.payMethod || '')); }).join('') + '</table>' : '') +
     (d.refunds.length ? '<h2>Refunds</h2><table>' + d.refunds.map(function(e){ return tr(esc(e.t ? '#' + e.t.num + ' ' + ((e.t.customer||{}).name||'') : 'Quick sale') + ' · ' + esc(e.x.reason||''), '−' + money(-e.a) + ' ' + esc(e.m)); }).join('') + '</table>' : '') +
     '<h2>Other</h2><table>' + tr('Deposits taken', money(d.depTotal)) + tr('Checked in', d.checkedIn) + tr('Picked up', d.pickedUp) + tr('Phones bought (paid out)', money(d.bbOutTotal)) + tr('Phones sold', money(d.bbInTotal)) + (d.creditIssued ? tr('Store credit given', money(d.creditIssued)) : '') + tr('Still open / ready for pickup', d.open + ' / ' + d.ready) + '</table>' +
@@ -2389,14 +2393,14 @@ function payBox(t){
     $('#py-sum', m).innerHTML = '<div class="tot"><span>Repairs'+(Object.keys(adds).some(function(k){ return adds[k]; })?' + accessories':'')+'</span><span>'+money(subtotal(d))+'</span></div>' + (discountAmt(d)?'<div class="tot"><span>Discount</span><span>−'+money(discountAmt(d))+'</span></div>':'') + (taxAmt(d)?'<div class="tot"><span>Sales tax ('+taxRateOf(d)+'%)</span><span>'+money(taxAmt(d))+'</span></div>':'') + (num(d.deposit)?'<div class="tot"><span>Deposit paid</span><span>−'+money(d.deposit)+'</span></div>':'') + '<div class="tot b" style="font-size:20px"><span>Amount due</span><span>'+money(bal)+'</span></div>';
     $('#py-cash', m).style.display = meth === 'Cash' ? '' : 'none';
     $('#py-split', m).style.display = meth === 'Split payment' ? '' : 'none';
-    var isCredit = CARDISH.indexOf(meth) > -1 && sr;
-    $('#py-card', m).style.display = isCredit ? '' : 'none';
-    if (isCredit) $('#py-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(withCard(bal, d)) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee (' + money(cardFee(bal, taxRateOf(d)).fee) + ') plus ' + money(cardFee(bal, taxRateOf(d)).tax) + ' tax on the fee, the same as Square. If Square shows it as a <b>debit</b> card, choose Debit card above instead.</span>';
+    var cardish = CARDISH.indexOf(meth) > -1 && sr;
+    $('#py-card', m).style.display = cardish ? '' : 'none';
+    if (cardish) $('#py-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(withCard(bal, d)) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee (' + money(cardFee(bal, taxRateOf(d)).fee) + ') plus ' + money(cardFee(bal, taxRateOf(d)).tax) + ' tax on the fee, the same as Square. If Square shows it as a <b>debit</b> card, choose Debit card above instead.</span>';
     var cin = num($('#py-in', m).value);
     $('#py-chg', m).textContent = cin ? (cin >= bal ? 'Change: ' + money(r2(cin - bal)) : 'That’s ' + money(r2(bal - cin)) + ' short') : '';
     var a1 = num($('#py-a1', m).value); $('#py-a2', m).value = a1 ? r2(Math.max(0, bal - a1)) : '';
     var m2 = $('#py-m2', m).value; $('#py-splith', m).textContent = a1 && CARDISH.indexOf(m2) > -1 && sr ? 'Charge ' + money(withCard(r2(bal - a1), d)) + ' on Square for the card part (includes ' + sr + '%).' : '';
-    $('#py-ok', m).textContent = 'Mark ' + money(isCredit ? withCard(bal, d) : bal) + ' paid';
+    $('#py-ok', m).textContent = 'Mark ' + money(cardish ? withCard(bal, d) : bal) + ' paid';
   }
   m.addEventListener('click', function(e){ var c = e.target.closest('[data-acc]'); if (!c) return; var k = c.getAttribute('data-acc'); adds[k] = !adds[k]; c.setAttribute('aria-pressed', String(!!adds[k])); upd(); });
   upd(); m.addEventListener('input', upd); m.addEventListener('change', upd);
@@ -2421,7 +2425,7 @@ function payBox(t){
       if (CARDISH.indexOf(meth) > -1 && sr) { var cf2 = cardFee(bal, taxRateOf(d)); f.surcharge = cf2.all; f.surTax = cf2.tax; f.surMethod = meth; log += ' + ' + money(f.surcharge) + ' credit card fee (' + sr + '%)'; }
     }
     if (added.length) log += '; added ' + added.map(function(a){ return a.name; }).join(', ');
-    S.lastPay = meth === 'Split payment' ? S.lastPay : meth;
+    S.lastPay = meth === 'Split payment' || isCredit(meth) ? S.lastPay : meth;
     m.remove();
     var live = byId(t.id); if (live) patchTicket(live, f, [logEntry(log)]);
     toast('Paid ' + money(r2(bal + f.surcharge)) + (f.cashIn ? ' · change ' + money(r2(f.cashIn - bal)) : ''));
@@ -2461,8 +2465,8 @@ function receiptDoc(t){
       tr('Sales tax' + (taxRateOf(t) ? ' (' + taxRateOf(t) + '%)' : t.taxExempt ? ' (exempt)' : ''), money(taxAmt(t))) + tr('Total', money(total(t)), 1) +
       (num(t.surcharge) ? tr('Credit card fee (with tax)', money(t.surcharge)) : '') +
       (num(t.deposit) ? tr('Deposit paid' + (t.depMethod ? ' (' + esc(t.depMethod) + ')' : ''), money(t.deposit)) : '') + (num(t.depSurcharge) ? tr('Credit card fee on deposit', money(t.depSurcharge)) : '') +
-      tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(total(t) - num(t.deposit) + num(t.surcharge))), 1) +
-      (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
+      tr('Paid' + (payLabel(t) ? ' · ' + esc(payLabel(t)) : ''), money(r2(balance(t) + num(t.surcharge))), 1) +
+      (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - balance(t)))) : '') + '</table>' +
     '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (warrNote(repairsText(t)) ? '. ' + esc(warrNote(repairsText(t))) + '.' : '') + '<br>Warranty covers glitches in the part only; drops, cracks, pressure marks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' + (/screen|oled|incell|lcd|display/i.test(repairsText(t)) ? '<p><b>Touch not responding?</b> Force restart: press volume up, then volume down, then hold the side button until the Apple logo appears. It doesn’t erase anything. ifixphones.net/#after</p>' : '') +
     '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
 }
@@ -2485,7 +2489,7 @@ function patternBox(cur, done){
 }
 
 /* ---------- refunds ---------- */
-function paidIn(x, isSale){ return isSale ? r2(num(x.total) + num(x.surcharge)) : (x.paid ? collected(x) : r2(num(x.deposit) + num(x.depSurcharge))); }
+function paidIn(x, isSale){ return isSale ? r2(num(x.total) + num(x.surcharge)) : (x.paid ? r2(collected(x) + depRefunded(x)) : r2(num(x.deposit) + num(x.depSurcharge))); }
 function refundLeft(x, isSale){ return r2(paidIn(x, isSale) - refundedAmt(x)); }
 function refundLines(x){
   return refundsOf(x).map(function(r){ return '<div class="tot" style="color:var(--red)"><span>Refunded · '+esc(r.how)+(r.reason?' · '+esc(r.reason):'')+' <span class="t2">'+esc(dt(r.at))+'</span></span><span>−'+money(r.amt)+'</span></div>'; }).join('');
@@ -2510,6 +2514,7 @@ function refundBox(x, isSale){
     if (amt > left + 0.001) { err.textContent = 'That’s more than the ' + money(left) + ' left to refund.'; return; }
     var rate = isSale ? (x.taxExempt ? 0 : num(x.taxRate)) : taxRateOf(x);
     var rec = {id:uid(), at:Date.now(), amt:amt, how:how, reason:$('#rf-why', m).value, note:$('#rf-note', m).value.trim().slice(0,120), by:who(), tax: rate ? rHE(amt - amt / (1 + rate/100)) : 0};
+    if (!isSale && !x.paid) rec.dep = true;
     m.remove();
     if (isSale) {
       var live = (S.sales||[]).filter(function(z){ return z.id === x.id; })[0] || x, list = refundsOf(live).concat([rec]); live.refunds = list; render();
@@ -2561,6 +2566,7 @@ function quickSale(){
     var ph = digits($('#qs-ph', m).value), nm = $('#qs-nm', m);
     ck = ph.length >= 10 ? ph.slice(-10) : '';
     if (ck && !nm.value) { var hit = S.tickets.filter(function(t){ return digits((t.customer||{}).phone).slice(-10) === ck; })[0]; if (hit) nm.value = hit.customer.name || ''; }
+    if (!ck && nm.value.trim()) ck = custKey({name:nm.value});
     credit = creditOf(ck);
     $('#qs-cr', m).innerHTML = credit ? '⭐ <b>'+money(credit)+' store credit</b> available.' : '';
     var sel = $('#qs-m', m), cur = sel.value || S.lastPay || 'Cash';
@@ -2587,7 +2593,7 @@ function quickSale(){
     var q = e.target.closest('[data-qq]');
     if (q) { var i = +q.getAttribute('data-qq'); cart[i].qty += +q.getAttribute('data-v'); if (cart[i].qty <= 0) cart.splice(i, 1); upd(); return; }
   });
-  m.addEventListener('input', function(e){ if (e.target.id === 'qs-ph') custUpd(); upd(); });
+  m.addEventListener('input', function(e){ if (e.target.id === 'qs-ph' || e.target.id === 'qs-nm') custUpd(); upd(); });
   m.addEventListener('change', upd);
   m.addEventListener('keydown', function(e){ if (e.key === 'Enter' && (e.target.id === 'qs-on' || e.target.id === 'qs-op')) { e.preventDefault(); var b = $('[data-qaddo]', m); if (b) b.click(); } });
   $('#qs-ok', m).addEventListener('click', function(){
@@ -2600,7 +2606,7 @@ function quickSale(){
     var ph = $('#qs-ph', m).value.trim(), nm2 = $('#qs-nm', m).value.trim();
     if (digits(ph).length >= 10 || nm2) x.cust = {name:nm2.slice(0,80), phone:fmtPhone(ph)};
     if (CARDISH.indexOf(meth) > -1 && sr) { var cf = cardFee(d.total, d.taxRate); x.surcharge = cf.all; x.surTax = cf.tax; x.surMethod = meth; }
-    S.lastPay = meth;
+    if (!isCredit(meth)) S.lastPay = meth;
     var ref = S.db.collection('sales').doc(); x.id = ref.id;
     S.sales = [x].concat(S.sales||[]); render();
     m.remove();
@@ -4193,7 +4199,7 @@ document.addEventListener('change', function(e){
   if (e.target.closest('.modal')) return;
   var el = e.target;
   if (el.hasAttribute && el.hasAttribute('data-photoin')) { var pt = S.openId ? byId(S.openId) : null; if (pt) addPhotos(pt, el.files); el.value = ''; return; }
-  if (el.id === 'rp-a' || el.id === 'rp-b') { RPC[el.id === 'rp-a' ? 'a' : 'b'] = el.value; render(); return; }
+  if (el.id === 'rp-a' || el.id === 'rp-b') return;
   var cm = el.getAttribute('data-comm');
   if (cm) { var co = Object.assign({}, S.settings.commission||{}); co[cm] = num(el.value); saveSettings({commission: co}); toast('Saved'); return; }
   var sk = el.getAttribute('data-setting');
@@ -4225,7 +4231,7 @@ document.addEventListener('input', function(e){
 
 document.addEventListener('submit', function(e){
   var f = e.target;
-  if (f.hasAttribute && f.hasAttribute('data-form')) e.preventDefault();
+  if (f.hasAttribute && f.hasAttribute('data-form')) { e.preventDefault(); var fae = document.activeElement; if (fae && f.contains(fae) && fae.blur) fae.blur(); }
   if (f.getAttribute('data-form') === 'addpart') {
     e.preventDefault();
     var t = S.openId ? byId(S.openId) : null; if (!t) return;
@@ -4235,6 +4241,15 @@ document.addEventListener('submit', function(e){
     $('#pn').value = ''; $('#pc2').value = '';
     patchTicket(t, {parts:(t.parts||[]).concat([part])}, [logEntry('added part “' + part.name + '” from ' + sup)]);
     return;
+  }
+  if (f.getAttribute('data-form') === 'rpdates') {
+    var okDay = function(v){ return /^\d{4}-\d{2}-\d{2}$/.test(v||'') && +v.slice(0,4) >= 2015 && +v.slice(0,4) <= 2100; };
+    var va = $('#rp-a').value, vb = $('#rp-b').value;
+    if (!okDay(va)) { toast('Pick a start date'); $('#rp-a').focus(); return; }
+    if (!okDay(vb)) { toast('Pick an end date'); $('#rp-b').focus(); return; }
+    if (vb < va) { var sw = va; va = vb; vb = sw; }
+    RPC = {a:va, b:vb}; try { localStorage.setItem('ifx_rpc', JSON.stringify(RPC)); } catch(x) {}
+    render(); return;
   }
   if (f.getAttribute('data-form') === 'addexp') {
     var ea = num($('#ex-amt').value); if (!ea) { toast('Enter an amount'); $('#ex-amt').focus(); return; }
@@ -4291,7 +4306,7 @@ document.addEventListener('keydown', function(e){
 document.addEventListener('keydown', function(e){ if (e.key && e.key.length === 1 && !(e.key === 'n' || e.key === 'N')) window.__lastKeyAt = Date.now(); else if (e.key === 'Enter') window.__lastKeyAt = Date.now(); }, true);
 
 // keep "updated 5m ago" fresh
-setInterval(function(){ if (S.status === 'ready' && !document.querySelector('.modal') && !(document.activeElement && document.activeElement.id === 'q')) render(); }, 60000);
+setInterval(function(){ var ae = document.activeElement; if (S.status === 'ready' && !document.querySelector('.modal') && !(ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) render(); }, 60000);
 
 })();
 </script>
