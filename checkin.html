@@ -78,6 +78,12 @@ h1{font-size:clamp(34px,7vw,48px);letter-spacing:-.03em;line-height:1.05;margin-
         </select>
       </div>
       <div class="field full"><label for="notes">Tell us more (optional)</label><textarea id="notes" placeholder="Dropped it, screen has lines but touch still works."></textarea></div>
+      <div class="field full"><label for="heard">How did you find us? (optional)</label>
+        <select id="heard">
+          <option value="">Choose</option>
+          <option>Google</option><option>Google Maps</option><option>Apple Maps</option><option>TikTok</option><option>Instagram</option><option>Facebook</option><option>Friend or family</option><option>Drove by</option><option>Been here before</option><option>Other</option>
+        </select>
+      </div>
     </div>
     <div class="hp" aria-hidden="true"><label for="hp">Leave empty</label><input id="hp" tabindex="-1" autocomplete="off"></div>
     <label class="check"><input type="checkbox" id="agree"><span>I’ve read and agree to the <a href="policy.html" target="_blank">iFixPhones warranty and repair policy</a>, and I’ll back up my data before the repair.</span></label>
@@ -154,7 +160,7 @@ h1{font-size:clamp(34px,7vw,48px);letter-spacing:-.03em;line-height:1.05;margin-
     err('');
     var b = $('go'); b.disabled = true; b.textContent = 'Checking in…';
     var d = {kind:'checkin', status:'new', where:'shop', name:$('name').value.trim().slice(0,80), phone:$('phone').value.trim().slice(0,24), device:$('device').value.trim().slice(0,80),
-      repair:$('repair').value, screen:'', day:'', time:'', whenText: where === 'here' ? 'At the shop now' : 'On the way', apptAt:0, address:'', notes:$('notes').value.trim().slice(0,500), createdAt:Date.now(), email:$('email').value.trim().slice(0,100), org:'', agreed:true, textOk:$('smsok').checked};
+      repair:$('repair').value, screen:'', day:'', time:'', whenText: where === 'here' ? 'At the shop now' : 'On the way', apptAt:0, address:'', notes:$('notes').value.trim().slice(0,500), createdAt:Date.now(), email:$('email').value.trim().slice(0,100), org:'', agreed:true, textOk:$('smsok').checked, heard:$('heard').value.slice(0,40)};
     var f = {}; Object.keys(d).forEach(function(k){ var v = d[k]; f[k] = typeof v === 'boolean' ? {booleanValue:v} : typeof v === 'number' ? {integerValue:String(Math.round(v))} : {stringValue:String(v)}; });
     fetch(URL_, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:f})}).then(function(r){
       if (!r.ok) throw new Error('send');

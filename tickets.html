@@ -426,6 +426,96 @@ select.in{-webkit-appearance:none;appearance:none;background-image:url("data:ima
 .skel{height:64px;border-bottom:1px solid var(--line2);background:linear-gradient(90deg,#fff 0,#f5f5f7 50%,#fff 100%);background-size:200% 100%;animation:sk 1.2s infinite}
 @keyframes sk{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- v3: cleaner layout ---- */
+.phead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.phead h2{margin:0}
+.sh3{font-size:14px;font-weight:600;margin:18px 0 8px}
+kbd{display:inline-block;min-width:24px;text-align:center;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font:600 12px var(--font);background:#fff}
+.me{flex-direction:row}
+.me .nm{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.me .nm small{font-size:11px;color:var(--graphite);font-weight:500}
+.me.clocked .av{box-shadow:0 0 0 2px #fff,0 0 0 4px #34c759}
+.me.clocked .nm small{color:var(--green)}
+.qsbtn{padding:9px 14px}
+@media (max-width:1280px){.trbtn .newtxt,.qsbtn .newtxt{display:none}.trbtn,.qsbtn{padding:9px 12px}}
+/* needs attention */
+.attn{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border-radius:var(--r);padding:10px 12px;margin-bottom:14px}
+.attl{font-size:12px;font-weight:700;color:var(--graphite);text-transform:uppercase;letter-spacing:.04em;margin:0 4px 0 2px}
+.achip{border:0;background:var(--mist);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:500;white-space:nowrap}
+.achip:hover{background:var(--mist2)}
+.achip.red{background:#fbeceb;color:#9b2c27}
+.achip.blue{background:#e8f2ff;color:#0058b0}
+/* settings */
+.setwrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
+.setnav{position:sticky;top:76px;display:flex;flex-direction:column;gap:2px;background:#fff;border-radius:var(--r);padding:8px}
+.setnav button{border:0;background:none;text-align:left;padding:9px 12px;border-radius:9px;font-size:14px;color:var(--ink)}
+.setnav button:hover{background:var(--mist)}
+.setnav button[aria-pressed="true"]{background:var(--ink);color:#fff;font-weight:600}
+.setmain{min-width:0;max-width:900px}
+@media (max-width:820px){.setwrap{grid-template-columns:1fr;gap:12px}.setnav{position:static;flex-direction:row;overflow-x:auto;scrollbar-width:none;padding:6px}.setnav::-webkit-scrollbar{display:none}.setnav button{white-space:nowrap;flex:none}}
+/* quick sale */
+.qsgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.qsitem{border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;transition:transform .12s,border-color .12s}
+.qsitem:hover{border-color:var(--ink)}
+.qsitem b{font-size:14px;line-height:1.25}
+.qsitem span{font-size:15px;font-weight:600;color:var(--blue)}
+.qsitem.other{border-style:dashed}.qsitem.other span{font-size:12.5px;font-weight:500;color:var(--graphite)}
+.qsitem.bump{transform:scale(.96);border-color:var(--blue)}
+.wrapseg{display:flex;flex-wrap:wrap}
+/* pattern + timer */
+.patrow{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.patrow svg{display:block;background:var(--mist);border-radius:8px}
+.patview{display:flex;align-items:center;gap:10px;margin-top:4px}
+.patview svg{background:var(--mist);border-radius:10px}
+.pathide svg{filter:blur(6px)}
+.patpad{width:min(280px,80vw);aspect-ratio:1;margin:6px auto;background:var(--mist);border-radius:20px;touch-action:none;cursor:pointer;user-select:none}
+.patpad svg{width:100%;height:100%;display:block}
+.timer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:var(--mist);border-radius:12px;padding:8px 8px 8px 12px;font-size:14px}
+.timer.on{background:#e9f7ee}
+/* reports */
+.rtop{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.rseg{overflow-x:auto;max-width:100%;scrollbar-width:none}.rseg::-webkit-scrollbar{display:none}
+.rseg button{white-space:nowrap}
+.rdates{display:flex;gap:8px;align-items:center}.rdates .in{width:auto;min-height:36px;padding:6px 10px}
+.rlabel{margin:0 2px 12px;font-size:15px}
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:#fff;border-radius:var(--r);padding:14px 16px;border:0;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .kl{font-size:13px;color:var(--graphite);font-weight:500}
+.kpi b{font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .ks{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:12.5px;min-height:18px}
+.dl{font-weight:700;font-size:12px;white-space:nowrap}.dl.up{color:var(--green)}.dl.down{color:var(--red)}.dl.flat{color:var(--graphite);font-weight:500}
+@media (max-width:1000px){.kgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.kpi b{font-size:22px}}
+.g2r{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.g2r>.panel{margin-bottom:14px}
+@media (max-width:1000px){.g2r{grid-template-columns:1fr;gap:0}}
+.chart{position:relative;display:flex;align-items:flex-end;gap:3px;height:190px;padding-top:22px;margin-top:8px;border-bottom:1px solid var(--line2)}
+.cmax{position:absolute;top:0;left:0;font-size:11.5px;color:var(--graphite)}
+.chart:before{content:"";position:absolute;left:0;right:0;top:22px;border-top:1px dashed var(--line2)}
+.cb{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;position:relative;min-width:0}
+.cb i{display:block;background:var(--blue);border-radius:4px 4px 0 0;min-height:0;transition:opacity .15s}
+.cb:hover i{opacity:.75}
+.cb span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--graphite);white-space:nowrap}
+.chart{margin-bottom:24px}
+.barw i.red{background:var(--red)}
+.heat{display:grid;gap:3px;align-items:center;font-size:11px;color:var(--graphite)}
+.heat i{display:block;aspect-ratio:1.6;border-radius:4px;min-height:14px}
+.heat span{white-space:nowrap}
+.mix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mix div{background:var(--mist);border-radius:12px;padding:10px 12px}
+.mix b{display:block;font-size:20px;letter-spacing:-.02em}.mix span{font-size:12.5px;color:var(--graphite)}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--mist);margin-top:4px}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--graphite)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:0}
+.c0{background:#1d1d1f}.c1{background:#0071e3}.c2{background:#34c759}.c3{background:#ff9f0a}.c4{background:#af52de}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rtable th.right,.rtable td.right{padding-left:10px;text-align:right}
+.rtable .amt{white-space:nowrap}
+@media (max-width:820px){.me .nm{display:none}}
+@media (max-width:480px){.brand span{display:none}.top .tin{gap:8px}.trbtn,.qsbtn{padding:8px 11px}}
+@media (max-width:820px){.rtable .hide-s{display:none}}
 .grecaptcha-badge{visibility:hidden!important}.rcnote{font-size:11px;color:#86868b;line-height:1.4}.rcnote a{color:inherit;text-decoration:underline}</style>
 </head>
 <body>
@@ -471,6 +561,8 @@ var WARR = ['None','30 days','90 days','6 months','1 year'];
 var CHECKS = [['power','Powers on'],['display','Display'],['touch','Touch'],['bio','Face ID / Touch ID'],['fcam','Front camera'],['rcam','Rear camera'],['ear','Earpiece'],['spk','Loudspeaker'],['mic','Microphone'],['charge','Charging'],['btn','Buttons'],['net','Wi-Fi / cellular']];
 var PAY = ['Cash','Credit card','Debit card','Apple / Google Pay','Zelle','Cash App','Venmo','Other'];
 var CARDISH = ['Credit card','Apple / Google Pay','Card'];
+var HEARD = ['Google','Google Maps','Apple Maps','TikTok','Instagram','Facebook','Friend or family','Drove by','Been here before','Other'];
+var REFUND_WHY = ['Couldn’t fix it','Customer changed their mind','Warranty problem','Charged too much','Other'];
 function surRate(){ return S.settings.surchargeOff ? 0 : (num(S.settings.surchargeRate) > 0 ? Math.min(3, num(S.settings.surchargeRate)) : 3); }
 function r2(n){ return Math.round((Number(n)||0) * 100) / 100; }
 var DEFAULT_TECHS = ['Mark','Ray','David'];
@@ -488,7 +580,7 @@ var S = {
   view:'tickets', filter:'active', q:'',
   openId:null, me:null
 };
-try { S.me = localStorage.getItem('ifx_tech') || null; S.tMode = localStorage.getItem('ifx_tmode') || 'list'; } catch(e) {}
+try { S.me = localStorage.getItem('ifx_tech') || null; S.tMode = localStorage.getItem('ifx_tmode') || 'list'; S.setSec = localStorage.getItem('ifx_setsec') || 'team'; } catch(e) {}
 
 /* ---------- helpers ---------- */
 function $(s, r){ return (r||document).querySelector(s); }
@@ -515,7 +607,9 @@ function rel(t){
 }
 function sameDay(a, b){ var x = new Date(a), y = new Date(b); return x.getFullYear()===y.getFullYear() && x.getMonth()===y.getMonth() && x.getDate()===y.getDate(); }
 function pill(k){ var s = SMAP[k] || SMAP['in']; return '<span class="pill" style="color:'+s.c+';background:'+s.bg+'"><i></i>'+esc(s.label)+'</span>'; }
-function subtotal(t){ return r2((t.items||[]).reduce(function(a,i){ return a + (i.apvSt === 'pending' || i.apvSt === 'declined' ? 0 : num(i.price)); }, 0)); }
+function diagWaived(t){ return (t.items||[]).some(function(i){ return !i.diag && i.repair !== 'Accessory' && i.apvSt !== 'pending' && i.apvSt !== 'declined' && num(i.price) > 0; }); }
+function itemCounts(t, i){ return !(i.apvSt === 'pending' || i.apvSt === 'declined') && !(i.diag && diagWaived(t)); }
+function subtotal(t){ return r2((t.items||[]).reduce(function(a,i){ return a + (itemCounts(t, i) ? num(i.price) : 0); }, 0)); }
 function discountAmt(t){ return Math.min(subtotal(t), num(t.discount)); }
 function taxRateOf(t){ return t.taxExempt ? 0 : num(t.taxRate); }
 function rHE(n){ // round to cents, half to even (same as Square)
@@ -546,8 +640,8 @@ function byMethod(t){ // amounts per method for a paid ticket (deposit counted i
   if (num(t.surcharge)) add(t.surMethod || 'Credit card', num(t.surcharge));
   return o;
 }
-function itemName(i){ return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv || i.repair === 'Accessory') && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
-function repairsText(t){ return (t.items||[]).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
+function itemName(i){ if (i.diag) return 'Diagnostic fee'; return (((i.repair === 'Other repair' || i.repair === 'Other') || i.apv || i.repair === 'Accessory') && i.desc ? i.desc : i.repair) + (i.apvSt === 'pending' ? ' (waiting for customer OK)' : i.apvSt === 'declined' ? ' (declined)' : ''); }
+function repairsText(t){ return (t.items||[]).filter(function(i){ return !(i.diag && diagWaived(t)); }).map(function(i){ return itemName(i) + (i.part ? ' (' + i.part + ')' : ''); }).join(', ') || 'Repair'; }
 function who(){ return S.me || 'Staff'; }
 function byId(id){ for (var i=0;i<S.tickets.length;i++) if (S.tickets[i].id === id) return S.tickets[i]; return null; }
 function clone(o){ return JSON.parse(JSON.stringify(o||{})); }
@@ -578,6 +672,72 @@ function warrNote(txt){ var o = /oled/i.test(txt), i = /incell/i.test(txt), a = 
   if (u === 'day') d.setDate(d.getDate() + n); else if (u === 'month') d.setMonth(d.getMonth() + n); else d.setFullYear(d.getFullYear() + n);
   return d.getTime();
 }
+/* ---------- money in and out ---------- */
+function refundsOf(x){ return Array.isArray(x && x.refunds) ? x.refunds : []; }
+function refundedAmt(x){ return r2(refundsOf(x).reduce(function(a,r){ return a + num(r.amt); }, 0)); }
+function payParts(t){ // the money taken at checkout, by method (the deposit is separate)
+  var out = [];
+  if (t.payMethod === 'Split' && t.split && t.split.length) t.split.forEach(function(x){ out.push({m:x.m, a:num(x.a)}); });
+  else out.push({m:t.payMethod || 'Not recorded', a:r2(total(t) - num(t.deposit))});
+  if (num(t.surcharge)) out.push({m:t.surMethod || 'Credit card', a:num(t.surcharge), fee:true});
+  return out;
+}
+function saleParts(s){
+  var out = [];
+  if (s.payMethod === 'Split' && s.split && s.split.length) s.split.forEach(function(x){ out.push({m:x.m, a:num(x.a)}); });
+  else out.push({m:s.payMethod || 'Not recorded', a:num(s.total)});
+  if (num(s.surcharge)) out.push({m:s.surMethod || 'Credit card', a:num(s.surcharge), fee:true});
+  return out;
+}
+function ledger(a, b){
+  var ev = [], inR = function(ts){ return ts >= a && ts < b; };
+  S.tickets.forEach(function(t){
+    var dep = num(t.deposit), dAt = t.depAt || t.createdAt;
+    if (dep && inR(dAt)) ev.push({at:dAt, kind:'deposit', m:t.depMethod || 'Not recorded', a:r2(dep + num(t.depSurcharge)), t:t});
+    if (t.paid && inR(t.paidAt)) payParts(t).forEach(function(p){ if (p.a) ev.push({at:t.paidAt, kind:p.fee ? 'fee' : 'pay', m:p.m, a:p.a, t:t}); });
+    refundsOf(t).forEach(function(x){ if (inR(x.at)) ev.push({at:x.at, kind:'refund', m:x.how, a:-num(x.amt), t:t, x:x}); });
+  });
+  (S.sales||[]).forEach(function(s){
+    if (inR(s.at)) saleParts(s).forEach(function(p){ if (p.a) ev.push({at:s.at, kind:p.fee ? 'fee' : 'sale', m:p.m, a:p.a, s:s}); });
+    refundsOf(s).forEach(function(x){ if (inR(x.at)) ev.push({at:x.at, kind:'refund', m:x.how, a:-num(x.amt), s:s, x:x}); });
+  });
+  (S.bb||[]).forEach(function(x){
+    if (num(x.paid) && inR(x.createdAt)) ev.push({at:x.createdAt, kind:'buy', m:x.payMethod || 'Cash', a:-num(x.paid), bb:x});
+    if (x.status === 'sold' && num(x.soldPrice) && inR(x.soldAt)) ev.push({at:x.soldAt, kind:'bbsale', m:x.soldMethod || 'Not recorded', a:num(x.soldPrice), bb:x});
+  });
+  return ev;
+}
+function isCredit(m){ return m === 'Store credit'; }
+function creditOf(key){
+  if (!key) return 0;
+  var bal = 0;
+  S.tickets.forEach(function(t){
+    if (custKey(t.customer) !== key) return;
+    refundsOf(t).forEach(function(x){ if (isCredit(x.how)) bal += num(x.amt); });
+    if (t.paid) payParts(t).forEach(function(p){ if (isCredit(p.m)) bal -= p.a; });
+  });
+  (S.sales||[]).forEach(function(s){
+    if (!s.cust || custKey(s.cust) !== key) return;
+    saleParts(s).forEach(function(p){ if (isCredit(p.m)) bal -= p.a; });
+    refundsOf(s).forEach(function(x){ if (isCredit(x.how)) bal += num(x.amt); });
+  });
+  (((S.custs||{})[key]||{}).creditAdj||[]).forEach(function(x){ bal += num(x.amt); });
+  return r2(Math.max(0, bal));
+}
+/* bench timer */
+function benchMs(t){ return num(t.benchMs) + (t.benchOn ? Math.max(0, Date.now() - t.benchOn) : 0); }
+function fmtDur(ms){ if (!ms) return '—'; var m = Math.round(ms/60000); if (m < 60) return Math.max(1, m) + ' min'; var h = Math.floor(m/60), mm = m % 60; if (h < 24) return h + 'h' + (mm ? ' ' + mm + 'm' : ''); return (Math.round(ms/8640000)/10) + ' days'; }
+/* unlock pattern: dots 1-9, left to right, top to bottom */
+function patternSvg(p, size){
+  var seq = String(p||'').split(/[^1-9]+/).filter(Boolean).map(Number); size = size || 64;
+  var pos = function(n){ var i = n - 1; return [16 + (i % 3) * 32, 16 + Math.floor(i / 3) * 32]; };
+  var dots = '', line = '';
+  for (var n = 1; n <= 9; n++) { var q = pos(n), on = seq.indexOf(n) > -1; dots += '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+(on?5:3.2)+'" fill="'+(on?'#1d1d1f':'#c7c7cc')+'"/>'; }
+  if (seq.length > 1) line = '<polyline points="'+seq.map(function(n){ return pos(n).join(','); }).join(' ')+'" fill="none" stroke="#0071e3" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>';
+  var st = seq.length ? '<circle cx="'+pos(seq[0])[0]+'" cy="'+pos(seq[0])[1]+'" r="8" fill="none" stroke="#0071e3" stroke-width="2"/>' : '';
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 96 96" role="img" aria-label="Unlock pattern '+esc(seq.join('-'))+'">'+line+dots+st+'</svg>';
+}
+
 function lastPrice(model, repair, part, exceptId){
   model = String(model||'').trim().toLowerCase(); if (!model || !repair) return null;
   for (var i = 0; i < S.tickets.length; i++) {
@@ -781,6 +941,7 @@ function startData(){
     if (!snap.metadata.fromCache) { seenApv = {}; snap.docs.forEach(function(d){ seenApv[d.id] = (d.data()||{}).status; }); }
   }, function(){}));
   unsubs.push(db.collection('customers').onSnapshot(function(snap){ var o = {}; snap.docs.forEach(function(d){ o[d.id] = clone(d.data()); }); S.custs = o; render(); }, function(){}));
+  unsubs.push(db.collection('sales').orderBy('at','desc').limit(3000).onSnapshot(function(snap){ S.sales = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){ S.sales = S.sales || []; }));
   unsubs.push(db.collection('expenses').orderBy('at','desc').limit(1500).onSnapshot(function(snap){ S.exp = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
   unsubs.push(db.collection('clock').orderBy('in','desc').limit(400).onSnapshot(function(snap){ S.clock = snap.docs.map(function(d){ var o = clone(d.data()); o.id = d.id; return o; }); render(); }, function(){}));
   unsubs.push(db.doc('public/site').onSnapshot(function(snap){ S.pub = snap.exists ? clone(snap.data()) : {}; render(); }, function(){}));
@@ -886,7 +1047,8 @@ function topbar(){
     '<nav class="tabs" aria-label="Sections">' + tabs + '</nav>' +
     '<div class="grow"></div>' +
     (S.status==='ready' ? '<a class="btn ghost trbtn" href="translate.html" target="_blank" rel="noopener" aria-label="Translator, English and Spanish (opens in a new tab)">🌐<span class="newtxt"> Translate</span></a>' : '') +
-    '<button class="me" data-act="who" aria-label="Working as '+esc(who())+'. Change"><span class="av">'+esc(S.me ? initials(S.me) : '?')+'</span><span class="nm">'+esc(S.me ? S.me : 'Who’s working?')+'</span></button>' +
+    (S.status==='ready' && S.canWrite ? '<button class="btn ghost qsbtn" data-act="qsale" aria-label="Quick sale: cases, screen protectors, cleaning">🛍<span class="newtxt"> Quick sale</span></button>' : '') +
+    (function(){ var on = S.me && openShift(S.me); return '<button class="me'+(on?' clocked':'')+'" data-act="who" aria-label="Working as '+esc(who())+(on?', clocked in':'')+'. Change or clock in"><span class="av">'+esc(S.me ? initials(S.me) : '?')+'</span><span class="nm">'+esc(S.me ? S.me : 'Who’s working?')+(S.me ? '<small>'+(on ? 'On the clock' : 'Clock in')+'</small>' : '')+'</span></button>'; })() +
     (S.status==='ready' && S.canWrite ? '<button class="btn" data-act="new">+ <span class="newtxt">New ticket</span></button>' : '') +
   '</div></header>';
 }
@@ -915,11 +1077,15 @@ function body(){
 function counts(){
   var c = {active:0, all:S.tickets.length};
   STATUSES.forEach(function(s){ c[s.k] = 0; });
-  c.overdue = 0;
-  S.tickets.forEach(function(t){ c[t.status] = (c[t.status]||0) + 1; if (ACTIVE.indexOf(t.status) > -1) c.active++; if (isOverdue(t)) c.overdue++; });
+  c.overdue = 0; c.waiting = 0; c.arrived = 0; c.unpaid = 0;
+  S.tickets.forEach(function(t){ c[t.status] = (c[t.status]||0) + 1; if (ACTIVE.indexOf(t.status) > -1) c.active++; if (isOverdue(t)) c.overdue++; if (isWaiting(t)) c.waiting++; if (hasArrived(t)) c.arrived++; if (isUnpaidDone(t)) c.unpaid++; });
   return c;
 }
 
+function isWaiting(t){ return t.status === 'ready' && daysSince(readyAt(t)) >= 3; }
+function hasArrived(t){ return ['in','part'].indexOf(t.status) > -1 && (t.parts||[]).some(function(p){ return p.status === 'arrived'; }); }
+function isUnpaidDone(t){ return t.status === 'done' && !t.paid && balance(t) > 0; }
+var XFILTERS = {overdue:['Overdue', isOverdue], waiting:['Ready 3+ days', isWaiting], arrived:['Part arrived', hasArrived], unpaid:['Picked up, unpaid', isUnpaidDone]};
 function matches(t, q){
   if (!q) return true;
   var hay = [t.num, t.customer && t.customer.name, t.customer && digits(t.customer.phone), t.device && t.device.model, t.device && t.device.imei, repairsText(t), t.assigned].join(' ').toLowerCase();
@@ -932,15 +1098,15 @@ function matches(t, q){
 
 function ticketsView(){
   var c = counts();
-  var paidToday = S.tickets.filter(function(t){ return t.paid && t.paidAt && sameDay(t.paidAt, Date.now()); }).reduce(function(a,t){ return a + collected(t); }, 0);
+  var td = dayRange(), paidToday = ledger(td[0], td[1]).filter(function(e){ return e.kind !== 'buy' && e.kind !== 'bbsale' && !isCredit(e.m); }).reduce(function(a,e){ return a + e.a; }, 0);
   var stats = '<div class="stats">' +
     '<button class="stat" data-act="filter" data-v="active"><b>'+c.active+'</b><span>Open tickets</span></button>' +
     '<button class="stat" data-act="filter" data-v="ready"><b>'+c.ready+'</b><span>Ready for pickup</span></button>' +
     '<button class="stat" data-act="filter" data-v="overdue"><b'+(c.overdue?' style="color:var(--red)"':'')+'>'+c.overdue+'</b><span>Past promised time</span></button>' +
-    '<div class="stat"><b>'+money(paidToday)+'</b><span>Paid today</span></div>' +
+    '<button class="stat" data-act="view" data-v="reports"><b>'+money(paidToday)+'</b><span>Taken in today</span></button>' +
   '</div>';
 
-  var chipDefs = [['active','Open']].concat(c.overdue || S.filter==='overdue' ? [['overdue','Overdue']] : []).concat(STATUSES.map(function(s){ return [s.k, s.short]; })).concat([['all','All']]);
+  var chipDefs = [['active','Open']].concat(Object.keys(XFILTERS).filter(function(k){ return S.filter === k || (k === 'overdue' && c.overdue); }).map(function(k){ return [k, XFILTERS[k][0]]; })).concat(STATUSES.map(function(s){ return [s.k, s.short]; })).concat([['all','All']]);
   var chips = chipDefs.map(function(d){
     return '<button class="chip" data-act="filter" data-v="'+d[0]+'" aria-pressed="'+(S.filter===d[0])+'">'+esc(d[1])+' <i>'+(c[d[0]]||0)+'</i></button>';
   }).join('');
@@ -950,8 +1116,8 @@ function ticketsView(){
 
   var list = S.tickets.filter(function(t){
     if (S.filter === 'active' && ACTIVE.indexOf(t.status) < 0) return false;
-    if (S.filter === 'overdue' && !isOverdue(t)) return false;
-    if (['active','all','overdue'].indexOf(S.filter) < 0 && t.status !== S.filter) return false;
+    if (XFILTERS[S.filter] && !XFILTERS[S.filter][1](t)) return false;
+    if (S.filter !== 'active' && S.filter !== 'all' && !XFILTERS[S.filter] && t.status !== S.filter) return false;
     return matches(t, S.q);
   });
 
@@ -966,13 +1132,20 @@ function ticketsView(){
   }
   var sod = new Date(); sod.setHours(0,0,0,0);
   var tAp = (S.reqs||[]).filter(function(r){ return isBooking(r) && (r.status === 'new' || r.status === 'confirmed') && r.apptAt >= sod.getTime() && r.apptAt < sod.getTime() + 86400e3; }).sort(function(a,b){ return a.apptAt - b.apptAt; });
-  var strip = tAp.length ? '<div class="todayap"><b>Today:</b>' + tAp.map(function(r){ return '<button class="chip" data-act="rqshow" data-id="'+esc(r.id)+'">'+esc(r.time)+' · '+esc(String(r.name||fmtPhone(r.phone)).split(' ')[0])+(r.where==='mobile'?' · 🚗':'')+'</button>'; }).join('') + '</div>' : '';
   var fu = followups();
-  var bk = backupDue() ? '<div class="todayap"><span>💾 <b>Weekly backup is due.</b> It saves a copy of every ticket to this computer.</span><button class="btn sm ghost" data-act="csv" style="margin-left:auto">Back up now</button></div>' : '';
-  var fuStrip = fu.length ? '<div class="todayap" style="background:#fff8e6"><span>🔔 <b>'+fu.length+' follow-up'+(fu.length>1?'s':'')+'</b>: ' + esc([['review','review request'],['pickup','pickup reminder']].map(function(k){ var n = fu.filter(function(f){ return f.kind === k[0]; }).length; return n ? n + ' ' + k[1] + (n>1?'s':'') : ''; }).filter(Boolean).join(', ')) + '</span><button class="btn sm" data-act="followups" style="margin-left:auto">Open</button></div>' : '';
+  var at = [];
+  if (c.overdue) at.push('<button class="achip red" data-act="filter" data-v="overdue">'+c.overdue+' past promised time</button>');
+  if (c.arrived) at.push('<button class="achip" data-act="filter" data-v="arrived">'+c.arrived+' part'+(c.arrived>1?'s':'')+' arrived</button>');
+  if (c.waiting) at.push('<button class="achip" data-act="filter" data-v="waiting">'+c.waiting+' ready 3+ days</button>');
+  if (c.unpaid) at.push('<button class="achip red" data-act="filter" data-v="unpaid">'+c.unpaid+' picked up, unpaid</button>');
+  tAp.forEach(function(r){ at.push('<button class="achip blue" data-act="rqshow" data-id="'+esc(r.id)+'">📅 '+esc(r.time)+' · '+esc(String(r.name||fmtPhone(r.phone)).split(' ')[0])+(r.where==='mobile'?' · mobile':'')+'</button>'); });
+  if (fu.length) at.push('<button class="achip" data-act="followups">🔔 '+fu.length+' follow-up'+(fu.length>1?'s':'')+'</button>');
+  if (backupDue()) at.push('<button class="achip" data-act="csv">💾 Weekly backup</button>');
+  var strip = at.length ? '<div class="attn"><span class="attl">Needs attention</span>' + at.join('') + '</div>' : '';
+  var bk = '', fuStrip = '';
   var mode = '<div class="bkbar" style="margin:-4px 0 12px"><div class="seg" role="group" aria-label="Layout"><button data-act="tmode" data-v="list" aria-pressed="'+(S.tMode!=='board')+'">List</button><button data-act="tmode" data-v="board" aria-pressed="'+(S.tMode==='board')+'">Shop screen</button></div>'+(S.tMode==='board'?'<button class="btn sm ghost" data-act="fullboard" style="margin-left:auto">Full screen</button>':'')+'</div>';
-  if (S.tMode === 'board') return fuStrip + mode + boardView();
-  return bk + fuStrip + strip + mode + stats + bar + '<div class="list">' + rows + '</div>';
+  if (S.tMode === 'board') return strip + mode + boardView();
+  return strip + mode + stats + bar + '<div class="list">' + rows + '</div>';
 }
 
 function rowHtml(t){
@@ -1031,60 +1204,287 @@ function partsView0(){
   }).join('');
 }
 
-var RP = 'today';
-function reportsView(){
-  var now = new Date(), start;
-  if (RP === 'today') { start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(); }
-  else if (RP === 'week') { start = Date.now() - 7*86400000; }
-  else if (RP === 'month') { start = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); }
-  else { start = Date.now() - 30*86400000; }
-  var inR = function(ts){ return ts && ts >= start; };
+var RP = 'today', RPC = {a:'', b:''};
+try { RP = localStorage.getItem('ifx_rp') || 'today'; } catch(e) {}
+var RPS = [['today','Today'],['yday','Yesterday'],['7','7 days'],['month','This month'],['lmonth','Last month'],['year','This year'],['custom','Pick dates']];
+var MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function rpRange(){
+  var n = new Date(), y = n.getFullYear(), mo = n.getMonth(), d = n.getDate(), D = function(Y, M, DD){ return new Date(Y, M, DD).getTime(); };
+  var today = D(y, mo, d), tmr = D(y, mo, d + 1), r;
+  switch (RP) {
+    case 'yday': r = {a:D(y, mo, d - 1), b:today, pa:D(y, mo, d - 2), pb:D(y, mo, d - 1), label:'Yesterday', vs:'the day before'}; break;
+    case '7': r = {a:D(y, mo, d - 6), b:tmr, pa:D(y, mo, d - 13), pb:D(y, mo, d - 6), label:'Last 7 days', vs:'the 7 days before'}; break;
+    case 'month': r = {a:D(y, mo, 1), b:tmr, pa:D(y, mo - 1, 1), pb:Math.min(D(y, mo - 1, d + 1), D(y, mo, 1)), label:MON[mo] + ' ' + y + ' so far', vs:'the same days last month'}; break;
+    case 'lmonth': r = {a:D(y, mo - 1, 1), b:D(y, mo, 1), pa:D(y, mo - 2, 1), pb:D(y, mo - 1, 1), label:new Date(y, mo - 1, 1).toLocaleDateString('en-US', {month:'long', year:'numeric'}), vs:'the month before'}; break;
+    case 'year': r = {a:D(y, 0, 1), b:tmr, pa:D(y - 1, 0, 1), pb:D(y - 1, mo, d + 1), label:y + ' so far', vs:'the same time last year'}; break;
+    case 'custom':
+      var ca = RPC.a ? parseDay(RPC.a).getTime() : D(y, mo, d - 29), cb = RPC.b ? parseDay(RPC.b).getTime() + 86400e3 : tmr;
+      if (cb <= ca) cb = ca + 86400e3;
+      r = {a:ca, b:cb, pa:ca - (cb - ca), pb:ca, label:dateOnly(ca) + ' – ' + dateOnly(cb - 1), vs:'the same number of days before'}; break;
+    default: r = {a:today, b:tmr, pa:D(y, mo, d - 1), pb:today, label:'Today', vs:'yesterday'};
+  }
+  return r;
+}
+function isAcc(i){ return i.repair === 'Accessory'; }
+function accRev(t){ return r2((t.items||[]).reduce(function(s2,i){ return s2 + (isAcc(i) && itemCounts(t, i) ? num(i.price) : 0); }, 0)); }
+function readyTs(t){ var l = t.log||[]; for (var i = l.length - 1; i >= 0; i--) if (/changed status to Ready/.test(l[i].what||'')) return l[i].t; return 0; }
+function rStats(a, b){
+  var inR = function(ts){ return ts >= a && ts < b; };
   var paid = S.tickets.filter(function(t){ return t.paid && inR(t.paidAt); });
-  var revenue = paid.reduce(function(a,t){ return a + netSales(t); }, 0), taxC = paid.reduce(function(a,t){ return a + allTax(t); }, 0), surC = paid.reduce(function(a,t){ return a + cardFees(t); }, 0);
-  var pcost = paid.reduce(function(a,t){ return a + partsCost(t); }, 0);
-  var created = S.tickets.filter(function(t){ return inR(t.createdAt); }).length;
+  var sales = (S.sales||[]).filter(function(x){ return inR(x.at); });
+  var refunds = [];
+  S.tickets.forEach(function(t){ refundsOf(t).forEach(function(x){ if (inR(x.at)) refunds.push({x:x, t:t}); }); });
+  (S.sales||[]).forEach(function(z){ refundsOf(z).forEach(function(x){ if (inR(x.at)) refunds.push({x:x, s:z}); }); });
+  var refundPre = r2(refunds.reduce(function(s2,r){ return s2 + num(r.x.amt) - num(r.x.tax); }, 0));
+  var tAcc = r2(paid.reduce(function(s2,t){ return s2 + accRev(t); }, 0));
+  var repRev = r2(paid.reduce(function(s2,t){ return s2 + netSales(t); }, 0) - tAcc);
+  var saleRev = r2(sales.reduce(function(s2,x){ return s2 + num(x.sub); }, 0));
+  var accTotal = r2(tAcc + saleRev);
+  var partCost = r2(paid.reduce(function(s2,t){ return s2 + partsCost(t); }, 0));
+  var exps = (S.exp||[]).filter(function(x){ return inR(x.at); });
+  var expTotal = r2(exps.reduce(function(s2,x){ return s2 + num(x.amt); }, 0));
+  var bbSold = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inR(x.soldAt); });
+  var bbP = r2(bbSold.reduce(function(s2,x){ return s2 + bbProfit(x); }, 0));
+  var salesNet = r2(repRev + accTotal - refundPre);
   var done = S.tickets.filter(function(t){ return t.status === 'done' && inR(t.pickedUpAt); });
-  var turn = done.length ? done.reduce(function(a,t){ return a + (t.pickedUpAt - t.createdAt); }, 0) / done.length : 0;
-  var turnTxt = !done.length ? '—' : turn < 3600e3 ? Math.max(1, Math.round(turn/60000)) + ' min' : turn < 86400e3 ? (Math.round(turn/360000)/10) + ' hrs' : (Math.round(turn/8640000)/10) + ' days';
-  var seg = '<div class="seg" role="group" aria-label="Period" style="margin-bottom:16px">' + [['today','Today'],['week','7 days'],['month','This month'],['30','30 days']].map(function(o){ return '<button data-act="rp" data-v="'+o[0]+'" aria-pressed="'+(RP===o[0])+'">'+o[1]+'</button>'; }).join('') + '</div>';
-  var tiles = '<div class="rgrid">' +
-    '<div class="stat"><b>'+money(revenue)+'</b><span>Sales (before tax)</span></div>' +
-    '<div class="stat"><b>'+money(revenue - pcost)+'</b><span>After part costs</span></div>' +
-    '<div class="stat"><b>'+money(taxC)+'</b><span>Sales tax collected'+(surC?' · '+money(surC)+' card surcharges':'')+'</span></div>' +
-    '<div class="stat"><b>'+created+'</b><span>New tickets</span></div>' +
-    '<div class="stat"><b>'+done.length+'</b><span>Picked up</span></div>' +
-    '<div class="stat"><b>'+turnTxt+'</b><span>Average check-in to pickup</span></div>' +
-  '</div>';
-  var byTech = {};
-  var tk = function(k){ return byTech[k] || (byTech[k] = {n:0, rev:0, tsum:0, tn:0, wr:0}); };
-  done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += netSales(t); var ra = readyAt(t); if (ra && ra > t.createdAt) { o.tsum += ra - t.createdAt; o.tn++; } });
-  S.tickets.filter(function(t){ return t.warrantyReturn && inR(t.createdAt); }).forEach(function(t){
-    var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && digits(x.customer&&x.customer.phone) === digits(t.customer&&t.customer.phone); }).sort(function(a,b){ return b.createdAt - a.createdAt; })[0];
+  var rd = done.map(function(t){ var r = readyTs(t); return r && r > t.createdAt ? {t:t, ms:r - t.createdAt, same:sameDay(r, t.createdAt)} : null; }).filter(Boolean);
+  var created = S.tickets.filter(function(t){ return inR(t.createdAt) && t.status !== 'cancel'; });
+  var comebacks = S.tickets.filter(function(t){ return t.warrantyReturn && inR(t.createdAt); }).length;
+  var taxC = r2(paid.reduce(function(s2,t){ return s2 + allTax(t); }, 0) + sales.reduce(function(s2,x){ return s2 + num(x.tax) + num(x.surTax); }, 0) - refunds.reduce(function(s2,r){ return s2 + num(r.x.tax); }, 0));
+  var orders = paid.length + sales.length;
+  return {paid:paid, sales:sales, refunds:refunds, refundPre:refundPre, refundAmt:r2(refunds.reduce(function(s2,r){ return s2 + num(r.x.amt); }, 0)),
+    repRev:repRev, accTotal:accTotal, partCost:partCost, exps:exps, expTotal:expTotal, bbSold:bbSold, bbP:bbP, salesNet:salesNet,
+    profit:r2(salesNet - partCost - expTotal + bbP), margin: salesNet > 0 ? (salesNet - partCost) / salesNet : null,
+    done:done, created:created, rd:rd, avgReady: rd.length ? rd.reduce(function(s2,x){ return s2 + x.ms; }, 0) / rd.length : 0,
+    sameDayPct: rd.length ? rd.filter(function(x){ return x.same; }).length / rd.length : null,
+    avgTicket: paid.length ? r2((repRev + tAcc + refundPre * 0) / paid.length) : 0, comebacks:comebacks, comebackPct: done.length ? comebacks / done.length : null, taxC:taxC, orders:orders};
+}
+function delta(cur, prev, kind, lowerBetter){
+  if (cur == null || prev == null) return '';
+  var d, txt;
+  if (kind === 'pct') { d = (cur - prev) * 100; if (Math.abs(d) < 0.5) return '<span class="dl flat">same as before</span>'; txt = (d > 0 ? '▲ ' : '▼ ') + Math.abs(Math.round(d)) + ' pts'; }
+  else { if (!prev) return ''; d = (cur - prev) / Math.abs(prev); if (Math.abs(d) < 0.005) return '<span class="dl flat">same as before</span>'; txt = (d > 0 ? '▲ ' : '▼ ') + Math.round(Math.abs(d) * 100) + '%'; }
+  var good = lowerBetter ? d < 0 : d > 0;
+  return '<span class="dl '+(good?'up':'down')+'">'+txt+'</span>';
+}
+function kpi(label, val, dl, sub, act){
+  return '<'+(act?'button data-act="'+act+'"':'div')+' class="kpi"><span class="kl">'+label+'</span><b>'+val+'</b><span class="ks">'+(dl||'')+(sub?'<span class="t2">'+sub+'</span>':'')+'</span></'+(act?'button':'div')+'>';
+}
+function pctTxt(v){ return v == null ? '—' : Math.round(v * 100) + '%'; }
+function hbar(v, max, cls){ return '<div class="barw"><i'+(cls?' class="'+cls+'"':'')+' style="width:'+(max && v > 0 ? Math.max(2, Math.round(v / max * 100)) : 0)+'%"></i></div>'; }
+function neg(v){ return v ? '−' + money(v) : money(0); }
+function salesSeries(a, b){
+  var days = Math.round((b - a) / 86400e3), byMonth = days > 92, keys = [], map = {};
+  var keyOf = function(ts){ var d = new Date(ts); return byMonth ? d.getFullYear() + '-' + d.getMonth() : isoDay(d); };
+  if (byMonth) { var c = new Date(a); c.setDate(1); while (c.getTime() < b) { var k = c.getFullYear() + '-' + c.getMonth(); keys.push({k:k, label:MON[c.getMonth()], full:MON[c.getMonth()] + ' ' + c.getFullYear()}); c.setMonth(c.getMonth() + 1); } }
+  else { var c2 = new Date(a); while (c2.getTime() < b) { keys.push({k:isoDay(c2), label:String(c2.getDate()), full:c2.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}), wk:c2.getDay()}); c2.setDate(c2.getDate() + 1); } }
+  keys.forEach(function(k){ map[k.k] = 0; });
+  var add = function(ts, v){ if (ts >= a && ts < b) { var k = keyOf(ts); if (k in map) map[k] = r2(map[k] + v); } };
+  S.tickets.forEach(function(t){ if (t.paid) add(t.paidAt, netSales(t)); refundsOf(t).forEach(function(x){ add(x.at, -(num(x.amt) - num(x.tax))); }); });
+  (S.sales||[]).forEach(function(z){ add(z.at, num(z.sub)); refundsOf(z).forEach(function(x){ add(x.at, -(num(x.amt) - num(x.tax))); }); });
+  return {byMonth:byMonth, pts:keys.map(function(k){ return {label:k.label, full:k.full, v:map[k.k], wk:k.wk}; })};
+}
+function salesChart(a, b){
+  var ser = salesSeries(a, b), pts = ser.pts;
+  if (pts.length < 2) return '';
+  var max = pts.reduce(function(m,p){ return Math.max(m, p.v); }, 0), every = pts.length > 45 ? 7 : pts.length > 16 ? 3 : 1, tot = pts.reduce(function(s2,p){ return s2 + p.v; }, 0);
+  var best = pts.reduce(function(m,p){ return p.v > m.v ? p : m; }, pts[0]);
+  return '<div class="panel"><div class="phead"><h2>Sales by '+(ser.byMonth?'month':'day')+'</h2><span class="t2">Average '+money(tot / pts.length)+' a '+(ser.byMonth?'month':'day')+(best.v ? ' · best: '+esc(best.full)+' ('+money(best.v)+')' : '')+'</span></div>' +
+    '<div class="chart" role="img" aria-label="Sales by '+(ser.byMonth?'month':'day')+'"><div class="cmax">'+money(max)+'</div>' + pts.map(function(p, i){
+      return '<div class="cb'+(p.wk === 0 ? ' sun' : '')+'" title="'+esc(p.full)+': '+esc(money(p.v))+'"><i style="height:'+(max ? Math.max(p.v > 0 ? 2 : 0, Math.round(p.v / max * 100)) : 0)+'%"></i><span>'+(i % every === 0 ? esc(p.label) : '')+'</span></div>';
+    }).join('') + '</div></div>';
+}
+function heatmap(){
+  var since = Date.now() - 90*86400e3, H0 = 9, H1 = 20, g = {}, max = 0;
+  var add = function(ts){ if (!ts || ts < since) return; var d = new Date(ts), r = (d.getDay() + 6) % 7, h = d.getHours(); if (h < H0 || h > H1) return; var k = r + '_' + h; g[k] = (g[k]||0) + 1; if (g[k] > max) max = g[k]; };
+  S.tickets.forEach(function(t){ add(t.createdAt); }); (S.sales||[]).forEach(function(x){ add(x.at); });
+  if (!max) return '<p class="muted">Not enough check-ins yet.</p>';
+  var days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], hl = function(h){ return (h % 12 || 12) + (h < 12 ? 'a' : 'p'); };
+  var head = '<div></div>' + (function(){ var o = ''; for (var h = H0; h <= H1; h++) o += '<span>'+(h % 2 ? '' : hl(h))+'</span>'; return o; })();
+  var rows = days.map(function(dn, r){ var o = '<span>'+dn+'</span>'; for (var h = H0; h <= H1; h++) { var v = g[r + '_' + h] || 0; o += '<i style="background:'+(v ? 'rgba(0,113,227,'+(0.12 + 0.88 * v / max).toFixed(2)+')' : '#f2f2f4')+'" title="'+dn+' '+hl(h)+': '+v+' check-in'+(v===1?'':'s')+' and sales"></i>'; } return o; }).join('');
+  var top = Object.keys(g).sort(function(x, y){ return g[y] - g[x]; })[0].split('_');
+  return '<div class="heat" style="grid-template-columns:34px repeat('+(H1 - H0 + 1)+',minmax(0,1fr))">' + head + rows + '</div><p class="hint">Busiest: <b>'+days[+top[0]]+' around '+hl(+top[1])+'</b>. Last 90 days of check-ins and quick sales.</p>';
+}
+function repairTable(paid){
+  var rows = {};
+  paid.forEach(function(t){
+    var its = (t.items||[]).filter(function(i){ return itemCounts(t, i) && !isAcc(i) && num(i.price) > 0; });
+    var sum = its.reduce(function(s2,i){ return s2 + num(i.price); }, 0), pc = partsCost(t), dsc = discountAmt(t);
+    its.forEach(function(i){
+      var k = (i.diag ? 'Diagnostic fee' : (i.repair === 'Other repair' || i.repair === 'Other') ? 'Other repair' : i.repair) + (i.part ? ' · ' + i.part : '');
+      var o = rows[k] || (rows[k] = {n:0, sales:0, cost:0});
+      var share = sum ? num(i.price) / sum : 0;
+      o.n++; o.sales += num(i.price) - dsc * share; o.cost += pc * share;
+    });
+  });
+  var keys = Object.keys(rows).sort(function(x, y){ return rows[y].sales - rows[x].sales; });
+  if (!keys.length) return '<p class="muted">No paid repairs in this period.</p>';
+  var max = rows[keys[0]].sales;
+  var tr = function(k){ var o = rows[k], pr = o.sales - o.cost; return '<tr><td>'+esc(k)+'</td><td class="right">'+o.n+'</td><td class="right amt">'+money(o.sales)+'</td><td class="right hide-s">'+money(o.sales / o.n)+'</td><td class="right hide-s">'+(o.cost ? money(o.cost) : '<span class="t2">—</span>')+'</td><td class="right amt" style="color:'+(pr >= 0 ? 'var(--green)' : 'var(--red)')+'">'+money(pr)+'</td><td style="width:18%;padding-left:16px" class="hide-s">'+hbar(o.sales, max)+'</td></tr>'; };
+  return '<div class="tscroll"><table class="rtable"><thead><tr><th>Repair</th><th class="right">Done</th><th class="right">Sales</th><th class="right hide-s">Avg price</th><th class="right hide-s">Part cost</th><th class="right">Profit</th><th class="hide-s"></th></tr></thead><tbody>' + keys.slice(0, 10).map(tr).join('') + '</tbody></table>' +
+    (keys.length > 10 ? '<details><summary class="link" style="margin-top:8px">Show all '+keys.length+'</summary><table class="rtable"><tbody>' + keys.slice(10).map(tr).join('') + '</tbody></table></details>' : '') + '</div>' +
+    (paid.some(function(t){ return !partsCost(t); }) ? '<p class="hint">Profit uses the part costs entered on tickets. Repairs with no part cost show their full price as profit.</p>' : '');
+}
+function custBlock(st, a){
+  var seen = {}, newN = 0, retN = 0;
+  S.tickets.forEach(function(t){ if (t.createdAt < a) seen[custKey(t.customer)] = 1; });
+  var cnt = {};
+  st.created.forEach(function(t){ var k = custKey(t.customer); if (cnt[k]) return; cnt[k] = 1; if (seen[k]) retN++; else newN++; });
+  var tot = newN + retN, hd = {}, asked = 0;
+  st.created.forEach(function(t){ if (t.heard) { hd[t.heard] = (hd[t.heard]||0) + 1; asked++; } });
+  var hk = Object.keys(hd).sort(function(x, y){ return hd[y] - hd[x]; }), hmax = hk.length ? hd[hk[0]] : 1;
+  return '<div class="mix"><div><b>'+newN+'</b><span>New customers</span></div><div><b>'+retN+'</b><span>Came back</span></div><div><b>'+(tot ? Math.round(retN / tot * 100) + '%' : '—')+'</b><span>Repeat rate</span></div></div>' +
+    '<h3 class="sh3">How they found you</h3>' + (hk.length ? '<table class="rtable"><tbody>' + hk.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:45%">'+hbar(hd[k], hmax)+'</td><td class="right" style="width:40px">'+hd[k]+'</td></tr>'; }).join('') + '</tbody></table>' + (asked < st.created.length ? '<p class="hint">'+(st.created.length - asked)+' ticket'+(st.created.length - asked === 1 ? '' : 's')+' didn’t say. Ask “How did you find us?” at check-in.</p>' : '') : '<p class="muted">Nobody answered yet. The tablet asks, and tickets now have a “How did they find us?” box.</p>');
+}
+function devBlock(st){
+  var br = {}, md = {};
+  st.created.forEach(function(t){ var d = t.device||{}, b = d.brand || guessBrand(d.model) || 'Other'; br[b] = (br[b]||0) + 1; if (d.model) md[d.model] = (md[d.model]||0) + 1; });
+  var bk = Object.keys(br).sort(function(x, y){ return br[y] - br[x]; }), mk = Object.keys(md).sort(function(x, y){ return md[y] - md[x]; }).slice(0, 6);
+  if (!bk.length) return '<p class="muted">No check-ins in this period.</p>';
+  var tot = st.created.length;
+  return '<div class="stack">' + bk.map(function(b, i){ return '<i class="c'+(i % 5)+'" style="width:'+(br[b] / tot * 100)+'%" title="'+esc(b)+': '+br[b]+'"></i>'; }).join('') + '</div><div class="legend">' + bk.map(function(b, i){ return '<span><i class="c'+(i % 5)+'"></i>'+esc(b.replace('Apple ', ''))+' '+Math.round(br[b] / tot * 100)+'%</span>'; }).join('') + '</div>' +
+    '<h3 class="sh3">Most common models</h3><table class="rtable"><tbody>' + mk.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:45%">'+hbar(md[k], md[mk[0]])+'</td><td class="right" style="width:40px">'+md[k]+'</td></tr>'; }).join('') + '</tbody></table>';
+}
+function techBlock(st, a, b){
+  var by = {}, tk = function(k){ return by[k] || (by[k] = {n:0, rev:0, ready:0, rn:0, bench:0, bn:0, wr:0}); };
+  st.done.forEach(function(t){ var o = tk(t.assigned || 'Unassigned'); o.n++; if (t.paid) o.rev += netSales(t) - accRev(t); var r = readyTs(t); if (r && r > t.createdAt) { o.ready += r - t.createdAt; o.rn++; } if (num(t.benchMs)) { o.bench += num(t.benchMs); o.bn++; } });
+  S.tickets.filter(function(t){ return t.warrantyReturn && t.createdAt >= a && t.createdAt < b; }).forEach(function(t){
+    var prev = S.tickets.filter(function(x){ return x.id !== t.id && x.status === 'done' && x.createdAt < t.createdAt && digits(x.customer&&x.customer.phone) === digits(t.customer&&t.customer.phone); }).sort(function(p, q){ return q.createdAt - p.createdAt; })[0];
     tk((prev && prev.assigned) || t.assigned || 'Unassigned').wr++;
   });
-  var dur = function(ms){ return !ms ? '—' : ms < 3600e3 ? Math.max(1, Math.round(ms/60000)) + ' min' : ms < 86400e3 ? (Math.round(ms/360000)/10) + ' hrs' : (Math.round(ms/8640000)/10) + ' days'; };
-  var techRows = Object.keys(byTech).sort(function(a,b){ return byTech[b].n - byTech[a].n; });
-  var maxN = techRows.reduce(function(m,k){ return Math.max(m, byTech[k].n); }, 1);
-  var techTbl = techRows.length ? '<div style="overflow-x:auto"><table class="rtable"><thead><tr><th>Technician</th><th>Repairs</th><th></th><th>Avg time to ready</th><th>Warranty returns</th><th class="right">Sales</th><th class="right">Commission</th></tr></thead><tbody>' + techRows.map(function(k){
-    var o = byTech[k];
-    return '<tr><td>'+esc(k)+'</td><td style="width:70px">'+o.n+'</td><td style="min-width:80px"><div class="barw"><i style="width:'+Math.round(o.n/maxN*100)+'%"></i></div></td><td>'+dur(o.tn ? o.tsum/o.tn : 0)+'</td><td'+(o.wr?' style="color:var(--red);font-weight:600"':'')+'>'+o.wr+'</td><td class="right amt">'+money(o.rev)+'</td><td class="right amt">'+(commPct(k)?money(r2(o.rev*commPct(k)/100))+' <span class="t2">('+commPct(k)+'%)</span>':'<span class="t2">—</span>')+'</td></tr>';
-  }).join('') + '</tbody></table></div>' : '<p class="muted">No repairs picked up in this period.</p>';
-  var rep = {};
-  S.tickets.filter(function(t){ return inR(t.createdAt); }).forEach(function(t){ (t.items||[]).forEach(function(i){ var k = ((i.repair === 'Other repair' || i.repair === 'Other') ? 'Other repair' : i.repair) + (i.part ? ' · ' + i.part : ''); rep[k] = (rep[k]||0) + 1; }); });
-  var repRows = Object.keys(rep).sort(function(a,b){ return rep[b]-rep[a]; }).slice(0,8);
-  var maxR = repRows.reduce(function(m,k){ return Math.max(m, rep[k]); }, 1);
-  var repTbl = repRows.length ? '<table class="rtable"><tbody>' + repRows.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:45%"><div class="barw"><i style="width:'+Math.round(rep[k]/maxR*100)+'%"></i></div></td><td class="right" style="width:40px">'+rep[k]+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No tickets in this period.</p>';
-  var pm = {};
-  paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ pm[k] = r2((pm[k]||0) + o[k]); }); });
-  var pmTbl = Object.keys(pm).length ? '<table class="rtable"><tbody>' + Object.keys(pm).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(pm[k])+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">No payments in this period.</p>';
-  return seg + tiles +
+  var hrsBy = {};
+  (S.clock||[]).forEach(function(x){ var s0 = Math.max(x.in, a), e0 = Math.min(x.out || Date.now(), b); if (e0 > s0) hrsBy[x.who] = (hrsBy[x.who]||0) + (e0 - s0); });
+  Object.keys(hrsBy).forEach(function(k){ tk(k); });
+  var keys = Object.keys(by).sort(function(x, y){ return by[y].n - by[x].n; });
+  if (!keys.length) return '<p class="muted">No repairs picked up in this period.</p>';
+  return '<div class="tscroll"><table class="rtable"><thead><tr><th>Technician</th><th class="right">Repairs</th><th class="right hide-s">Avg to ready</th><th class="right hide-s">Bench time</th><th class="right">Comebacks</th><th class="right">Sales</th><th class="right hide-s">Commission</th><th class="right hide-s">Hours</th></tr></thead><tbody>' + keys.map(function(k){
+    var o = by[k], cp = commPct(k);
+    return '<tr><td>'+esc(k)+'</td><td class="right">'+o.n+'</td><td class="right hide-s">'+fmtDur(o.rn ? o.ready / o.rn : 0)+'</td><td class="right hide-s">'+(o.bn ? fmtDur(o.bench / o.bn) : '—')+'</td><td class="right"'+(o.wr?' style="color:var(--red);font-weight:600"':'')+'>'+o.wr+'</td><td class="right amt">'+money(o.rev)+'</td><td class="right amt hide-s">'+(cp ? money(o.rev * cp / 100) : '—')+'</td><td class="right hide-s">'+(hrsBy[k] ? hrs(hrsBy[k]) : '—')+'</td></tr>';
+  }).join('') + '</tbody></table></div><p class="hint">Repairs picked up in this period. Comebacks count against the tech who did the original repair. Bench time comes from the repair timer.</p>';
+}
+function payBlock(a, b){
+  var ev = ledger(a, b), by = {}, cr = 0;
+  ev.forEach(function(e){ if (e.kind === 'buy' || e.kind === 'bbsale') return; if (isCredit(e.m)) { if (e.kind !== 'refund') cr += e.a; return; } by[e.m] = r2((by[e.m]||0) + e.a); });
+  var keys = Object.keys(by).sort(function(x, y){ return by[y] - by[x]; }), tot = keys.reduce(function(s2,k){ return s2 + by[k]; }, 0);
+  if (!keys.length) return '<p class="muted">No payments in this period.</p>';
+  return '<table class="rtable"><tbody>' + keys.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:40%">'+hbar(Math.max(0, by[k]), by[keys[0]])+'</td><td class="right amt">'+money(by[k])+'</td></tr>'; }).join('') + '<tr><td><b>Taken in</b></td><td></td><td class="right amt"><b>'+money(tot)+'</b></td></tr>' + (cr ? '<tr><td class="t2">Paid with store credit</td><td></td><td class="right t2">'+money(cr)+'</td></tr>' : '') + '</tbody></table><p class="hint">Includes deposits and card fees, minus refunds. Matches what came in, not when the repair was finished.</p>';
+}
+function owedBlock(){
+  var owed = S.tickets.filter(isUnpaidDone).sort(function(x, y){ return (y.pickedUpAt||0) - (x.pickedUpAt||0); });
+  var ready = S.tickets.filter(function(t){ return t.status === 'ready' && !t.paid && balance(t) > 0; });
+  var rt = ready.reduce(function(s2,t){ return s2 + balance(t); }, 0);
+  return (owed.length ? '<table class="rtable"><tbody>' + owed.slice(0, 12).map(function(t){ return '<tr><td><button class="link" data-act="open" data-id="'+esc(t.id)+'">#'+esc(t.num)+' · '+esc((t.customer||{}).name||'')+'</button><div class="t2">Picked up '+esc(rel(t.pickedUpAt))+'</div></td><td class="right amt" style="color:var(--red)">'+money(balance(t))+'</td></tr>'; }).join('') + '</tbody></table>' : '<p class="muted">Nobody owes you money. 👍</p>') +
+    (ready.length ? '<p class="hint" style="margin-top:10px">Ready for pickup and not paid yet: <b>'+money(rt)+'</b> across '+ready.length+' ticket'+(ready.length===1?'':'s')+'.</p>' : '');
+}
+function taxBlock(){
+  var n = new Date(), rows = [];
+  for (var i = 0; i < 12; i++) {
+    var a = new Date(n.getFullYear(), n.getMonth() - i, 1).getTime(), b = new Date(n.getFullYear(), n.getMonth() - i + 1, 1).getTime(), st = rStats(a, b);
+    var taxable = r2(st.paid.filter(function(t){ return !t.taxExempt; }).reduce(function(s2,t){ return s2 + netSales(t); }, 0) + st.sales.filter(function(x){ return !x.taxExempt; }).reduce(function(s2,x){ return s2 + num(x.sub); }, 0) - st.refundPre);
+    if (i > 0 && !st.paid.length && !st.sales.length && !st.refunds.length) continue;
+    rows.push({label:new Date(a).toLocaleDateString('en-US', {month:'long', year:'numeric'}), taxable:taxable, tax:st.taxC});
+  }
+  return rows;
+}
+function taxTable(){
+  var rows = taxBlock();
+  return '<table class="rtable"><thead><tr><th>Month</th><th class="right">Taxable sales</th><th class="right">Sales tax collected</th></tr></thead><tbody>' + rows.map(function(r){ return '<tr><td>'+esc(r.label)+'</td><td class="right amt">'+money(r.taxable)+'</td><td class="right amt">'+money(r.tax)+'</td></tr>'; }).join('') + '</tbody></table>';
+}
+function expBlock(st){
+  var byC = {}; st.exps.forEach(function(x){ byC[x.cat] = (byC[x.cat]||0) + num(x.amt); });
+  var ck = Object.keys(byC).sort(function(x, y){ return byC[y] - byC[x]; });
+  return (ck.length ? '<table class="rtable"><tbody>' + ck.map(function(k){ return '<tr><td>'+esc(k)+'</td><td style="width:40%">'+hbar(byC[k], byC[ck[0]], 'red')+'</td><td class="right amt">'+money(byC[k])+'</td></tr>'; }).join('') + '</tbody></table>' +
+    '<details style="margin-top:8px"><summary class="link">Show each expense</summary><table class="rtable"><tbody>' + st.exps.slice().sort(function(x, y){ return y.at - x.at; }).slice(0, 150).map(function(x){ return '<tr><td>'+esc(dateOnly(x.at))+'</td><td>'+esc(x.cat)+(x.note?' · '+esc(x.note):'')+'</td><td class="right amt">'+money(x.amt)+'</td><td class="right">'+(S.canWrite?'<button class="link red" data-act="rmexp" data-id="'+esc(x.id)+'">Delete</button>':'')+'</td></tr>'; }).join('') + '</tbody></table></details>' : '<p class="muted">No expenses logged for this period.</p>');
+}
+function salesList(st){
+  var items = st.sales.slice().sort(function(x, y){ return y.at - x.at; });
+  if (!items.length && !st.refunds.length) return '<p class="muted">No quick sales or refunds in this period.</p>';
+  return (items.length ? '<table class="rtable"><tbody>' + items.slice(0, 40).map(function(x){ var left = refundLeft(x, true); return '<tr><td><div>'+esc(saleText(x))+'</div><div class="t2">'+esc(dt(x.at))+' · '+esc(x.by||'')+(x.cust && x.cust.name ? ' · '+esc(x.cust.name) : '')+(refundedAmt(x) ? ' · <span style="color:var(--red)">refunded '+money(refundedAmt(x))+'</span>' : '')+'</div></td><td class="right amt">'+money(num(x.total) + num(x.surcharge))+'<div class="t2">'+esc(x.payMethod)+'</div></td><td class="right" style="white-space:nowrap"><button class="link" data-act="sreceipt" data-id="'+esc(x.id)+'">Receipt</button>'+(S.canWrite && left > 0 ? ' · <button class="link red" data-act="srefund" data-id="'+esc(x.id)+'">Refund</button>' : '')+'</td></tr>'; }).join('') + '</tbody></table>' : '') +
+    (st.refunds.length ? '<h3 class="sh3">Refunds</h3><table class="rtable"><tbody>' + st.refunds.map(function(r){ return '<tr><td>'+(r.t ? '<button class="link" data-act="open" data-id="'+esc(r.t.id)+'">#'+esc(r.t.num)+' · '+esc((r.t.customer||{}).name||'')+'</button>' : esc(saleText(r.s)))+'<div class="t2">'+esc(dt(r.x.at))+' · '+esc(r.x.reason||'')+' · '+esc(r.x.by||'')+'</div></td><td class="right amt" style="color:var(--red)">−'+money(r.x.amt)+'<div class="t2">'+esc(r.x.how)+'</div></td></tr>'; }).join('') + '</tbody></table>' : '');
+}
+function reportsView(){
+  var R = rpRange(), st = rStats(R.a, R.b), pv = rStats(R.pa, R.pb);
+  var seg = '<div class="rtop"><div class="seg rseg" role="group" aria-label="Period">' + RPS.map(function(o){ return '<button data-act="rp" data-v="'+o[0]+'" aria-pressed="'+(RP===o[0])+'">'+o[1]+'</button>'; }).join('') + '</div>' +
+    (RP === 'custom' ? '<div class="rdates"><label class="sr" for="rp-a">From</label><input class="in" type="date" id="rp-a" value="'+esc(RPC.a || isoDay(new Date(R.a)))+'"><span class="t2">to</span><label class="sr" for="rp-b">To</label><input class="in" type="date" id="rp-b" value="'+esc(RPC.b || isoDay(new Date(R.b - 1)))+'"></div>' : '') +
+    '<span class="grow"></span>' + (S.canWrite ? '<button class="btn sm ghost" data-act="expadd">+ Expense</button>' : '') + '<button class="btn sm ghost" data-act="rexport">Export</button><button class="btn sm ghost" data-act="rprint">Print</button></div>' +
+    '<p class="rlabel"><b>'+esc(R.label)+'</b> <span class="t2">· arrows compare with '+esc(R.vs)+'</span></p>';
+  var kp = '<div class="kgrid">' +
+    kpi('Sales', money(st.salesNet), delta(st.salesNet, pv.salesNet), st.refundAmt ? 'after '+money(st.refundAmt)+' refunds' : 'before tax') +
+    kpi('Profit', '<span style="color:'+(st.profit >= 0 ? 'var(--green)' : 'var(--red)')+'">'+money(st.profit)+'</span>', delta(st.profit, pv.profit), 'after parts and expenses') +
+    kpi('Repairs done', st.done.length, delta(st.done.length, pv.done.length), st.created.length + ' checked in') +
+    kpi('Average ticket', st.avgTicket ? money(st.avgTicket) : '—', delta(st.avgTicket || null, pv.avgTicket || null), st.paid.length + ' paid tickets') +
+    kpi('Profit margin', pctTxt(st.margin), delta(st.margin, pv.margin, 'pct'), 'after part costs') +
+    kpi('Same-day repairs', pctTxt(st.sameDayPct), delta(st.sameDayPct, pv.sameDayPct, 'pct'), 'ready the day they came in') +
+    kpi('Check-in to ready', fmtDur(st.avgReady), delta(st.avgReady || null, pv.avgReady || null, null, true), 'average') +
+    kpi('Comebacks', pctTxt(st.comebackPct), delta(st.comebackPct, pv.comebackPct, 'pct', true), st.comebacks + ' warranty return' + (st.comebacks === 1 ? '' : 's')) +
+  '</div>';
+  var mixMax = Math.max(st.repRev, st.accTotal, st.bbP, 1);
+  var money1 = '<div class="panel"><h2>Where the money comes from</h2><p class="d">Before sales tax.</p><table class="rtable"><tbody>' +
+    '<tr><td>Repairs</td><td style="width:38%">'+hbar(st.repRev, mixMax)+'</td><td class="right amt">'+money(st.repRev)+'</td></tr>' +
+    '<tr><td>Cases, protectors and services</td><td>'+hbar(st.accTotal, mixMax)+'</td><td class="right amt">'+money(st.accTotal)+'</td></tr>' +
+    (st.refundPre ? '<tr><td>Refunds</td><td></td><td class="right amt" style="color:var(--red)">−'+money(st.refundPre)+'</td></tr>' : '') +
+    '<tr><td><b>Sales</b></td><td></td><td class="right amt"><b>'+money(st.salesNet)+'</b></td></tr>' +
+    '<tr><td>Part costs</td><td></td><td class="right amt">'+neg(st.partCost)+'</td></tr>' +
+    '<tr><td>Expenses</td><td></td><td class="right amt">'+neg(st.expTotal)+'</td></tr>' +
+    (st.bbSold.length || st.bbP ? '<tr><td>Phones resold ('+st.bbSold.length+')</td><td>'+hbar(Math.max(0, st.bbP), mixMax)+'</td><td class="right amt">'+(st.bbP >= 0 ? '+' : '')+money(st.bbP)+'</td></tr>' : '') +
+    '<tr><td><b>Profit</b></td><td></td><td class="right amt" style="color:'+(st.profit >= 0 ? 'var(--green)' : 'var(--red)')+'"><b>'+money(st.profit)+'</b></td></tr>' +
+    '<tr><td class="t2">Sales tax collected (owed to Texas)</td><td></td><td class="right t2">'+money(st.taxC)+'</td></tr></tbody></table></div>';
+  return seg + kp +
     (RP === 'today' ? closeoutPanel() : '') +
-    '<div class="rgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><b>'+money(revenue - pcost)+'</b><span>After part costs</span></div><div class="stat"><b>'+money((S.exp||[]).filter(function(x){ return x.at >= start; }).reduce(function(a,x){ return a + num(x.amt); }, 0))+'</b><span>Expenses</span></div><div class="stat"><b style="color:var(--green)">'+money(revenue - pcost - (S.exp||[]).filter(function(x){ return x.at >= start; }).reduce(function(a,x){ return a + num(x.amt); }, 0))+'</b><span>Real profit (after parts and expenses)</span></div></div>' +
-    expensesPanel(start) + clockPanel() +
-    '<div class="panel"><h2>By technician</h2><p class="d">Repairs picked up in this period. Warranty returns count against the tech who did the original repair.</p>'+techTbl+'</div>' +
-    '<div class="g2"><div class="panel"><h2>Most common repairs</h2><p class="d">From tickets checked in this period.</p>'+repTbl+'</div>' +
-    '<div class="panel"><h2>Payments</h2><p class="d">By payment method.</p>'+pmTbl+'</div></div>' +
-    '<p class="muted" style="font-size:13px">“Sales” and “After part costs” don’t include sales tax (that money goes to Texas). “After part costs” uses the part costs entered on tickets.</p>';
+    salesChart(R.a, R.b) +
+    '<div class="g2r">' + money1 + '<div class="panel"><h2>Payments</h2><p class="d">Money in by payment method.</p>'+payBlock(R.a, R.b)+'</div></div>' +
+    '<div class="panel"><h2>Repairs that make you money</h2><p class="d">Paid repairs in this period, most sales first.</p>'+repairTable(st.paid)+'</div>' +
+    '<div class="g2r"><div class="panel"><h2>Customers</h2><p class="d">From tickets checked in this period.</p>'+custBlock(st, R.a)+'</div><div class="panel"><h2>Devices</h2><p class="d">What came in this period.</p>'+devBlock(st)+'</div></div>' +
+    '<div class="panel"><h2>Technicians</h2>'+techBlock(st, R.a, R.b)+'</div>' +
+    '<div class="g2r"><div class="panel"><h2>Busiest times</h2><p class="d">When customers come in. Plan who works when.</p>'+heatmap()+'</div><div class="panel"><h2>Money owed</h2><p class="d">Picked up but not paid, right now.</p>'+owedBlock()+'</div></div>' +
+    '<div class="g2r"><div class="panel"><div class="phead"><h2>Expenses</h2><b>'+money(st.expTotal)+'</b></div><p class="d">Rent, parts orders, supplies and more for this period.</p>'+expBlock(st)+(S.canWrite ? '<div class="acts"><button class="btn sm ghost" data-act="expadd">+ Add expense</button></div>' : '')+'</div>' +
+    '<div class="panel"><h2>Quick sales and refunds</h2><p class="d">In this period.</p>'+salesList(st)+'</div></div>' +
+    '<div class="panel"><div class="phead"><h2>Sales tax by month</h2><button class="btn sm ghost" data-act="taxprint">Print</button></div><p class="d">For your Texas sales tax return. Tax on card fees is included.</p>'+taxTable()+'</div>' +
+    '<p class="muted" style="font-size:13px">Sales don’t include sales tax (that money goes to Texas). Profit = sales − part costs − expenses + profit on resold phones. Part costs come from tickets.</p>';
+}
+function expBox(){
+  var m = modalShell('ex', 'Add an expense',
+    '<div class="g2"><div class="f"><label for="ex-amt">Amount</label><input class="in" id="ex-amt" inputmode="decimal" placeholder="$"></div><div class="f"><label for="ex-cat">Category</label><select class="in" id="ex-cat">'+EXP_CATS.map(function(c){ return '<option>'+c+'</option>'; }).join('')+'</select></div></div>' +
+    '<div class="g2" style="margin-top:12px"><div class="f"><label for="ex-note">Note (optional)</label><input class="in" id="ex-note" maxlength="80" placeholder="MobileSentrix order"></div><div class="f"><label for="ex-date">Date</label><input class="in" id="ex-date" type="date" value="'+isoDay(new Date())+'"></div></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="ex-ok">Add expense</button>');
+  requestAnimationFrame(function(){ $('#ex-amt', m).focus(); });
+  var go = function(){
+    var ea = num($('#ex-amt', m).value); if (!ea) { $('#ex-err', m).textContent = 'Enter an amount.'; $('#ex-amt', m).focus(); return; }
+    var ed = $('#ex-date', m).value ? parseDay($('#ex-date', m).value).getTime() + 12*3600e3 : Date.now();
+    var eref = S.db.collection('expenses').doc(), eo = {amt:ea, cat:$('#ex-cat', m).value, note:$('#ex-note', m).value.trim().slice(0,80), at:ed, by:who(), createdAt:Date.now()};
+    S.exp = [Object.assign({id:eref.id}, eo)].concat(S.exp||[]); m.remove(); render();
+    eref.set(eo).then(function(){ toast('Expense added'); }).catch(writeErr);
+  };
+  $('#ex-ok', m).addEventListener('click', go);
+  m.addEventListener('keydown', function(e){ if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); go(); } });
+}
+function reportCsv(){
+  var R = rpRange(), rows = [['Date','What','Ticket','Customer','Details','Paid by','Amount','Sales tax']];
+  ledger(R.a, R.b).sort(function(x, y){ return x.at - y.at; }).forEach(function(e){
+    var kind = {deposit:'Deposit', pay:'Repair payment', fee:'Card fee', refund:'Refund', sale:'Quick sale', buy:'Phone bought', bbsale:'Phone sold'}[e.kind] || e.kind;
+    var tax = e.kind === 'pay' && e.t ? allTax(e.t) : e.kind === 'sale' && e.s ? num(e.s.tax) : e.kind === 'refund' && e.x ? -num(e.x.tax) : '';
+    rows.push([dt(e.at), kind, e.t ? e.t.num : '', e.t ? (e.t.customer||{}).name : e.s && e.s.cust ? e.s.cust.name : e.bb ? (e.kind === 'buy' ? e.bb.sellerName : e.bb.buyerName) : '', e.t ? repairsText(e.t) : e.s ? saleText(e.s) : e.bb ? e.bb.model : '', e.m, r2(e.a), tax === '' ? '' : r2(tax)]);
+  });
+  (S.exp||[]).filter(function(x){ return x.at >= R.a && x.at < R.b; }).forEach(function(x){ rows.push([dt(x.at), 'Expense', '', '', x.cat + (x.note ? ' · ' + x.note : ''), '', -num(x.amt), '']); });
+  var name = 'iFixPhones-report-' + isoDay(new Date(R.a)) + '-to-' + isoDay(new Date(R.b - 1)) + '.csv';
+  S.dl.save({filename:name, data:rows.map(function(r){ return r.map(csvCell).join(','); }).join('\n')}).then(function(){ toast('Saved ' + name); });
+}
+function reportDoc(){
+  var R = rpRange(), st = rStats(R.a, R.b);
+  var tr = function(a, b){ return '<tr><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
+  var css = 'body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:22px;margin:0}h2{font-size:14px;margin:20px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td,th{padding:5px 0;border-bottom:1px solid #eee;text-align:left}th{font-size:11px;color:#666}.k{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.k div{border:1px solid #ddd;border-radius:10px;padding:10px}.k b{display:block;font-size:18px}.k span{font-size:11px;color:#666}';
+  var k = function(l, v){ return '<div><b>'+v+'</b><span>'+l+'</span></div>'; };
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>iFixPhones report · '+esc(R.label)+'</title><style>'+css+'</style></head><body><h1>iFixPhones · Report</h1><div>'+esc(R.label)+' · printed '+esc(dt(Date.now()))+' by '+esc(who())+'</div>' +
+    '<div class="k">'+k('Sales', money(st.salesNet))+k('Profit', money(st.profit))+k('Repairs done', st.done.length)+k('Average ticket', st.avgTicket ? money(st.avgTicket) : '—')+k('Profit margin', pctTxt(st.margin))+k('Same-day repairs', pctTxt(st.sameDayPct))+k('Check-in to ready', fmtDur(st.avgReady))+k('Comebacks', pctTxt(st.comebackPct))+'</div>' +
+    '<h2>Money</h2><table>'+tr('Repairs', money(st.repRev))+tr('Cases, protectors and services', money(st.accTotal))+(st.refundPre ? tr('Refunds', '−'+money(st.refundPre)) : '')+tr('<b>Sales</b>', '<b>'+money(st.salesNet)+'</b>')+tr('Part costs', '−'+money(st.partCost))+tr('Expenses', '−'+money(st.expTotal))+tr('Phones resold (profit)', money(st.bbP))+tr('<b>Profit</b>', '<b>'+money(st.profit)+'</b>')+tr('Sales tax collected', money(st.taxC))+'</table>' +
+    '<h2>Repairs that make money</h2>' + repairTable(st.paid).replace(/<button[^>]*>|<\/button>|<details[\s\S]*?<\/details>/g, '').replace(/<td style="width:18%" class="hide-s">[\s\S]*?<\/td>/g, '') +
+    '<h2>Technicians</h2>' + techBlock(st, R.a, R.b) +
+    '<h2>Expenses</h2><table>' + st.exps.map(function(x){ return tr(esc(dateOnly(x.at)) + ' · ' + esc(x.cat) + (x.note ? ' · ' + esc(x.note) : ''), money(x.amt)); }).join('') + tr('<b>Total</b>', '<b>'+money(st.expTotal)+'</b>') + '</table>' +
+    '</body></html>';
+}
+function taxDoc(){
+  var rows = taxBlock();
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Sales tax by month</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:640px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:20px}table{width:100%;border-collapse:collapse}td,th{padding:6px 0;border-bottom:1px solid #ddd;text-align:left}td+td,th+th{text-align:right}</style></head><body><h1>iFixPhones · Sales tax by month</h1><p>'+esc(SHOP.addr)+' · printed '+esc(dateOnly(Date.now()))+'</p><table><tr><th>Month</th><th>Taxable sales</th><th>Sales tax collected</th></tr>' + rows.map(function(r){ return '<tr><td>'+esc(r.label)+'</td><td>'+money(r.taxable)+'</td><td>'+money(r.tax)+'</td></tr>'; }).join('') + '</table><p style="color:#555">Taxable sales are before tax and after refunds. Tax collected includes tax on credit card fees. Check these against Square before filing.</p></body></html>';
 }
 
 function custKey(c){ c = c || {}; var d = digits(c.phone).slice(-10); return d ? d : 'n:' + String(c.name||'').trim().toLowerCase(); }
@@ -1126,7 +1526,9 @@ function renderProfile(){
         '<div class="acts"><a class="btn sm ghost" href="tel:'+esc(e164(latest.phone))+'">Call</a><a class="btn sm ghost" href="sms:'+esc(e164(latest.phone))+'">Text</a>'+(S.canWrite?'<button class="btn sm" data-act="newfor">+ New ticket</button>':'')+'</div>' +
         '<dl class="kv" style="margin-top:14px"><dt>Address</dt><dd>'+(addr?'<a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr)+'">'+esc(addr)+'</a>':'<span class="muted">Not on file</span>')+'</dd>' +
         '<dt>Email</dt><dd>'+(email?esc(email):'<span class="muted">Not on file</span>')+'</dd>' +
-        '<dt>Repairs</dt><dd>'+list.length+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Last visit</dt><dd>'+esc(dateOnly(list[0].createdAt))+'</dd></dl></div>' +
+        '<dt>Repairs</dt><dd>'+list.length+'</dd><dt>Total paid</dt><dd>'+money(paid)+'</dd><dt>Last visit</dt><dd>'+esc(dateOnly(list[0].createdAt))+'</dd>' +
+        (latest.heard || list.filter(function(t){ return t.heard; })[0] ? '<dt>Found us</dt><dd>'+esc((list.filter(function(t){ return t.heard; }).pop()||{}).heard||'')+'</dd>' : '') +
+        '<dt>Store credit</dt><dd><b'+(creditOf(S.profile)?' style="color:var(--green)"':'')+'>'+money(creditOf(S.profile))+'</b>'+(S.canWrite?' <button class="link" data-act="credit" data-key="'+esc(S.profile)+'">Change</button>':'')+'</dd></dl></div>' +
       custNotesCard(S.profile) +
       '<div class="card"><h3>Devices</h3><div class="devs">'+devHtml+'</div></div>' +
       '<div class="card"><h3>Repair history</h3>'+hist+'</div>' +
@@ -1154,43 +1556,62 @@ function customersView0(){
   }).join('') + '</div>';
 }
 
+var SET_SECS = [['team','Team'],['prices','Prices and payments'],['texts','Texts and alerts'],['tablet','Check-in tablet'],['website','Website'],['printing','Printing'],['backup','Backup and account']];
 function settingsView(){
+  var sec = S.setSec || 'team';
+  if (!SET_SECS.some(function(x){ return x[0] === sec; })) sec = 'team';
+  var nav = '<nav class="setnav" aria-label="Settings sections">' + SET_SECS.map(function(x){ return '<button data-act="setsec" data-v="'+x[0]+'" aria-pressed="'+(sec===x[0])+'">'+esc(x[1])+'</button>'; }).join('') + '</nav>';
+  var body = sec === 'prices' ? setPrices() : sec === 'texts' ? twilioPanel() + setAlerts() : sec === 'tablet' ? kioskPanel() + screenPricesPanel() : sec === 'website' ? siteSettingsPanel() : sec === 'printing' ? setPrinting() : sec === 'backup' ? setBackup() : setTeam();
+  return '<div class="setwrap">' + nav + '<div class="setmain">' + body + '</div></div>';
+}
+function setTeam(){
   var techs = (S.settings.techs||[]).map(function(n, i){
     return '<span class="tchip"><span class="av">'+esc(initials(n))+'</span>'+esc(n)+(S.canWrite?'<button data-act="rmtech" data-i="'+i+'" aria-label="Remove '+esc(n)+'">×</button>':'')+'</span>';
   }).join('');
-  var comm = '<h3 style="margin-top:18px;font-size:15px">Commission</h3><p class="hint" style="margin-bottom:8px">% of each tech’s repair sales (before tax). Leave at 0 for none. Shows in Reports.</p><div class="g3" style="max-width:640px">' + (S.settings.techs||[]).map(function(n){ return '<div class="f"><label>'+esc(n)+' %</label><input class="in" inputmode="decimal" data-comm="'+esc(n)+'" value="'+esc(commPct(n)||'')+'" placeholder="0"></div>'; }).join('') + '</div>';
-  return '<div class="panel"><h2>Team</h2><p class="d">Everyone who works on repairs. Each action on a ticket is saved with the name of whoever is working.</p>' + 
+  var comm = '<h3 class="sh3">Commission</h3><p class="hint" style="margin-bottom:8px">% of each tech’s repair sales (before tax). Leave at 0 for none. Shows in Reports.</p><div class="g3" style="max-width:640px">' + (S.settings.techs||[]).map(function(n){ return '<div class="f"><label>'+esc(n)+' %</label><input class="in" inputmode="decimal" data-comm="'+esc(n)+'" value="'+esc(commPct(n)||'')+'" placeholder="0"></div>'; }).join('') + '</div>';
+  return '<div class="panel"><h2>Team</h2><p class="d">Everyone who works on repairs. Each action on a ticket is saved with the name of whoever is working.</p>' +
     '<div class="techs">' + (techs || '<span class="muted">No one added yet.</span>') + '</div>' +
     (S.canWrite ? '<form class="inline" data-form="addtech"><label class="sr" for="newtech">Name</label><input class="in" id="newtech" placeholder="Add a name" maxlength="30" autocomplete="off"><button class="btn dark" type="submit">Add</button></form>' : '') +
-    comm +
-  '</div>' + backupPanel() +
-  siteSettingsPanel() + kioskPanel() + screenPricesPanel() + twilioPanel() +
-  '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
-    '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
-    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushNewTickets"'+(S.settings.pushNewTickets===true?' checked':'')+'>Also alert me when a ticket is checked in (off by default)</label>' +
-    '<div class="match" style="margin-top:14px"><b>Phone alerts</b> go to the <b>Pushover</b> app. Install it and sign in with the shop’s Pushover account on any phone that should get alerts.</div>' +
-    '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div>' +
-  '</div>' +
-  '<div class="panel"><h2>Tax and payments</h2><p class="d">New tickets add sales tax automatically. Texas taxes phone repair (parts and labor). San Antonio’s rate is 8.25%.</p>' +
+    comm + '</div>' + clockPanel();
+}
+function setPrices(){
+  var ex = (S.settings.qsExtra||[]);
+  return '<div class="panel"><h2>Sales tax and card fee</h2><p class="d">New tickets add sales tax automatically. Texas taxes phone repair (parts and labor). San Antonio’s rate is 8.25%.</p>' +
     '<div class="g2" style="max-width:520px"><div class="f"><label for="set-tax">Sales tax %</label><input class="in" id="set-tax" inputmode="decimal" data-setting="taxRate" value="'+esc(S.settings.taxRate == null ? 8.25 : S.settings.taxRate)+'"></div>' +
     '<div class="f"><label for="set-sur">Credit card surcharge %</label><input class="in" id="set-sur" inputmode="decimal" data-setting="surchargeRate" value="'+esc(surRate() || 3)+'"></div></div>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="surchargeOff"'+(S.settings.surchargeOff?' checked':'')+'>Turn the credit card surcharge off</label>' +
-    '<h3 style="margin-top:18px;font-size:15px">Accessory prices</h3><p class="hint" style="margin-bottom:8px">Offered at checkout. Tax is added automatically.</p>' +
+    '<div class="match" style="margin-top:12px"><b>Card surcharge:</b> turn it on in <b>Square</b> (Dashboard → Settings → Payments → Credit card surcharges) and use the same % here. Square only charges it on credit cards, never debit, and prints it on the receipt. Debit cards and cash don’t pay it.</div></div>' +
+  '<div class="panel"><h2>Quick sale and add-ons</h2><p class="d">Shown in <b>Quick sale</b> and offered at checkout on repairs. Tax is added automatically.</p>' +
     '<div class="g2" style="max-width:520px">' + ACCS.map(function(a){ return '<div class="f"><label for="acc-'+a.k+'">'+esc(a.name)+'</label><input class="in" id="acc-'+a.k+'" inputmode="decimal" data-setting="acc_'+a.k+'" value="'+esc(accPrice(a.k))+'"></div>'; }).join('') + '</div>' +
-    '<h3 style="margin-top:18px;font-size:15px">Repeat customers</h3><div class="g2" style="max-width:520px"><div class="f"><label for="set-lv">Discount on visit #</label><input class="in" id="set-lv" inputmode="numeric" data-setting="loyaltyVisit" value="'+esc(loyaltyVisit())+'"></div><div class="f"><label for="set-lp">Discount %</label><input class="in" id="set-lp" inputmode="decimal" data-setting="loyaltyPct" value="'+esc(loyaltyPct())+'"></div></div>' +
-    '<div class="match" style="margin-top:12px"><b>Card surcharge:</b> turn it on in <b>Square</b> (Dashboard → Settings → Payments → Credit card surcharges) and use the same % here. Square only charges it on credit cards, never debit, and prints it on the receipt. Credit cards get 3% added on the total (tax included). Debit cards and cash don’t. Square gives you a sign to post at the counter.</div>' +
+    (ex.length ? '<h3 class="sh3">Your other items</h3><table class="rtable" style="max-width:520px"><tbody>' + ex.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="right amt">'+money(x.price)+'</td><td class="right" style="width:70px"><button class="link red" data-act="qsrm" data-id="'+esc(x.id)+'">Remove</button></td></tr>'; }).join('') + '</tbody></table>' : '') +
+    (S.canWrite ? '<form class="inline" data-form="addqs" style="margin-top:12px;max-width:520px"><label class="sr" for="qs-new">Item name</label><input class="in" id="qs-new" placeholder="Add an item, e.g. USB-C charger" maxlength="40"><label class="sr" for="qs-newp">Price</label><input class="in" id="qs-newp" inputmode="decimal" placeholder="$" style="max-width:90px;flex:none"><button class="btn dark" type="submit">Add</button></form>' : '') +
   '</div>' +
-  '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
+  '<div class="panel"><h2>Diagnostic fee</h2><p class="d">An optional fee when a customer only wants you to find the problem. It’s waived automatically if they go ahead with a repair. Leave at 0 to hide it.</p>' +
+    '<div class="f" style="max-width:240px"><label for="set-diag">Diagnostic fee ($)</label><input class="in" id="set-diag" inputmode="decimal" data-setting="diagFee" value="'+esc(num(S.settings.diagFee) || '')+'" placeholder="0"></div></div>' +
+  '<div class="panel"><h2>Repeat customers</h2><p class="d">The ticket offers this discount when a customer comes back.</p><div class="g2" style="max-width:520px"><div class="f"><label for="set-lv">Discount on visit #</label><input class="in" id="set-lv" inputmode="numeric" data-setting="loyaltyVisit" value="'+esc(loyaltyVisit())+'"></div><div class="f"><label for="set-lp">Discount %</label><input class="in" id="set-lp" inputmode="decimal" data-setting="loyaltyPct" value="'+esc(loyaltyPct())+'"></div></div></div>';
+}
+function setAlerts(){
+  return '<div class="panel"><h2>Alerts</h2><p class="d">New bookings, quote requests and tickets ding on every computer that has this app open.</p>' +
+    '<label class="check"><input type="checkbox" data-setting="sound"'+(S.settings.sound!==false?' checked':'')+'>Play a ding sound</label>' +
+    '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="pushNewTickets"'+(S.settings.pushNewTickets===true?' checked':'')+'>Also alert me when a ticket is checked in (off by default)</label>' +
+    '<div class="match" style="margin-top:14px"><b>Phone alerts</b> go to the <b>Pushover</b> app. Install it and sign in with the shop’s Pushover account on any phone that should get alerts.</div>' +
+    '<div class="acts" style="margin-top:12px"><button class="btn sm ghost" data-act="testalert">Send a test alert</button></div></div>';
+}
+function setPrinting(){
+  return '<div class="panel"><h2>Printing</h2><p class="d">“Print ticket” prints a full page with the policy and signature. “Print label” prints a sticker for the phone or bag.</p>' +
     '<div class="f" style="max-width:360px"><label for="lblsize">Label size</label><select class="in" id="lblsize" data-setting="labelSize">' + Object.keys(LABELS).map(function(k){ return '<option value="'+k+'"'+((S.settings.labelSize||'brother62')===k?' selected':'')+'>'+esc(LABELS[k].name)+'</option>'; }).join('') + '</select></div>' +
     '<label class="check" style="margin-top:12px"><input type="checkbox" data-setting="autoLabel"'+(S.settings.autoLabel?' checked':'')+'>Print a label automatically after check-in</label>' +
     '<label class="check" style="margin-top:10px"><input type="checkbox" data-setting="custStub"'+(custStub()?' checked':'')+'>Also print a customer ticket (their QR opens the repair status page)</label>' +
     (isNiimLabel() ? '<div class="match" style="margin-top:14px"><b>Niimbot B1:</b> the app prints to it directly over USB, no driver needed. Plug the B1 into this computer, <b>close the NIIMBOT app</b>, then click <b>Connect label printer</b> and pick the B1 (it may show as “USB Serial Device” or a COM port). You only do this once.<div class="acts" style="margin-top:10px"><button class="btn sm" data-act="niimsetup">Connect label printer</button><button class="btn sm ghost" data-act="niimtest">Print a test label</button></div>' +
       '<div class="f" style="max-width:220px;margin-top:10px"><label for="niimd">Darkness (1–5)</label><select class="in" id="niimd" data-setting="niimDensity">'+[1,2,3,4,5].map(function(v){ return '<option'+((num(S.settings.niimDensity)||3)===v?' selected':'')+'>'+v+'</option>'; }).join('')+'</select></div></div>' : '') +
-  '</div>' +
-  '<div class="panel"><h2>Back up your tickets</h2><p class="d">Download every ticket as a spreadsheet file (CSV). Good to do once a month.</p>' +
-    (S.dl ? '<button class="btn ghost" data-act="csv">Download CSV</button>' : '<span class="muted">Downloads aren’t available in this view.</span>') +
-  '</div>' +
-  '<div class="panel"><h2>Privacy</h2><p class="rcnote" style="margin-bottom:8px">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p><p class="d">Passcodes are deleted automatically when a ticket is marked Picked up or Cancelled, as your repair policy promises. Only the shop Google account can open tickets.</p></div>' +
+  '</div>';
+}
+function setBackup(){
+  var lb = num(S.settings.lastBackup);
+  return '<div class="panel"><h2>Backup</h2><p class="d">Download every ticket as a spreadsheet file (CSV). '+(lb ? 'Last backup '+esc(rel(lb))+'.' : 'No backup yet.')+' The app reminds you every 7 days.</p>' +
+    (S.dl ? '<button class="btn" data-act="csv">Back up now</button>' : '<span class="muted">Downloads aren’t available in this view.</span>') + '</div>' +
+  '<div class="panel"><h2>Keyboard shortcuts</h2><p class="d">For the computer at the counter.</p><table class="rtable" style="max-width:420px"><tbody><tr><td><kbd>N</kbd></td><td>New ticket</td></tr><tr><td><kbd>S</kbd></td><td>Quick sale</td></tr><tr><td><kbd>/</kbd></td><td>Search</td></tr><tr><td><kbd>Esc</kbd></td><td>Close</td></tr><tr><td>Scan a ticket label</td><td>Opens that ticket</td></tr></tbody></table></div>' +
+  '<div class="panel"><h2>Privacy</h2><p class="rcnote" style="margin-bottom:8px">This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.</p><p class="d">Passcodes and unlock patterns are deleted automatically when a ticket is marked Picked up or Cancelled, as your repair policy promises. Only the shop Google account can open tickets.</p></div>' +
   '<div class="panel"><h2>Account</h2><p class="d">Signed in as '+esc(S.authUser ? S.authUser.email : '')+'</p><button class="btn ghost" data-act="signout">Sign out</button></div>';
 }
 
@@ -1728,7 +2149,7 @@ function bbBox(item, pre){
     '<datalist id="bb-models">'+[].concat(CATALOG['Apple iPhone'], CATALOG['Samsung'], CATALOG['Google Pixel']).map(function(x){ return '<option value="'+esc(x)+'">'; }).join('')+'</datalist>' +
     '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-imei">IMEI / serial</label><input class="in" id="bb-imei" value="'+esc(b.imei||'')+'" inputmode="numeric" placeholder="Dial *#06#"></div><div class="f"><label for="bb-cond">Condition</label><select class="in" id="bb-cond">'+opt(BB_COND, b.cond)+'</select></div></div>' +
     '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-lock">Carrier / lock</label><input class="in" id="bb-lock" value="'+esc(b.lock||'')+'" placeholder="Unlocked, T-Mobile…"></div><div class="f"><label for="bb-bat">Battery health %</label><input class="in" id="bb-bat" inputmode="numeric" value="'+esc(b.battery||'')+'"></div></div>' +
-    '<p class="hint" style="margin-top:8px">Before paying: make sure iCloud / Google account is signed out (Find My off) and check the IMEI isn’t reported lost or stolen. '+(b.imei?'<a href="https://www.imei.info/?imei='+encodeURIComponent(b.imei)+'" target="_blank" rel="noopener">Check this IMEI</a>':'')+'</p>' +
+    '<div class="match" style="margin-top:10px"><b>Before you pay:</b> make sure iCloud / Google is signed out (Find My off), then check the IMEI isn’t reported lost or stolen. <div class="acts" style="margin-top:8px"><button type="button" class="btn sm" id="bb-check">Check if stolen</button></div><p class="hint" style="margin-top:6px">Copies the IMEI and opens CTIA’s free Stolen Phone Checker (5 checks a day). Paste it there.</p></div>' +
     '<label class="check" style="margin-top:6px"><input type="checkbox" id="bb-fmi"'+(b.fmiOff?' checked':'')+'>Find My / Google lock is off</label>' +
     '<h3 style="font-size:15px;margin:16px 0 8px">Seller</h3>' +
     '<div class="g2"><div class="f"><label for="bb-sn">Name</label><input class="in" id="bb-sn" value="'+esc(b.sellerName||'')+'"></div><div class="f"><label for="bb-sp">Phone</label><input class="in" id="bb-sp" type="tel" value="'+esc(b.sellerPhone||'')+'"></div></div>' +
@@ -1736,11 +2157,18 @@ function bbBox(item, pre){
     '<div class="g2" style="margin-top:10px"><div class="f"><label for="bb-pm">Paid by</label><select class="in" id="bb-pm">'+opt(PAY, b.payMethod)+'</select></div><div class="f"><label for="bb-fix">Repair cost (parts)</label><input class="in" id="bb-fix" inputmode="decimal" value="'+esc(b.fixCost||'')+'"></div></div>' +
     '<h3 style="font-size:15px;margin:16px 0 8px">Selling</h3>' +
     '<div class="g2"><div class="f"><label for="bb-st">Status</label><select class="in" id="bb-st">'+opt(BB_ST, b.status)+'</select></div><div class="f"><label for="bb-list">Asking price</label><input class="in" id="bb-list" inputmode="decimal" value="'+esc(b.listPrice||'')+'"></div></div>' +
-    '<div class="g2" style="margin-top:10px" id="bb-soldw"><div class="f"><label for="bb-sold">Sold for</label><input class="in" id="bb-sold" inputmode="decimal" value="'+esc(b.soldPrice||'')+'"></div><div class="f"><label for="bb-buyer">Buyer (optional)</label><input class="in" id="bb-buyer" value="'+esc(b.buyerName||'')+'"></div></div>' +
+    '<div class="g3" style="margin-top:10px" id="bb-soldw"><div class="f"><label for="bb-sold">Sold for</label><input class="in" id="bb-sold" inputmode="decimal" value="'+esc(b.soldPrice||'')+'"></div><div class="f"><label for="bb-sm">Buyer paid by</label><select class="in" id="bb-sm">'+opt(PAY, b.soldMethod || 'Cash')+'</select></div><div class="f"><label for="bb-buyer">Buyer (optional)</label><input class="in" id="bb-buyer" value="'+esc(b.buyerName||'')+'"></div></div>' +
     '<div class="f" style="margin-top:10px"><label for="bb-notes">Notes</label><textarea class="in" id="bb-notes" style="min-height:56px">'+esc(b.notes||'')+'</textarea></div>' +
     '<div id="bb-prof" class="match" style="margin-top:12px"></div>',
     (item ? '<button class="link red" id="bb-del" style="margin-right:auto">Delete</button><button class="btn ghost" id="bb-wipe">Data-wipe certificate</button>' : '') + '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="bb-save">Save</button>', true);
   var wb = $('#bb-wipe', m); if (wb) wb.addEventListener('click', function(){ printHtml(wipeDoc(item)); });
+  $('#bb-check', m).addEventListener('click', function(){
+    var im = digits($('#bb-imei', m).value);
+    if (im.length < 14) { $('#bb-err', m).textContent = 'Type the IMEI first (dial *#06# on the phone).'; $('#bb-imei', m).focus(); return; }
+    $('#bb-err', m).textContent = '';
+    try { navigator.clipboard.writeText(im).then(function(){ toast('IMEI copied. Paste it on the checker page.'); }, function(){}); } catch(x) {}
+    if (!window.__noNav) window.open('https://stolenphonechecker.org/spc/consumer', '_blank', 'noopener'); else window.__lastOpen = 'stolenphonechecker';
+  });
   function prof(){
     var sold = $('#bb-st', m).value === 'sold';
     $('#bb-soldw', m).style.display = sold ? '' : 'none';
@@ -1755,7 +2183,7 @@ function bbBox(item, pre){
     if (st === 'sold' && !num($('#bb-sold', m).value)) { err.textContent = 'Enter what it sold for.'; return; }
     var o = {model:model.slice(0,60), storage:$('#bb-sto', m).value.trim().slice(0,20), imei:$('#bb-imei', m).value.trim().slice(0,30), cond:$('#bb-cond', m).value, lock:$('#bb-lock', m).value.trim().slice(0,40), battery:$('#bb-bat', m).value.trim().slice(0,5), fmiOff:$('#bb-fmi', m).checked,
       sellerName:$('#bb-sn', m).value.trim().slice(0,60), sellerPhone:$('#bb-sp', m).value.trim().slice(0,24), idNote:$('#bb-id', m).value.trim().slice(0,40), paid:num($('#bb-paid', m).value), payMethod:$('#bb-pm', m).value, fixCost:num($('#bb-fix', m).value),
-      status:st, listPrice:num($('#bb-list', m).value), soldPrice: st === 'sold' ? num($('#bb-sold', m).value) : 0, buyerName:$('#bb-buyer', m).value.trim().slice(0,60), notes:$('#bb-notes', m).value.trim().slice(0,500), updatedAt:Date.now(), updatedBy:who()};
+      status:st, listPrice:num($('#bb-list', m).value), soldPrice: st === 'sold' ? num($('#bb-sold', m).value) : 0, soldMethod: st === 'sold' ? $('#bb-sm', m).value : '', buyerName:$('#bb-buyer', m).value.trim().slice(0,60), notes:$('#bb-notes', m).value.trim().slice(0,500), updatedAt:Date.now(), updatedBy:who()};
     if (st === 'sold' && (!item || item.status !== 'sold')) o.soldAt = Date.now();
     if (!item && o.paid && !o.fmiOff && !confirm('Find My / Google lock isn’t marked off. Save anyway?')) return;
     var ref = item ? S.db.doc('buybacks/'+item.id) : S.db.collection('buybacks').doc();
@@ -1877,59 +2305,79 @@ function applyApproval(id, a){
 }
 
 /* ---------- end of day ---------- */
+function dayRange(d){ var x = new Date(d || Date.now()); x.setHours(0,0,0,0); return [x.getTime(), x.getTime() + 86400e3]; }
 function closeoutData(){
-  var sod = new Date(); sod.setHours(0,0,0,0); var a = sod.getTime(), b = a + 86400e3;
-  var inD = function(ts){ return ts >= a && ts < b; };
+  var rg = dayRange(), a = rg[0], b = rg[1], inD = function(ts){ return ts >= a && ts < b; };
+  var ev = ledger(a, b);
+  var shop = ev.filter(function(e){ return e.kind !== 'buy' && e.kind !== 'bbsale'; });
+  var by = {}, credit = 0;
+  shop.forEach(function(e){ if (isCredit(e.m)) { if (e.kind !== 'refund') credit = r2(credit + e.a); return; } by[e.m] = r2((by[e.m]||0) + e.a); });
+  var creditIssued = r2(shop.filter(function(e){ return e.kind === 'refund' && isCredit(e.m); }).reduce(function(s2,e){ return s2 - e.a; }, 0));
+  var refunds = shop.filter(function(e){ return e.kind === 'refund' && !isCredit(e.m); });
   var paid = S.tickets.filter(function(t){ return t.paid && inD(t.paidAt); });
-  var by = {}; paid.forEach(function(t){ var o = byMethod(t); Object.keys(o).forEach(function(k){ by[k] = r2((by[k]||0) + o[k]); }); });
-  var taxC = paid.reduce(function(s2,t){ return s2 + allTax(t); }, 0), surC = paid.reduce(function(s2,t){ return s2 + cardFees(t); }, 0);
-  var deps = S.tickets.filter(function(t){ return inD(t.createdAt) && num(t.deposit); });
+  var sales = (S.sales||[]).filter(function(x){ return inD(x.at); });
+  var taxC = paid.reduce(function(s2,t){ return s2 + allTax(t); }, 0) + sales.reduce(function(s2,x){ return s2 + num(x.tax) + num(x.surTax); }, 0) - ev.filter(function(e){ return e.kind === 'refund'; }).reduce(function(s2,e){ return s2 + num(e.x.tax); }, 0);
+  var surC = paid.reduce(function(s2,t){ return s2 + cardFees(t); }, 0) + sales.reduce(function(s2,x){ return s2 + num(x.surcharge) - num(x.surTax); }, 0);
+  var deps = S.tickets.filter(function(t){ return num(t.deposit) && inD(t.depAt || t.createdAt); });
   var bbOut = (S.bb||[]).filter(function(x){ return inD(x.createdAt) && num(x.paid); });
   var bbIn = (S.bb||[]).filter(function(x){ return x.status === 'sold' && inD(x.soldAt); });
-  var cashBuy = bbOut.filter(function(x){ return x.payMethod === 'Cash'; }).reduce(function(s2,x){ return s2 + num(x.paid); }, 0);
-  return {day:sod, paid:paid, by:by, taxC:r2(taxC), surC:r2(surC), total:r2(paid.reduce(function(s2,t){ return s2 + collected(t); }, 0)), deps:deps, depTotal:deps.reduce(function(s2,t){ return s2 + num(t.deposit); }, 0),
+  var cash = ev.filter(function(e){ return e.m === 'Cash'; }).reduce(function(s2,e){ return s2 + e.a; }, 0);
+  return {day:new Date(a), by:by, total:r2(Object.keys(by).reduce(function(s2,k){ return s2 + by[k]; }, 0)), credit:credit, creditIssued:creditIssued,
+    refunds:refunds, refundTotal:r2(refunds.reduce(function(s2,e){ return s2 - e.a; }, 0)), paid:paid, sales:sales, saleTotal:r2(sales.reduce(function(s2,x){ return s2 + num(x.total) + num(x.surcharge); }, 0)),
+    taxC:r2(taxC), surC:r2(surC), deps:deps, depTotal:r2(deps.reduce(function(s2,t){ return s2 + num(t.deposit); }, 0)),
     checkedIn:S.tickets.filter(function(t){ return inD(t.createdAt); }).length, pickedUp:S.tickets.filter(function(t){ return t.status === 'done' && inD(t.pickedUpAt); }).length,
-    bbOut:bbOut, bbOutTotal:bbOut.reduce(function(s2,x){ return s2 + num(x.paid); }, 0), bbIn:bbIn, bbInTotal:bbIn.reduce(function(s2,x){ return s2 + num(x.soldPrice); }, 0), cashBuy:cashBuy,
+    bbOut:bbOut, bbOutTotal:r2(bbOut.reduce(function(s2,x){ return s2 + num(x.paid); }, 0)), bbIn:bbIn, bbInTotal:r2(bbIn.reduce(function(s2,x){ return s2 + num(x.soldPrice); }, 0)), cash:r2(cash),
     ready:S.tickets.filter(function(t){ return t.status === 'ready'; }).length, open:S.tickets.filter(function(t){ return ['in','part','repair'].indexOf(t.status) > -1; }).length};
 }
 function closeoutPanel(){
   var d = closeoutData();
-  var rows = Object.keys(d.by).map(function(k){ return '<tr><td>'+esc(k)+'</td><td class="right amt">'+money(d.by[k])+'</td></tr>'; }).join('');
-  return '<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Close out today</h2><button class="btn sm ghost" data-act="closeout">Print close-out</button></div>' +
-    '<div class="g2" style="margin-top:12px"><div><table class="rtable"><tbody>' + (rows || '<tr><td class="muted">No repair payments yet today</td><td></td></tr>') + '<tr><td><b>Collected</b></td><td class="right amt"><b>'+money(d.total)+'</b></td></tr><tr><td class="t2">Includes sales tax</td><td class="right t2">'+money(d.taxC)+'</td></tr>'+(d.surC?'<tr><td class="t2">Includes card surcharges</td><td class="right t2">'+money(d.surC)+'</td></tr>':'')+'</tbody></table></div>' +
-    '<div><table class="rtable"><tbody><tr><td>Checked in</td><td class="right">'+d.checkedIn+'</td></tr><tr><td>Picked up</td><td class="right">'+d.pickedUp+'</td></tr><tr><td>Deposits taken</td><td class="right amt">'+money(d.depTotal)+'</td></tr>' +
-    (d.bbOut.length || d.bbIn.length ? '<tr><td>Phones bought</td><td class="right amt">−'+money(d.bbOutTotal)+'</td></tr><tr><td>Phones sold</td><td class="right amt">'+money(d.bbInTotal)+'</td></tr>' : '') +
-    '<tr><td>Still open / ready</td><td class="right">'+d.open+' / '+d.ready+'</td></tr></tbody></table></div></div>' +
-    '<p class="hint" style="margin-top:8px">Cash in drawer should be about: repairs paid in cash'+(d.cashBuy?' minus '+money(d.cashBuy)+' paid out for phones':'')+'. Card payments should match Square.</p></div>';
+  var row = function(a, b, cls){ return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+a+'</td><td class="right amt">'+b+'</td></tr>'; };
+  var rows = Object.keys(d.by).sort(function(a,b){ return d.by[b] - d.by[a]; }).map(function(k){ return row(esc(k), money(d.by[k])); }).join('');
+  return '<div class="panel"><div class="phead"><h2>Close out today</h2><button class="btn sm ghost" data-act="closeout">Print close-out</button></div>' +
+    '<div class="g2" style="margin-top:12px"><div><table class="rtable"><tbody>' + (rows || '<tr><td class="muted">No money in yet today</td><td></td></tr>') +
+      row('<b>Taken in</b>', '<b>'+money(d.total)+'</b>') +
+      (d.credit ? row('<span class="t2">Paid with store credit (not cash)</span>', '<span class="t2">'+money(d.credit)+'</span>') : '') +
+      row('<span class="t2">Includes sales tax</span>', '<span class="t2">'+money(d.taxC)+'</span>') + (d.surC ? row('<span class="t2">Includes card fees</span>', '<span class="t2">'+money(d.surC)+'</span>') : '') +
+    '</tbody></table></div>' +
+    '<div><table class="rtable"><tbody>' + row('Checked in', d.checkedIn) + row('Picked up', d.pickedUp) + row('Deposits taken', money(d.depTotal)) +
+      (d.sales.length ? row('Quick sales ('+d.sales.length+')', money(d.saleTotal)) : '') +
+      (d.refunds.length ? row('Refunds ('+d.refunds.length+')', '−'+money(d.refundTotal)) : '') +
+      (d.creditIssued ? row('Store credit given', money(d.creditIssued)) : '') +
+      (d.bbOut.length || d.bbIn.length ? row('Phones bought', '−'+money(d.bbOutTotal)) + row('Phones sold', money(d.bbInTotal)) : '') +
+      row('Still open / ready', d.open+' / '+d.ready) + '</tbody></table></div></div>' +
+    '<div class="match" style="margin-top:12px">Cash in the drawer should be <b>'+money(d.cash)+'</b> more than this morning'+(d.bbOut.some(function(x){ return x.payMethod === 'Cash'; }) ? ' (after cash paid out for phones)' : '')+'. Card payments should match Square.</div></div>';
 }
 function closeoutDoc(){
   var d = closeoutData();
   var tr = function(a, b){ return '<tr><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
   return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Close-out '+esc(dateOnly(d.day))+'</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:640px;margin:24px auto;padding:0 20px;font-size:13px;color:#1d1d1f}h1{font-size:20px;margin:0}h2{font-size:14px;margin:18px 0 6px;border-bottom:1px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid #eee}.sig{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:24px}.sig div{border-top:1px solid #1d1d1f;padding-top:4px;font-size:11px;color:#555}</style></head><body>' +
     '<h1>iFixPhones · Close-out</h1><div>'+esc(d.day.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}))+' · printed by '+esc(who())+'</div>' +
-    '<h2>Repair payments</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total collected</b>', '<b>'+money(d.total)+'</b>') + tr('Sales tax collected (owed to Texas)', money(d.taxC)) + tr('Card surcharges', money(d.surC)) + '</table>' +
-    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(collected(t))+' '+esc(payLabel(t))); }).join('') || tr('None','')) + '</table>' +
-    '<h2>Other</h2><table>' + tr('Deposits taken', money(d.depTotal)) + tr('Checked in', d.checkedIn) + tr('Picked up', d.pickedUp) + tr('Phones bought (paid out)', money(d.bbOutTotal)) + tr('Phones sold', money(d.bbInTotal)) + tr('Still open / ready for pickup', d.open + ' / ' + d.ready) + '</table>' +
+    '<h2>Money taken in</h2><table>' + Object.keys(d.by).map(function(k){ return tr(esc(k), money(d.by[k])); }).join('') + tr('<b>Total taken in</b>', '<b>'+money(d.total)+'</b>') + (d.credit ? tr('Paid with store credit (not cash)', money(d.credit)) : '') + tr('Sales tax collected (owed to Texas)', money(d.taxC)) + tr('Card fees', money(d.surC)) + tr('<b>Cash drawer should be up by</b>', '<b>'+money(d.cash)+'</b>') + '</table>' +
+    '<h2>Paid tickets</h2><table>' + (d.paid.map(function(t){ return tr('#'+esc(t.num)+' '+esc((t.customer||{}).name||'')+' · '+esc(repairsText(t)), money(r2(total(t) - num(t.deposit) + num(t.surcharge)))+' '+esc(payLabel(t))); }).join('') || tr('None','')) + '</table>' +
+    (d.sales.length ? '<h2>Quick sales</h2><table>' + d.sales.map(function(x){ return tr(esc(saleText(x)), money(num(x.total) + num(x.surcharge)) + ' ' + esc(x.payMethod === 'Split' ? 'Split' : x.payMethod || '')); }).join('') + '</table>' : '') +
+    (d.refunds.length ? '<h2>Refunds</h2><table>' + d.refunds.map(function(e){ return tr(esc(e.t ? '#' + e.t.num + ' ' + ((e.t.customer||{}).name||'') : 'Quick sale') + ' · ' + esc(e.x.reason||''), '−' + money(-e.a) + ' ' + esc(e.m)); }).join('') + '</table>' : '') +
+    '<h2>Other</h2><table>' + tr('Deposits taken', money(d.depTotal)) + tr('Checked in', d.checkedIn) + tr('Picked up', d.pickedUp) + tr('Phones bought (paid out)', money(d.bbOutTotal)) + tr('Phones sold', money(d.bbInTotal)) + (d.creditIssued ? tr('Store credit given', money(d.creditIssued)) : '') + tr('Still open / ready for pickup', d.open + ' / ' + d.ready) + '</table>' +
     '<h2>Drawer count</h2><table>' + tr('Cash counted', '$__________') + tr('Card total in Square', '$__________') + tr('Difference', '$__________') + '</table>' +
     '<div class="sig"><div>Counted by</div><div>Checked by</div></div></body></html>';
 }
 
 /* ---------- payments ---------- */
-var ACCS = [{k:'caseReg', name:'Case · Regular', def:15},{k:'caseDef', name:'Case · Defender', def:30},{k:'spReg', name:'Screen protector · Regular', def:10},{k:'spPriv', name:'Screen protector · Privacy', def:20}];
+var ACCS = [{k:'caseReg', name:'Case · Regular', def:15},{k:'caseDef', name:'Case · Defender', def:30},{k:'spReg', name:'Screen protector · Regular', def:10},{k:'spPriv', name:'Screen protector · Privacy', def:20},{k:'clean', name:'Phone cleaning', def:10}];
 function accPrice(k){ var v = S.settings['acc_' + k]; if (v != null && v !== '') return num(v); return ACCS.filter(function(a){ return a.k === k; })[0].def; }
 function loyaltyVisit(){ return num(S.settings.loyaltyVisit) || 3; }
 function loyaltyPct(){ return S.settings.loyaltyPct == null || S.settings.loyaltyPct === '' ? 10 : num(S.settings.loyaltyPct); }
 function visitNo(t){ var k = custKey(t.customer); return S.tickets.filter(function(x){ return x.status !== 'cancel' && custKey(x.customer) === k && (x.createdAt||0) <= (t.createdAt||Date.now()); }).length; }
 function payBox(t){
-  var sr = surRate(), adds = {};
+  var sr = surRate(), adds = {}, credit = creditOf(custKey(t.customer)), PAYX = PAY.concat(credit ? ['Store credit'] : []);
   var m = modalShell('py', 'Take payment · #' + esc(t.num),
     '<div class="f" style="margin-bottom:14px"><label>Add accessories</label><div class="chips" style="margin-top:4px;flex-wrap:wrap;overflow:visible">' + ACCS.map(function(a){ return '<button type="button" class="chip" data-acc="'+a.k+'" aria-pressed="false">'+esc(a.name)+' <i>'+money(accPrice(a.k))+'</i></button>'; }).join('') + '</div></div>' +
     '<div id="py-sum"></div>' +
-    '<div class="f" style="margin-top:12px"><label for="py-m">Paid by</label><select class="in" id="py-m">'+PAY.concat(['Split payment']).map(function(p){ return '<option'+(p===(S.lastPay||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div>' +
+    (credit ? '<div class="match" style="margin-top:12px">⭐ <b>'+money(credit)+' store credit</b> available. Choose “Store credit” below to use it.</div>' : '') +
+    '<div class="f" style="margin-top:12px"><label for="py-m">Paid by</label><select class="in" id="py-m">'+PAYX.concat(['Split payment']).map(function(p){ return '<option'+(p===(S.lastPay||'Cash')?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div>' +
     '<div id="py-cash" class="f" style="margin-top:12px"><label for="py-in">Cash received (optional)</label><input class="in" id="py-in" inputmode="decimal" placeholder="$"><p class="hint" id="py-chg"></p></div>' +
     '<div id="py-card" class="match" style="margin-top:12px"></div>' +
-    '<div id="py-split" style="margin-top:12px"><div class="g2"><div class="f"><label for="py-m1">First payment</label><select class="in" id="py-m1">'+PAY.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a1">Amount</label><input class="in" id="py-a1" inputmode="decimal"></div></div>' +
-      '<div class="g2" style="margin-top:10px"><div class="f"><label for="py-m2">Second payment</label><select class="in" id="py-m2">'+PAY.map(function(p, i){ return '<option'+(i===1?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a2">Amount</label><input class="in" id="py-a2" inputmode="decimal" readonly></div></div><p class="hint" id="py-splith"></p></div>',
+    '<div id="py-split" style="margin-top:12px"><div class="g2"><div class="f"><label for="py-m1">First payment</label><select class="in" id="py-m1">'+PAYX.map(function(p){ return '<option>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a1">Amount</label><input class="in" id="py-a1" inputmode="decimal"></div></div>' +
+      '<div class="g2" style="margin-top:10px"><div class="f"><label for="py-m2">Second payment</label><select class="in" id="py-m2">'+PAYX.map(function(p, i){ return '<option'+(i===1?' selected':'')+'>'+p+'</option>'; }).join('')+'</select></div><div class="f"><label for="py-a2">Amount</label><input class="in" id="py-a2" inputmode="decimal" readonly></div></div><p class="hint" id="py-splith"></p></div>',
     '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="py-ok">Mark paid</button>', true);
   function draft(){
     var live = byId(t.id) || t, items = (live.items||[]).slice();
@@ -1958,9 +2406,11 @@ function payBox(t){
     var added = ACCS.filter(function(a){ return adds[a.k]; });
     if (added.length) f.items = d.items;
     var log = 'took payment of ' + money(bal);
+    if (meth === 'Store credit' && bal > credit) { err.textContent = 'Store credit covers ' + money(credit) + '. Use Split payment for the rest.'; return; }
     if (meth === 'Split payment') {
       var a1 = num($('#py-a1', m).value), a2 = r2(bal - a1), m1 = $('#py-m1', m).value, m2 = $('#py-m2', m).value;
       if (!a1 || a1 >= bal) { err.textContent = 'Enter the first amount (less than ' + money(bal) + ').'; return; }
+      if ((isCredit(m1) ? a1 : 0) + (isCredit(m2) ? a2 : 0) > credit) { err.textContent = 'Only ' + money(credit) + ' of store credit is available.'; return; }
       f.payMethod = 'Split'; f.split = [{m:m1, a:a1}, {m:m2, a:a2}];
       var sc = 0, stx = 0; f.split.forEach(function(x){ if (CARDISH.indexOf(x.m) > -1 && sr) { var cf = cardFee(x.a, taxRateOf(d)); sc += cf.all; stx += cf.tax; } }); f.surTax = r2(stx);
       if (sc) { f.surcharge = r2(sc); f.surMethod = 'Credit card'; }
@@ -2015,6 +2465,171 @@ function receiptDoc(t){
       (t.cashIn ? tr('Cash received / change', money(t.cashIn) + ' / ' + money(r2(t.cashIn - (total(t) - num(t.deposit))))) : '') + '</table>' +
     '<p><b>Warranty:</b> ' + esc(t.warranty || 'None') + (we ? ' (until ' + esc(dateOnly(we)) + ')' : '') + (warrNote(repairsText(t)) ? '. ' + esc(warrNote(repairsText(t))) + '.' : '') + '<br>Warranty covers glitches in the part only; drops, cracks, pressure marks, damage or liquid void it. Full policy: ifixphones.net/policy.html</p>' + (/screen|oled|incell|lcd|display/i.test(repairsText(t)) ? '<p><b>Touch not responding?</b> Force restart: press volume up, then volume down, then hold the side button until the Apple logo appears. It doesn’t erase anything. ifixphones.net/#after</p>' : '') +
     '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
+}
+
+/* ---------- unlock pattern ---------- */
+function patternBox(cur, done){
+  var seq = String(cur||'').split(/[^1-9]+/).filter(Boolean).map(Number);
+  var m = modalShell('pt', 'Unlock pattern', '<p class="muted" style="margin-bottom:10px">Drag through the dots in order, or tap them one by one. The first dot has a ring.</p><div class="patpad" id="pt-pad"><svg viewBox="0 0 96 96"></svg></div><p class="hint" id="pt-seq" style="text-align:center"></p>',
+    '<button class="btn ghost" id="pt-clear">Start over</button><button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="pt-ok">Save pattern</button>');
+  var pad = $('#pt-pad', m), svg = $('svg', pad), drawing = false;
+  function paint(){ svg.innerHTML = patternSvg(seq.join(','), 96).replace(/^<svg[^>]*>|<\/svg>$/g, ''); $('#pt-seq', m).textContent = seq.length ? 'Pattern: ' + seq.join(' → ') : 'No pattern yet'; }
+  function hit(e){ var r = pad.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 96, y = (e.clientY - r.top) / r.height * 96; for (var n = 1; n <= 9; n++) { var cx = 16 + ((n-1) % 3) * 32, cy = 16 + Math.floor((n-1) / 3) * 32; if (Math.hypot(x - cx, y - cy) < 12) return n; } return 0; }
+  function add(n){ if (n && seq.indexOf(n) < 0) { seq.push(n); paint(); } }
+  pad.addEventListener('pointerdown', function(e){ e.preventDefault(); drawing = true; try { pad.setPointerCapture(e.pointerId); } catch(x) {} var n = hit(e); if (n && !seq.length) add(n); else if (n) add(n); });
+  pad.addEventListener('pointermove', function(e){ if (drawing) add(hit(e)); });
+  ['pointerup','pointercancel'].forEach(function(ev){ pad.addEventListener(ev, function(){ drawing = false; }); });
+  $('#pt-clear', m).addEventListener('click', function(){ seq = []; paint(); });
+  $('#pt-ok', m).addEventListener('click', function(){ if (seq.length && seq.length < 4) { $('#pt-err', m).textContent = 'Patterns use at least 4 dots.'; return; } m.remove(); done(seq.join(',')); });
+  paint();
+}
+
+/* ---------- refunds ---------- */
+function paidIn(x, isSale){ return isSale ? r2(num(x.total) + num(x.surcharge)) : (x.paid ? collected(x) : r2(num(x.deposit) + num(x.depSurcharge))); }
+function refundLeft(x, isSale){ return r2(paidIn(x, isSale) - refundedAmt(x)); }
+function refundLines(x){
+  return refundsOf(x).map(function(r){ return '<div class="tot" style="color:var(--red)"><span>Refunded · '+esc(r.how)+(r.reason?' · '+esc(r.reason):'')+' <span class="t2">'+esc(dt(r.at))+'</span></span><span>−'+money(r.amt)+'</span></div>'; }).join('');
+}
+function refundBox(x, isSale){
+  var left = refundLeft(x, isSale), cust = isSale ? x.cust : x.customer, canCredit = !!(cust && (digits(cust.phone).length >= 10 || cust.name));
+  var hows = ['Cash','Card','Zelle / Cash App / Venmo'].concat(canCredit ? ['Store credit'] : []), how = 'Cash';
+  var m = modalShell('rf', 'Refund · ' + (isSale ? 'quick sale' : '#' + esc(x.num)),
+    '<p class="muted" style="margin-bottom:12px">They paid '+money(paidIn(x, isSale))+(refundedAmt(x) ? ', '+money(refundedAmt(x))+' already refunded' : '')+'. Up to <b>'+money(left)+'</b> can be refunded.</p>' +
+    '<div class="f"><label for="rf-amt">Amount to refund</label><input class="in" id="rf-amt" inputmode="decimal" value="'+esc(left)+'"></div>' +
+    '<div class="f" style="margin-top:12px"><label>Give it back as</label><div class="seg wrapseg" role="group" aria-label="Refund as">' + hows.map(function(h){ return '<button type="button" data-how="'+esc(h)+'" aria-pressed="'+(h===how)+'">'+esc(h)+'</button>'; }).join('') + '</div><p class="hint" id="rf-hint"></p></div>' +
+    '<div class="f" style="margin-top:12px"><label for="rf-why">Reason</label><select class="in" id="rf-why">' + REFUND_WHY.map(function(w){ return '<option>'+esc(w)+'</option>'; }).join('') + '</select></div>' +
+    '<div class="f" style="margin-top:12px"><label for="rf-note">Note (optional)</label><input class="in" id="rf-note" maxlength="120"></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn danger" id="rf-ok">Refund</button>');
+  var hint = function(){ $('#rf-hint', m).textContent = how === 'Card' ? 'Refund it in Square too, so it goes back to their card.' : how === 'Store credit' ? 'They can use it on any repair or sale. It shows on their customer profile.' : how === 'Cash' ? 'Take it out of the drawer. Close-out counts it.' : ''; var a = num($('#rf-amt', m).value); $('#rf-ok', m).textContent = 'Refund ' + money(a); };
+  hint();
+  m.addEventListener('input', hint);
+  m.addEventListener('click', function(e){ var b = e.target.closest('[data-how]'); if (!b) return; how = b.getAttribute('data-how'); $$('[data-how]', m).forEach(function(z){ z.setAttribute('aria-pressed', String(z === b)); }); hint(); });
+  $('#rf-ok', m).addEventListener('click', function(){
+    var amt = num($('#rf-amt', m).value), err = $('#rf-err', m);
+    if (!amt) { err.textContent = 'Enter an amount.'; return; }
+    if (amt > left + 0.001) { err.textContent = 'That’s more than the ' + money(left) + ' left to refund.'; return; }
+    var rate = isSale ? (x.taxExempt ? 0 : num(x.taxRate)) : taxRateOf(x);
+    var rec = {id:uid(), at:Date.now(), amt:amt, how:how, reason:$('#rf-why', m).value, note:$('#rf-note', m).value.trim().slice(0,120), by:who(), tax: rate ? rHE(amt - amt / (1 + rate/100)) : 0};
+    m.remove();
+    if (isSale) {
+      var live = (S.sales||[]).filter(function(z){ return z.id === x.id; })[0] || x, list = refundsOf(live).concat([rec]); live.refunds = list; render();
+      retryOnce(function(){ return S.db.doc('sales/'+x.id).update({refunds:list}); }).then(function(){ toast('Refunded ' + money(amt) + ' · ' + how); }).catch(writeErr);
+    } else {
+      var lt = byId(x.id); if (!lt) return;
+      patchTicket(lt, {refunds:refundsOf(lt).concat([rec])}, [logEntry('refunded ' + money(amt) + ' as ' + how + ' · ' + rec.reason + (rec.note ? ' (' + rec.note + ')' : ''))]);
+      toast('Refunded ' + money(amt) + ' · ' + how);
+    }
+  });
+}
+
+/* ---------- quick sale (cases, screen protectors, cleaning, anything) ---------- */
+function qsItems(){
+  return ACCS.map(function(a){ return {k:a.k, name:a.name, price:accPrice(a.k)}; }).concat((S.settings.qsExtra||[]).filter(function(x){ return x && x.name; }).map(function(x){ return {k:'x_' + x.id, name:x.name, price:num(x.price)}; }));
+}
+function saleText(x){ return (x.items||[]).map(function(i){ return (num(i.qty) > 1 ? i.qty + ' × ' : '') + i.name; }).join(', ') || 'Quick sale'; }
+function saleReceiptDoc(x){
+  var tr = function(a, b, bold){ return '<tr'+(bold?' style="font-weight:700"':'')+'><td>'+a+'</td><td style="text-align:right">'+b+'</td></tr>'; };
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt</title><style>body{font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1d1d1f;max-width:420px;margin:20px auto;padding:0 16px;font-size:13px;line-height:1.45}h1{font-size:20px;margin:0}table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:5px 0;border-bottom:1px solid #eee}.c{text-align:center}.m{color:#555}</style></head><body>' +
+    '<div class="c"><h1>iFixPhones</h1><div class="m">'+esc(SHOP.addr)+'<br>'+esc(SHOP.shop)+' · '+esc(SHOP.web)+'</div></div><p style="margin-top:14px"><b>Receipt</b><br>'+esc(dt(x.at))+(x.cust && x.cust.name ? '<br>'+esc(x.cust.name) : '')+'</p>' +
+    '<table>' + (x.items||[]).map(function(i){ return tr(esc(i.name) + (num(i.qty) > 1 ? ' × ' + i.qty : ''), money(num(i.price) * (num(i.qty)||1))); }).join('') + tr('Subtotal', money(x.sub)) + tr('Sales tax' + (x.taxExempt ? ' (exempt)' : ' (' + num(x.taxRate) + '%)'), money(x.tax)) + tr('Total', money(x.total), 1) + (num(x.surcharge) ? tr('Credit card fee (with tax)', money(x.surcharge)) : '') + tr('Paid · ' + esc(x.payMethod === 'Split' && x.split ? x.split.map(function(z){ return z.m + ' ' + money(z.a); }).join(' + ') : x.payMethod), money(r2(num(x.total) + num(x.surcharge))), 1) + (x.cashIn ? tr('Cash received / change', money(x.cashIn) + ' / ' + money(r2(x.cashIn - num(x.total)))) : '') + refundsOf(x).map(function(r){ return tr('Refunded · ' + esc(r.how), '−' + money(r.amt)); }).join('') + '</table>' +
+    '<p class="c" style="margin-top:16px">Thank you for choosing iFixPhones!</p></body></html>';
+}
+function saleSms(x){ return 'iFixPhones receipt: ' + saleText(x) + '. Total ' + money(r2(num(x.total) + num(x.surcharge))) + ' (' + (x.payMethod || '') + '). Thank you!'; }
+function quickSale(){
+  if (!S.me) { whoBox(); return; }
+  var cart = [], sr = surRate(), rate = S.settings.taxRate == null ? 8.25 : num(S.settings.taxRate);
+  var items = qsItems();
+  var m = modalShell('qs', 'Quick sale',
+    '<div class="qsgrid">' + items.map(function(it){ return '<button type="button" class="qsitem" data-qadd="'+esc(it.k)+'"><b>'+esc(it.name)+'</b><span>'+money(it.price)+'</span></button>'; }).join('') + '<button type="button" class="qsitem other" data-qother><b>Something else</b><span>Type a name and price</span></button></div>' +
+    '<div id="qs-other" class="hidden" style="margin-top:10px"><div class="inline" style="max-width:none"><input class="in" id="qs-on" placeholder="What is it? e.g. USB-C charger" maxlength="60"><input class="in" id="qs-op" inputmode="decimal" placeholder="$" style="max-width:100px"><button type="button" class="btn dark" data-qaddo>Add</button></div></div>' +
+    '<div id="qs-cart" style="margin-top:14px"></div>' +
+    '<details style="margin-top:12px"><summary class="link">Add the customer (optional)</summary><div class="g2" style="margin-top:10px"><div class="f"><label for="qs-ph">Phone</label><input class="in" id="qs-ph" type="tel" inputmode="tel" placeholder="(210) 555-0123"></div><div class="f"><label for="qs-nm">Name</label><input class="in" id="qs-nm"></div></div><p class="hint" id="qs-cr"></p></details>' +
+    '<label class="check" style="margin-top:12px"><input type="checkbox" id="qs-tex">No sales tax on this sale</label>' +
+    '<div id="qs-sum" style="margin-top:12px"></div>' +
+    '<div class="f" style="margin-top:12px"><label for="qs-m">Paid by</label><select class="in" id="qs-m"></select></div>' +
+    '<div id="qs-cash" class="f" style="margin-top:12px"><label for="qs-in">Cash received (optional)</label><input class="in" id="qs-in" inputmode="decimal" placeholder="$"><p class="hint" id="qs-chg"></p></div>' +
+    '<div id="qs-card" class="match" style="margin-top:12px"></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="qs-ok" disabled>Charge</button>', true);
+  m.classList.add('qsmodal');
+  var credit = 0, ck = '';
+  function draft(){
+    var sub = r2(cart.reduce(function(a,c){ return a + c.price * c.qty; }, 0)), tex = $('#qs-tex', m).checked;
+    var tax = tex ? 0 : rHE(sub * rate / 100);
+    return {sub:sub, tax:tax, total:r2(sub + tax), taxRate:tex ? 0 : rate, taxExempt:tex};
+  }
+  function custUpd(){
+    var ph = digits($('#qs-ph', m).value), nm = $('#qs-nm', m);
+    ck = ph.length >= 10 ? ph.slice(-10) : '';
+    if (ck && !nm.value) { var hit = S.tickets.filter(function(t){ return digits((t.customer||{}).phone).slice(-10) === ck; })[0]; if (hit) nm.value = hit.customer.name || ''; }
+    credit = creditOf(ck);
+    $('#qs-cr', m).innerHTML = credit ? '⭐ <b>'+money(credit)+' store credit</b> available.' : '';
+    var sel = $('#qs-m', m), cur = sel.value || S.lastPay || 'Cash';
+    sel.innerHTML = PAY.concat(credit ? ['Store credit'] : []).map(function(p){ return '<option'+(p===cur?' selected':'')+'>'+p+'</option>'; }).join('');
+  }
+  function upd(){
+    var d = draft(), meth = $('#qs-m', m).value;
+    $('#qs-cart', m).innerHTML = cart.length ? '<table class="items">' + cart.map(function(c, i){ return '<tr><td>'+esc(c.name)+'</td><td style="width:120px"><span class="qty"><button type="button" data-qq="'+i+'" data-v="-1" aria-label="One less">−</button><b>'+c.qty+'</b><button type="button" data-qq="'+i+'" data-v="1" aria-label="One more">+</button></span></td><td class="right amt" style="width:80px">'+money(c.price * c.qty)+'</td></tr>'; }).join('') + '</table>' : '<p class="muted" style="text-align:center;padding:10px 0">Tap what they’re buying.</p>';
+    $('#qs-sum', m).innerHTML = cart.length ? '<div class="tot"><span>Subtotal</span><span>'+money(d.sub)+'</span></div><div class="tot"><span>Sales tax'+(d.taxExempt?' (none)':' ('+rate+'%)')+'</span><span>'+money(d.tax)+'</span></div><div class="tot b" style="font-size:20px"><span>Total</span><span>'+money(d.total)+'</span></div>' : '';
+    $('#qs-cash', m).style.display = meth === 'Cash' && cart.length ? '' : 'none';
+    var cc = CARDISH.indexOf(meth) > -1 && sr && d.total;
+    $('#qs-card', m).style.display = cc ? '' : 'none';
+    if (cc) $('#qs-card', m).innerHTML = 'Charge on Square: <b style="font-size:18px">' + money(withCard(d.total, {taxRate:d.taxRate})) + '</b><br><span class="muted" style="font-size:13px">Includes the ' + sr + '% credit card fee plus tax on the fee, the same as Square.</span>';
+    var cin = num($('#qs-in', m).value);
+    $('#qs-chg', m).textContent = cin ? (cin >= d.total ? 'Change: ' + money(r2(cin - d.total)) : 'That’s ' + money(r2(d.total - cin)) + ' short') : '';
+    var ok = $('#qs-ok', m); ok.disabled = !cart.length; ok.textContent = cart.length ? 'Charge ' + money(cc ? withCard(d.total, {taxRate:d.taxRate}) : d.total) : 'Charge';
+  }
+  custUpd(); upd();
+  m.addEventListener('click', function(e){
+    var a = e.target.closest('[data-qadd]');
+    if (a) { var it = items.filter(function(z){ return z.k === a.getAttribute('data-qadd'); })[0]; if (!it) return; var ex = cart.filter(function(c){ return c.k === it.k; })[0]; if (ex) ex.qty++; else cart.push({k:it.k, name:it.name, price:it.price, qty:1}); a.classList.add('bump'); setTimeout(function(){ a.classList.remove('bump'); }, 180); upd(); return; }
+    if (e.target.closest('[data-qother]')) { $('#qs-other', m).classList.remove('hidden'); $('#qs-on', m).focus(); return; }
+    if (e.target.closest('[data-qaddo]')) { var nm = $('#qs-on', m).value.trim(), pr = num($('#qs-op', m).value); if (!nm || !pr) { $('#qs-err', m).textContent = 'Type a name and a price.'; return; } $('#qs-err', m).textContent = ''; cart.push({k:'o_' + uid(), name:nm.slice(0,60), price:pr, qty:1}); $('#qs-on', m).value = ''; $('#qs-op', m).value = ''; upd(); return; }
+    var q = e.target.closest('[data-qq]');
+    if (q) { var i = +q.getAttribute('data-qq'); cart[i].qty += +q.getAttribute('data-v'); if (cart[i].qty <= 0) cart.splice(i, 1); upd(); return; }
+  });
+  m.addEventListener('input', function(e){ if (e.target.id === 'qs-ph') custUpd(); upd(); });
+  m.addEventListener('change', upd);
+  m.addEventListener('keydown', function(e){ if (e.key === 'Enter' && (e.target.id === 'qs-on' || e.target.id === 'qs-op')) { e.preventDefault(); var b = $('[data-qaddo]', m); if (b) b.click(); } });
+  $('#qs-ok', m).addEventListener('click', function(){
+    var d = draft(), meth = $('#qs-m', m).value, err = $('#qs-err', m);
+    if (!cart.length) return;
+    if (isCredit(meth) && d.total > credit) { err.textContent = 'Store credit covers ' + money(credit) + '. Take the rest another way.'; return; }
+    var cin = num($('#qs-in', m).value);
+    if (meth === 'Cash' && cin && cin < d.total) { err.textContent = 'Cash received is less than the total.'; return; }
+    var x = {at:Date.now(), by:who(), items:cart.map(function(c){ return {k:c.k, name:c.name, price:c.price, qty:c.qty}; }), sub:d.sub, taxRate:d.taxRate, taxExempt:d.taxExempt, tax:d.tax, total:d.total, payMethod:meth, split:[], surcharge:0, surTax:0, surMethod:'', cashIn: meth === 'Cash' ? cin : 0, refunds:[]};
+    var ph = $('#qs-ph', m).value.trim(), nm2 = $('#qs-nm', m).value.trim();
+    if (digits(ph).length >= 10 || nm2) x.cust = {name:nm2.slice(0,80), phone:fmtPhone(ph)};
+    if (CARDISH.indexOf(meth) > -1 && sr) { var cf = cardFee(d.total, d.taxRate); x.surcharge = cf.all; x.surTax = cf.tax; x.surMethod = meth; }
+    S.lastPay = meth;
+    var ref = S.db.collection('sales').doc(); x.id = ref.id;
+    S.sales = [x].concat(S.sales||[]); render();
+    m.remove();
+    retryOnce(function(){ var o = clone(x); delete o.id; return ref.set(o); }).catch(writeErr);
+    saleDone(x);
+  });
+}
+function saleDone(x){
+  var m = modalShell('qd', 'Sale complete',
+    '<div style="text-align:center;padding:6px 0 4px"><div style="font-size:34px;font-weight:700;letter-spacing:-.03em">'+money(r2(num(x.total) + num(x.surcharge)))+'</div><p class="muted">'+esc(saleText(x))+' · '+esc(x.payMethod)+'</p>' + (x.cashIn ? '<p style="margin-top:6px;font-size:18px">Change: <b>'+money(r2(x.cashIn - num(x.total)))+'</b></p>' : '') + '</div>',
+    '<button class="btn ghost" id="qd-print">Print receipt</button>' + (x.cust && digits(x.cust.phone).length >= 10 ? '<a class="btn ghost" href="sms:'+esc(e164(x.cust.phone))+'?&body='+encodeURIComponent(saleSms(x))+'">Text receipt</a>' : '') + '<button class="btn" data-mclose>Done</button>');
+  $('#qd-print', m).addEventListener('click', function(){ printHtml(saleReceiptDoc(x)); });
+}
+function creditBox(key){
+  var bal = creditOf(key);
+  var m = modalShell('cr', 'Store credit',
+    '<p class="muted" style="margin-bottom:12px">Balance now: <b>'+money(bal)+'</b>. Add credit (a gift, a make-good) or take some off.</p>' +
+    '<div class="seg" role="group" aria-label="Add or remove" style="margin-bottom:12px"><button type="button" data-crd="1" aria-pressed="true">Add credit</button><button type="button" data-crd="-1" aria-pressed="false">Remove credit</button></div>' +
+    '<div class="g2"><div class="f"><label for="cr-amt">Amount</label><input class="in" id="cr-amt" inputmode="decimal" placeholder="$"></div><div class="f"><label for="cr-note">Why</label><input class="in" id="cr-note" maxlength="80" placeholder="Sorry for the wait"></div></div>',
+    '<button class="btn ghost" data-mclose>Cancel</button><button class="btn" id="cr-ok">Save</button>');
+  var dir = 1;
+  m.addEventListener('click', function(e){ var b = e.target.closest('[data-crd]'); if (!b) return; dir = +b.getAttribute('data-crd'); $$('[data-crd]', m).forEach(function(z){ z.setAttribute('aria-pressed', String(z === b)); }); });
+  $('#cr-ok', m).addEventListener('click', function(){
+    var amt = num($('#cr-amt', m).value); if (!amt) { $('#cr-err', m).textContent = 'Enter an amount.'; return; }
+    if (dir < 0 && amt > bal) { $('#cr-err', m).textContent = 'They only have ' + money(bal) + '.'; return; }
+    var adj = ((S.custs||{})[key]||{}).creditAdj || [];
+    m.remove();
+    saveCust(key, {creditAdj: adj.concat([{amt: dir * amt, note:$('#cr-note', m).value.trim().slice(0,80), at:Date.now(), by:who()}])});
+  });
 }
 
 /* ---------- scanning ---------- */
@@ -2468,7 +3083,7 @@ function reqToTicket(r){
   var okSig = typeof r.sig === 'string' && /^data:image\/(png|jpeg);base64,/.test(r.sig);
   ticketForm(null, {name:r.name||'', phone:r.phone||'', address:r.address||'', email:r.email||'', type: r.where === 'mobile' ? 'mobile' : 'shop', model: r.device||'',
     items: items.concat(ACCS.filter(function(a){ return a.name === r.addons; }).map(function(a){ return {repair:'Accessory', part:'', price:accPrice(a.k), desc:a.name}; })),
-    reqId: r.id, notes: r.notes||'', lang: r.lang === 'es' ? 'es' : '', textOk: r.textOk === true, sig: okSig ? r.sig : '', sigAt: okSig ? (r.createdAt || Date.now()) : 0,
+    reqId: r.id, notes: r.notes||'', lang: r.lang === 'es' ? 'es' : '', textOk: r.textOk === true, heard: String(r.heard||'').slice(0,40), sig: okSig ? r.sig : '', sigAt: okSig ? (r.createdAt || Date.now()) : 0,
     kioskInfo: isKiosk(r) ? [r.heard ? 'found us on ' + r.heard : '', r.backup ? 'backed up: ' + r.backup : '', r.lang === 'es' ? 'prefers Spanish' : ''].filter(Boolean).join(', ') : ''});
 }
 function reqExtras(r){ return [r.addons || '', r.backup ? 'Backed up: ' + r.backup : '', r.heard ? 'Found us: ' + r.heard : '', r.lang === 'es' ? 'Prefers Spanish' : ''].filter(Boolean).join(' · '); }
@@ -2645,15 +3260,17 @@ function renderSheet(){
   var past = S.tickets.filter(function(x){ return x.id !== t.id && digits(x.customer && x.customer.phone) && digits(x.customer && x.customer.phone) === digits(c.phone); }).length;
 
   var items = (t.items||[]).map(function(i){
-    return '<tr><td><div>'+esc(itemName(i))+'</div>'+(i.part?'<div class="p">'+esc(i.part)+'</div>':'')+'</td><td class="right amt">'+(num(i.price)?money(i.price):'<span class="muted">—</span>')+'</td></tr>';
+    var waived = i.diag && diagWaived(t);
+    return '<tr><td><div>'+esc(itemName(i))+(waived?' <span class="tagk ok">Waived</span>':'')+'</div>'+(i.part?'<div class="p">'+esc(i.part)+'</div>':'')+(i.diag?'<div class="p">'+(waived?'They’re doing the repair, so it’s free.':'Free if they go ahead with the repair.')+'</div>':'')+'</td><td class="right amt">'+(num(i.price)?(waived?'<s class="t2">'+money(i.price)+'</s>':money(i.price)):'<span class="muted">—</span>')+'</td></tr>';
   }).join('');
   var tot = total(t), dep = num(t.deposit), bal = balance(t);
   var payBlock = t.paid
     ? (num(t.surcharge) ? '<div class="tot"><span>Credit card fee (with tax)</span><span>'+money(t.surcharge)+'</span></div>' : '') +
       '<div class="tot" style="color:var(--green);font-weight:600"><span>Paid'+(payLabel(t)?' · '+esc(payLabel(t)):'')+'</span><span>'+esc(dt(t.paidAt))+'</span></div>' +
       (t.cashIn ? '<div class="tot t2"><span>Cash received / change</span><span>'+money(t.cashIn)+' / '+money(r2(t.cashIn - (t.payMethod==='Cash' ? bal : 0)))+'</span></div>' : '') +
-      '<div class="acts"><button class="btn sm ghost" data-act="receipt">Print receipt</button><a class="btn sm ghost" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(receiptText(t))+'">Text receipt</a>' + (ro?'':'<button class="link" data-act="unpay">Undo payment</button>') + '</div>'
-    : (surRate() && bal ? '<div class="tot t2"><span>If paid by credit card (+'+surRate()+'%)</span><span>'+money(withCard(bal, t))+'</span></div>' : '') + (ro ? '' : '<div class="acts"><button class="btn sm" data-act="pay">Take payment · '+money(bal)+'</button></div>');
+      refundLines(t) +
+      '<div class="acts"><button class="btn sm ghost" data-act="receipt">Print receipt</button><a class="btn sm ghost" href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(receiptText(t))+'">Text receipt</a>' + (ro?'':(refundLeft(t) > 0 ? '<button class="btn sm ghost" data-act="refund">Refund</button>' : '') + (refundsOf(t).length ? '' : '<button class="link" data-act="unpay">Undo payment</button>')) + '</div>'
+    : (surRate() && bal ? '<div class="tot t2"><span>If paid by credit card (+'+surRate()+'%)</span><span>'+money(withCard(bal, t))+'</span></div>' : '') + refundLines(t) + (ro ? '' : '<div class="acts">' + (t.status === 'cancel' ? '' : '<button class="btn sm" data-act="pay">Take payment · '+money(bal)+'</button>') + (num(t.deposit) && refundLeft(t) > 0 && t.status === 'cancel' ? '<button class="btn sm ghost" data-act="refund">Refund deposit</button>' : '') + '</div>');
 
   var checklist = function(which){
     var m = t[which] || {};
@@ -2680,6 +3297,7 @@ function renderSheet(){
     '<div class="sbody">' +
       '<div class="card"><h3>Status '+pill(t.status)+'</h3><div class="steps" role="group" aria-label="Set status">'+steps+'</div>' +
         (['in','part','repair'].indexOf(t.status) > -1 ? '<div class="f" style="margin-top:14px;max-width:280px"><label for="due">Promised by'+(isOverdue(t)?' <span style="color:var(--red)">(past due)</span>':'')+'</label><input class="in" id="due" type="datetime-local" value="'+esc(toLocalInput(t.dueAt))+'" data-act="due" '+(ro?'disabled':'')+'></div>' : '') +
+        (['in','part','repair'].indexOf(t.status) > -1 || t.benchOn || num(t.benchMs) ? '<div class="timer'+(t.benchOn?' on':'')+'"><span>⏱ '+(t.benchOn ? '<b>Repair timer running</b> · '+esc(fmtDur(benchMs(t)))+(t.benchBy?' · '+esc(t.benchBy):'') : num(t.benchMs) ? 'Time on the bench: <b>'+esc(fmtDur(benchMs(t)))+'</b>' : 'Repair timer')+'</span>' + (ro || ['in','part','repair'].indexOf(t.status) < 0 ? '' : '<button class="btn sm '+(t.benchOn?'dark':'ghost')+'" data-act="timer">'+(t.benchOn?'Stop':'Start')+'</button>') + '</div>' : '') +
         (t.status==='cancel' ? '' : (ro?'':'<div class="acts"><button class="link red" data-act="status" data-v="cancel">Cancel ticket</button></div>')) +
         (t.status==='ready' && daysSince(readyAt(t)) >= 30 ? '<div class="notice warn" style="margin:12px 0 0">Waiting '+daysSince(readyAt(t))+' days. Your policy allows a storage fee after 30 days and treats devices as abandoned after 90 days with notice.</div>' : '') +
         (t.status==='ready' ? '<div class="match" style="margin-top:12px"><b>Let the customer know.</b> <a href="sms:'+esc(e164(c.phone))+'?&body='+encodeURIComponent(readyMsg)+'">Text '+esc(fmtPhone(c.phone))+'</a> or <button class="link" data-act="copymsg" data-msg="'+esc(readyMsg)+'">copy the message</button>.</div>' : '') +
@@ -2697,7 +3315,7 @@ function renderSheet(){
         '<dt>Model</dt><dd>'+esc(d.model||'—')+(d.brand && d.brand !== 'Other' ? ' <span class="muted">· '+esc(d.brand)+'</span>' : '')+'</dd>' +
         (d.color?'<dt>Color</dt><dd>'+esc(d.color)+'</dd>':'') +
         '<dt>IMEI / serial</dt><dd>'+esc(d.imei||'—')+'</dd>' +
-        '<dt>Passcode</dt><dd>' + (d.passcode ? '<span id="pc" data-pc="'+esc(d.passcode)+'">••••</span> <button class="link" data-act="showpc">Show</button>' : '<span class="muted">'+(t.status==='done'||t.status==='cancel'?'Deleted after pickup':'Not given')+'</span>') + '</dd>' +
+        '<dt>Passcode</dt><dd>' + (d.passcode ? '<span id="pc" data-pc="'+esc(d.passcode)+'">••••</span> <button class="link" data-act="showpc">Show</button>' : (d.pattern ? '' : '<span class="muted">'+(t.status==='done'||t.status==='cancel'?'Deleted after pickup':'Not given')+'</span>')) + (d.pattern ? '<div class="patview"><span id="pt" class="pathide">'+patternSvg(d.pattern, 72)+'</span><button class="link" data-act="showpt">Show pattern</button></div>' : '') + '</dd>' +
         '<dt>Liquid signs</dt><dd>'+(t.liquid?'<b style="color:var(--red)">Yes</b>':'No')+'</dd>' +
         '<dt>Existing damage</dt><dd>'+esc(t.damage||'None noted')+'</dd>' +
       '</dl></div>' +
@@ -2857,10 +3475,11 @@ async function setStatus(t, k){
   var fields = {status:k};
   var logs = [logEntry('changed status to ' + SMAP[k].label)];
   if (k === 'done') fields.pickedUpAt = Date.now();
-  if ((k === 'done' || k === 'cancel') && t.device && t.device.passcode) {
-    fields.device = Object.assign({}, t.device, {passcode:''});
+  if ((k === 'done' || k === 'cancel') && t.device && (t.device.passcode || t.device.pattern)) {
+    fields.device = Object.assign({}, t.device, {passcode:'', pattern:''});
     logs.push(logEntry('deleted the passcode'));
   }
+  if ((k === 'ready' || k === 'done' || k === 'cancel') && t.benchOn) { fields.benchMs = r2(benchMs(t)); fields.benchOn = 0; logs.push(logEntry('stopped the repair timer at ' + fmtDur(fields.benchMs))); }
   patchTicket(t, fields, logs);
   toast(SMAP[k].label);
   if (k === 'ready') autoText(byId(t.id) || t, 'Ready for pickup');
@@ -2922,7 +3541,9 @@ function ticketForm(existing, prefill){
   NT = {
     editId: t ? t.id : null,
     type: t ? (t.type||'shop') : (prefill && prefill.type) || 'shop',
-    items: t && t.items && t.items.length ? clone(t.items) : (prefill && prefill.items ? clone(prefill.items) : [{repair:'Screen', part:'', price:''}]),
+    items: (function(){ var src = t && t.items && t.items.length ? clone(t.items) : (prefill && prefill.items ? clone(prefill.items) : []); src = src.filter(function(i){ return !i.diag; }); return src.length ? src : [{repair:'Screen', part:'', price:''}]; })(),
+    diag: (function(){ var di = t && (t.items||[]).filter(function(i){ return i.diag; })[0]; return di ? num(di.price) : 0; })(),
+    pattern: t && t.device && t.device.pattern || '',
     reqId: prefill && prefill.reqId || null,
     preSig: (!t && prefill && prefill.sig) || '',
     preSigAt: (!t && prefill && prefill.sigAt) || 0,
@@ -2946,6 +3567,7 @@ function ticketForm(existing, prefill){
         '<div id="tf-match"></div>' +
         '<label class="check" style="margin-top:10px"><input type="checkbox" id="tf-text"'+((t ? t.textOk !== false : !!(prefill && prefill.textOk)) ? ' checked' : '')+'>Customer said yes to texts about this repair <span class="t2">(ask: “Can we text you when it’s ready?”)</span></label>' +
         '<label class="check" style="margin-top:8px"><input type="checkbox" id="tf-es"'+((t ? t.lang === 'es' : prefill && prefill.lang === 'es') ? ' checked' : '')+'>Prefers Spanish (texts and receipts in Spanish)</label>' +
+        (function(){ var hv = t ? (t.heard||'') : (prefill && prefill.heard) || ''; var list = HEARD.concat(hv && HEARD.indexOf(hv) < 0 ? [hv] : []); return '<div class="f" style="margin-top:12px;max-width:320px"><label for="tf-heard">How did they find us? (optional)</label><select class="in" id="tf-heard"><option value="">Didn’t ask</option>' + list.map(function(h){ return '<option'+(h===hv?' selected':'')+'>'+esc(h)+'</option>'; }).join('') + '</select></div>'; })() +
         '<div style="margin-top:12px" class="seg" role="group" aria-label="Where"><button type="button" data-tftype="shop" aria-pressed="'+(NT.type==='shop')+'">At the shop</button><button type="button" data-tftype="mobile" aria-pressed="'+(NT.type==='mobile')+'">Mobile</button></div>' +
         '<div class="g2" style="margin-top:12px"><div class="f" id="tf-addrw"><label for="tf-addr" id="tf-addrl">'+(NT.type==='mobile'?'Address (where we’re going)':'Address (optional)')+'</label><input class="in" id="tf-addr" autocomplete="off" value="'+esc((t&&t.address)||c.address||'')+'"></div>' +
         '<div class="f"><label for="tf-email">Email (optional)</label><input class="in" id="tf-email" type="email" autocomplete="off" value="'+esc(c.email||'')+'"></div></div>' +
@@ -2956,10 +3578,12 @@ function ticketForm(existing, prefill){
         '<div class="f"><label for="tf-color">Color (optional)</label><input class="in" id="tf-color" autocomplete="off" value="'+esc(d.color)+'"></div>' +
         '<div class="f"><label for="tf-imei">IMEI or serial (optional)</label><input class="in" id="tf-imei" autocomplete="off" value="'+esc(d.imei)+'"></div>' +
         '<div class="f"><label for="tf-pc">Passcode (optional)</label><input class="in" id="tf-pc" autocomplete="off" value="'+esc(d.passcode)+'"></div></div>' +
-        '<p class="hint">Passcodes are deleted automatically when the ticket is picked up.</p>' +
+        '<div class="patrow"><span id="tf-patv">'+(NT.pattern ? patternSvg(NT.pattern, 44) : '')+'</span><button type="button" class="link" data-tfpat>'+(NT.pattern ? 'Change unlock pattern' : 'Android? Draw the unlock pattern')+'</button>'+(NT.pattern ? '<button type="button" class="link red" data-tfpatx>Remove</button>' : '')+'</div>' +
+        '<p class="hint">Passcodes and patterns are deleted automatically when the ticket is picked up.</p>' +
       '</div>' +
       '<div class="msec"><h3><span class="n">3</span>Repairs</h3><div id="tf-items"></div>' +
         '<button type="button" class="link" data-additem>+ Add another repair</button>' +
+        (num(S.settings.diagFee) || NT.diag ? '<label class="check" style="margin-top:12px"><input type="checkbox" id="tf-diag"'+(NT.diag?' checked':'')+'><span>Diagnostic fee <b>'+money(NT.diag || num(S.settings.diagFee))+'</b>, free if they go ahead with the repair</span></label>' : '') +
         '<div class="g3" style="margin-top:14px"><div class="f"><label for="tf-disc">Discount ($)</label><input class="in" id="tf-disc" inputmode="decimal" value="'+esc(t && num(t.discount) ? t.discount : '')+'" placeholder="$0"></div>' +
         '<div class="f"><label for="tf-discn">Discount reason</label><input class="in" id="tf-discn" maxlength="40" value="'+esc(t && t.discountNote || '')+'" placeholder="Returning customer"></div>' +
         '<div class="f" style="justify-content:flex-end"><label class="check" style="min-height:42px;align-items:center"><input type="checkbox" id="tf-tex" '+(t&&t.taxExempt?'checked':'')+'>Tax exempt</label></div></div>' +
@@ -3023,6 +3647,8 @@ function ticketForm(existing, prefill){
     }
     var use = el.closest('[data-usecust]');
     if (use) { $('#tf-name').value = use.getAttribute('data-usecust'); $('#tf-model').focus(); return; }
+    if (el.closest('[data-tfpat]')) { patternBox(NT.pattern, function(p){ NT.pattern = p; paintPat(); }); return; }
+    if (el.closest('[data-tfpatx]')) { NT.pattern = ''; paintPat(); return; }
   });
   m.addEventListener('input', function(e){ if (e.target.id === 'tf-model' || e.target.id === 'tf-brand') stockSuggest(); });
   m.addEventListener('change', function(e){
@@ -3036,7 +3662,7 @@ function ticketForm(existing, prefill){
   });
   m.addEventListener('input', function(e){
     if (e.target.id === 'tf-phone') lookupCustomer();
-    if (e.target.closest('.irow') || ['tf-dep','tf-disc','tf-tex','tf-depm'].indexOf(e.target.id) > -1) { syncItems(); updateTotal(); }
+    if (e.target.closest('.irow') || ['tf-dep','tf-disc','tf-tex','tf-depm','tf-diag'].indexOf(e.target.id) > -1) { syncItems(); updateTotal(); }
     if (e.target.classList.contains('bad')) e.target.classList.remove('bad');
   });
   m.addEventListener('change', function(e){
@@ -3052,6 +3678,10 @@ function ticketForm(existing, prefill){
   $('#tf-model', m).addEventListener('change', function(){ var br = $('#tf-brand', m); if (br && !br.value) { var g = guessBrand(this.value); if (g && g !== 'Other') { br.value = g; fillModels(); } } });
   $('form', m).addEventListener('submit', function(e){ e.preventDefault(); submitForm(t, m, closeForm); });
 
+  function paintPat(){
+    var row = $('.patrow', m); if (!row) return;
+    row.innerHTML = '<span id="tf-patv">'+(NT.pattern ? patternSvg(NT.pattern, 44) : '')+'</span><button type="button" class="link" data-tfpat>'+(NT.pattern ? 'Change unlock pattern' : 'Android? Draw the unlock pattern')+'</button>'+(NT.pattern ? '<button type="button" class="link red" data-tfpatx>Remove</button>' : '');
+  }
   function lookupCustomer(){
     var dg = digits($('#tf-phone').value); var box = $('#tf-match');
     if (dg.length < 10) { box.innerHTML = ''; return; }
@@ -3124,12 +3754,14 @@ function syncItems(){
     var de = $('[data-f="desc"]', r); NT.items[i].desc = de ? de.value : (NT.items[i].desc || '');
   });
 }
+function diagItem(){ var cb = $('#tf-diag'); if (!cb || !cb.checked || !NT) return null; return {repair:'Diagnostic', part:'', price: NT.diag || num(S.settings.diagFee), diag:true}; }
 function updateTotal(){
-  var tmp = {items: NT.items, discount: num(($('#tf-disc')||{}).value), taxExempt: !!(($('#tf-tex')||{}).checked), taxRate: NT.taxRate};
+  var di = diagItem();
+  var tmp = {items: di ? NT.items.concat([di]) : NT.items, discount: num(($('#tf-disc')||{}).value), taxExempt: !!(($('#tf-tex')||{}).checked), taxRate: NT.taxRate};
   var el = $('#tf-total'); if (el) el.textContent = money(total(tmp));
   stockSuggest();
   var sm = $('#tf-sums');
-  if (sm) sm.innerHTML = '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
+  if (sm) sm.innerHTML = (di ? '<div class="tot t2"><span>Diagnostic fee'+(diagWaived(tmp)?' (waived, they’re doing the repair)':'')+'</span><span>'+(diagWaived(tmp)?'<s>'+money(di.price)+'</s>':money(di.price))+'</span></div>' : '') + '<div class="tot"><span>Subtotal</span><span>'+money(subtotal(tmp))+'</span></div>' + (discountAmt(tmp) ? '<div class="tot"><span>Discount</span><span>−'+money(discountAmt(tmp))+'</span></div>' : '') +
     '<div class="tot"><span>Sales tax'+(tmp.taxExempt ? ' (exempt)' : ' ('+num(NT.taxRate)+'%)')+'</span><span>'+money(taxAmt(tmp))+'</span></div>' + (num(($('#tf-dep')||{}).value) ? '<div class="tot"><span>Deposit</span><span>−'+money(num($('#tf-dep').value))+'</span></div>' : '');
   var sr = surRate(), tc = $('#tf-card');
   if (tc) tc.innerHTML = sr && total(tmp) ? '<div class="tot" style="color:var(--blue)"><span>If paid by credit card (+'+sr+'%)</span><span>'+money(withCard(total(tmp), tmp))+'</span></div>' : '';
@@ -3152,14 +3784,16 @@ function submitForm(t, m, closeForm){
 
   var needDesc = NT.items.filter(function(i){ return (i.repair === 'Other repair' || i.repair === 'Other') && !String(i.desc||'').trim(); });
   if (needDesc.length) { var di = NT.items.indexOf(needDesc[0]); var de = $('#it-d' + di); if (de) { de.classList.add('bad'); de.focus(); } err.textContent = 'Describe the “Other repair”.'; return; }
-  var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other' || i.repair === 'Accessory') && i.desc) o.desc = String(i.desc).trim().slice(0,120); return o; });
+  var items = NT.items.filter(function(i){ return i.repair; }).map(function(i){ var o = {repair:i.repair, part:i.part||'', price: i.price === '' ? '' : num(i.price)}; if ((i.repair === 'Other repair' || i.repair === 'Other' || i.repair === 'Accessory') && i.desc) o.desc = String(i.desc).trim().slice(0,120); ['apv','apvSt','apvSent','apvAt'].forEach(function(k){ if (i[k] != null) o[k] = i[k]; }); return o; });
+  var di = diagItem(); if (di) items.push(di);
   var data = {
     lang: ($('#tf-es')||{}).checked ? 'es' : '',
     textOk: !!($('#tf-text')||{}).checked,
     type: NT.type,
     address: NT.type === 'mobile' ? $('#tf-addr').value.trim() : '',
     customer: {name:name, phone:fmtPhone(phone), address:$('#tf-addr').value.trim(), email:$('#tf-email').value.trim()},
-    device: {brand:$('#tf-brand').value || guessBrand(model), model:model, color:$('#tf-color').value.trim(), imei:$('#tf-imei').value.trim(), passcode:$('#tf-pc').value.trim()},
+    device: {brand:$('#tf-brand').value || guessBrand(model), model:model, color:$('#tf-color').value.trim(), imei:$('#tf-imei').value.trim(), passcode:$('#tf-pc').value.trim(), pattern:NT.pattern||''},
+    heard: ($('#tf-heard')||{}).value || '',
     items: items,
     deposit: num($('#tf-dep').value),
     depMethod: num($('#tf-dep').value) ? $('#tf-depm').value : '',
@@ -3181,6 +3815,7 @@ function submitForm(t, m, closeForm){
 
   if (t) {
     var live = byId(t.id); if (!live) { closeForm(); return; }
+    if (num(data.deposit) && num(data.deposit) !== num(live.deposit)) data.depAt = Date.now();
     var oldK = pubKey(live);
     patchTicket(live, data, [logEntry('edited the ticket details')]);
     syncStatusSoon(live, oldK);
@@ -3197,8 +3832,11 @@ function submitForm(t, m, closeForm){
     log:[logEntry('checked in the device')].concat(NT.preSig && !(m._sig && m._sig.has()) ? [logEntry('customer signed on the check-in tablet')] : []).concat(NT.kioskInfo ? [logEntry('noted from the tablet: ' + NT.kioskInfo)] : []).concat(stkParts.map(function(p){ return logEntry('took “' + p.name + '” from stock'); })).concat(data.assigned ? [logEntry('assigned the ticket to ' + data.assigned)] : [])
   });
   var reqId = NT.reqId;
+  if (body.deposit) body.depAt = now;
   var ref = S.db.collection('tickets').doc();
-  retryOnce(function(){ return ref.set(body); }).then(function(){
+  var settled = false, saveP = retryOnce(function(){ return ref.set(body); });
+  saveP.then(function(){ settled = true; }, function(e){ if (settled === 'moved') writeErr(e); settled = true; });
+  Promise.race([saveP, new Promise(function(r){ setTimeout(function(){ if (!settled) { settled = 'moved'; r(); } }, 1800); })]).then(function(){
     var sb = clone(body); sb.id = ref.id; syncStatus(sb);
     if (!byId(ref.id)) { var loc = clone(body); loc.id = ref.id; S.tickets.unshift(loc); }
     closeForm(); toast('Ticket #' + body.num + ' created');
@@ -3400,7 +4038,11 @@ document.addEventListener('click', async function(e){
     }
     case 'csv': exportCsv(); break;
     case 'signout': signOut(); break;
-    case 'rp': RP = a.getAttribute('data-v'); render(); break;
+    case 'rp': RP = a.getAttribute('data-v'); try { localStorage.setItem('ifx_rp', RP); } catch(x) {} render(); break;
+    case 'expadd': expBox(); break;
+    case 'rexport': reportCsv(); break;
+    case 'rprint': printHtml(reportDoc()); break;
+    case 'taxprint': printHtml(taxDoc()); break;
     case 'msgs': if (t) msgBox(t); break;
     case 'pstat': {
       var tt = byId(a.getAttribute('data-tid')) || t; if (!tt || a.disabled) break;
@@ -3428,8 +4070,28 @@ document.addEventListener('click', async function(e){
       break;
     }
     case 'pay': if (t) payBox(t); break;
+    case 'refund': if (t) refundBox(t, false); break;
+    case 'timer': {
+      if (!t) break;
+      if (t.benchOn) { var ms = r2(benchMs(t)); patchTicket(t, {benchOn:0, benchMs:ms}, [logEntry('stopped the repair timer at ' + fmtDur(ms))]); }
+      else { var tf = {benchOn:Date.now(), benchBy:who()}, tl = [logEntry('started the repair timer')]; if (t.status === 'in' || t.status === 'part') { tf.status = 'repair'; tl.push(logEntry('changed status to Repairing')); } patchTicket(t, tf, tl); }
+      break;
+    }
+    case 'srefund': { var rsx = (S.sales||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (rsx) refundBox(rsx, true); break; }
+    case 'sreceipt': { var rsr = (S.sales||[]).filter(function(x){ return x.id === a.getAttribute('data-id'); })[0]; if (rsr) printHtml(saleReceiptDoc(rsr)); break; }
+    case 'qsale': quickSale(); break;
+    case 'setsec': S.setSec = a.getAttribute('data-v'); try { localStorage.setItem('ifx_setsec', S.setSec); } catch(x) {} render(); window.scrollTo(0,0); break;
+    case 'qsrm': saveSettings({qsExtra:(S.settings.qsExtra||[]).filter(function(x){ return x.id !== a.getAttribute('data-id'); })}); break;
+    case 'credit': creditBox(a.getAttribute('data-key')); break;
+    case 'showpt': { var ptv = $('#pt'); if (ptv) { var hid = ptv.classList.toggle('pathide'); a.textContent = hid ? 'Show pattern' : 'Hide pattern'; } break; }
     case 'receipt': if (t) printHtml(receiptDoc(t)); break;
-    case 'unpay': if (t) patchTicket(t, {paid:false, payMethod:'', paidAt:0, surcharge:0, split:[], cashIn:0}, [logEntry('undid the payment')]); break;
+    case 'unpay': {
+      if (!t) break;
+      if (refundsOf(t).length) { toast('This ticket has refunds. Undo isn’t available; give another refund instead.'); break; }
+      var okU = await confirmBox('Undo this payment?', 'The ticket goes back to unpaid. Use this if the payment was entered by mistake.', 'Undo payment');
+      if (okU) patchTicket(t, {paid:false, payMethod:'', paidAt:0, surcharge:0, surTax:0, surMethod:'', split:[], cashIn:0}, [logEntry('undid the payment')]);
+      break;
+    }
     case 'note': {
       if (!t) break;
       var ta = $('#note'); var txt = ta ? ta.value.trim() : '';
@@ -3519,6 +4181,7 @@ document.addEventListener('click', async function(e){
       var ok3 = await confirmBox('Delete ticket #' + t.num + '?', 'This removes the ticket and its history for everyone. It can’t be undone. To keep a record, cancel it instead.', 'Delete ticket', true);
       if (!ok3) break;
       var id = t.id; dropStatus(t); closeSheet();
+      (t.parts||[]).forEach(function(p){ if (p.stockId && p.status !== 'used' && t.status !== 'done') stockQty(p.stockId, 1); });
       S.tickets = S.tickets.filter(function(x){ return x.id !== id; }); render();
       enqueue('tickets/'+id, function(){ return retryOnce(function(){ return S.db.doc('tickets/'+id).delete(); }); }).then(function(){ toast('Ticket deleted'); }).catch(writeErr);
       break;
@@ -3530,6 +4193,7 @@ document.addEventListener('change', function(e){
   if (e.target.closest('.modal')) return;
   var el = e.target;
   if (el.hasAttribute && el.hasAttribute('data-photoin')) { var pt = S.openId ? byId(S.openId) : null; if (pt) addPhotos(pt, el.files); el.value = ''; return; }
+  if (el.id === 'rp-a' || el.id === 'rp-b') { RPC[el.id === 'rp-a' ? 'a' : 'b'] = el.value; render(); return; }
   var cm = el.getAttribute('data-comm');
   if (cm) { var co = Object.assign({}, S.settings.commission||{}); co[cm] = num(el.value); saveSettings({commission: co}); toast('Saved'); return; }
   var sk = el.getAttribute('data-setting');
@@ -3561,6 +4225,7 @@ document.addEventListener('input', function(e){
 
 document.addEventListener('submit', function(e){
   var f = e.target;
+  if (f.hasAttribute && f.hasAttribute('data-form')) e.preventDefault();
   if (f.getAttribute('data-form') === 'addpart') {
     e.preventDefault();
     var t = S.openId ? byId(S.openId) : null; if (!t) return;
@@ -3593,6 +4258,12 @@ document.addEventListener('submit', function(e){
     var pl = ((S.pub||{}).prices||[]).concat([{model: pm.slice(0,40), repair: $('#pg-rep').value, from: pf}]);
     savePublic({prices: pl}); return;
   }
+  if (f.getAttribute('data-form') === 'addqs') {
+    var qn = ($('#qs-new')||{}).value || '', qp = num(($('#qs-newp')||{}).value);
+    qn = qn.trim().slice(0,40); if (!qn || !qp) { toast('Type a name and a price'); return; }
+    saveSettings({qsExtra:(S.settings.qsExtra||[]).concat([{id:uid(), name:qn, price:qp}])}); toast(qn + ' added');
+    return;
+  }
   if (f.getAttribute('data-form') === 'addtech') {
     e.preventDefault();
     var inp = $('#newtech'); var n = inp.value.trim().slice(0,30);
@@ -3604,7 +4275,14 @@ document.addEventListener('submit', function(e){
 });
 
 document.addEventListener('keydown', function(e){
-  if (e.key === 'Escape' && S.openId && !document.querySelector('.modal')) closeSheet();
+  var typing = /input|textarea|select/i.test((document.activeElement||{}).tagName||'');
+  if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !document.querySelector('.modal') && S.status === 'ready') {
+    e.preventDefault(); if (S.openId) closeSheet();
+    if (!$('#q')) { S.view = 'tickets'; render(); }
+    var qi = $('#q'); if (qi) { qi.focus(); qi.select(); } return;
+  }
+  if ((e.key === 's' || e.key === 'S') && !typing && !e.metaKey && !e.ctrlKey && !e.altKey && !document.querySelector('.modal') && !S.openId && S.status === 'ready' && S.canWrite) { e.preventDefault(); quickSale(); return; }
+  if (e.key === 'Escape' && (S.openId || S.profile) && !document.querySelector('.modal')) closeSheet();
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey && !/input|textarea|select/i.test((document.activeElement||{}).tagName||'') && !document.querySelector('.modal') && !S.openId && S.status === 'ready' && S.canWrite) {
     e.preventDefault(); var kt = window.__lastKeyAt = Date.now();
     setTimeout(function(){ if (window.__lastKeyAt !== kt || document.querySelector('.modal') || S.openId) return; if (!S.me) whoBox(); else ticketForm(null); }, 150);
